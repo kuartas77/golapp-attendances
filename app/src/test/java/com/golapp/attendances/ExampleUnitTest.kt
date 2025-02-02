@@ -1,4 +1,4 @@
-package com.co.golapp.attendances
+package com.golapp.attendances
 
 import org.junit.Test
 
