@@ -1,0 +1,12 @@
+package com.co.golapp.attendances.domain.repository
+
+import com.co.golapp.attendances.domain.models.GroupWithClassDays
+import com.co.golapp.attendances.domain.models.GroupWithPlayers
+import kotlinx.coroutines.flow.Flow
+
+interface GroupRepository {
+    suspend fun fetchGroupWithClassDaysList(): Flow<List<GroupWithClassDays>>
+    suspend fun fetchGroupsWithClassDaysOnMonth(month: Int): Flow<List<GroupWithClassDays>>
+    suspend fun fetchGroupWithClassDaysById(groupId: Int): Flow<GroupWithClassDays>
+    suspend fun fetchGroupWithPlayers(groupId: Int): Flow<GroupWithPlayers>
+}
