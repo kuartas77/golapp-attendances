@@ -1,6 +1,7 @@
 package com.co.golapp.attendances.ui.theme
 
 import android.os.Build
+import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -35,23 +36,26 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun GolappAttendancesTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    androidTheme: Boolean = false,
+    disableDynamicTheming: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    val colorScheme = if (androidTheme) {
+        if (darkTheme) DarkColorScheme else LightColorScheme
+    } else if (!disableDynamicTheming && supportsDynamicTheming()) {
+        val context = LocalContext.current
+        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    } else {
+        if (darkTheme) DarkColorScheme else LightColorScheme
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
+        shapes = shapes,
         typography = Typography,
         content = content
     )
 }
+
+@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
+private fun supportsDynamicTheming() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S

@@ -1,3 +1,61 @@
 <resources>
-    <string name="app_name">Golapp Attendances</string>
+    <string name="app_name">Golapp Asistencias</string>
+
+    <string name="something_went_wrong">Algo salió mal. Por favor, vuelva a intentarlo</string>
+    <string name="connectivity_error">¡Por favor revisa tu conexión a internet
+        e intenta nuevamente!</string>
+    <string name="server_error">Tenemos problemas de conexión con el servidor.
+        \nPor favor intenta nuevamente.</string>
+    <string name="unknown_error">Ha ocurrido un error.\nPor favor intenta nuevamente.</string>
+
+    <string name="home">Inicio</string>
+    <string name="training">Grupos</string>
+    <string name="attendances">Asistencias</string>
+
+    <string name="title_groups">Grupos De Entrenamiento</string>
+    <string name="body_groups">En esta sección podrás encontrar los grupos de entrenamiento, además podrás ver los integrantes de cada grupo.</string>
+
+    <string name="title_attendances">Asistencias</string>
+    <string name="body_attendances">En esta sección podrás encontrar las asistencias a los entrenamientos de los integrantes de cada grupo y podrás modificarlas.</string>
+
+    <string name="title_attendances_p">Asistencias, Mes: %1$s, Fecha: %2$s, Día: %3$s</string>
+
+    <string name="month">Mes: </string>
+    <string name="members">Integrantes: </string>
+    <string name="days">Días: </string>">
+    <string name="schedules">Horarios: </string>
+    <string name="trainings">Entrenamientos en el mes: </string>
+    <string name="groups">Grupos</string>
+    <string name="no_groups_found">No ha sido posible encontrar grupos, verifica la conexión a internet!.</string>
+    <string name="no_attendances_found">No ha sido posible encontrar asistencias con ese código.</string>
+    <string name="category">Categoría:</string>
+    <string name="unique_code">Código unico:</string>
+    <string name="names">Nombres:</string>
+
+    <string name="search_bar_text">Buscar</string>
+
+    <string name="login_title">Ingreso</string>
+    <string name="login_button">Ingresar</string>
+    <string name="input_email">Correo electronico</string>
+    <string name="input_password">Ingrese contraseña</string>
+    <string name="invalid_email">Ingrese un correo electronico valido</string>
+    <string name="invalid_password">Ingrese una contraseña valida</string>
+    <string name="error_credential_is_not_valid">Credenciales no coinciden con nuestros registros</string>
+    <string name="error_not_found">Lo sentimos, tenemos problemas en estos momentos, intentalo más tarde.</string>
+    <string name="error_unknown">Ponte en contacto con el administrador</string>
+    <string name="pick_date">Selecciona una fecha para tomar asistencia de:</string>
+    <string name="pick_group_description">Selecciona un grupo para gestionar sus asistencias.</string>
+    <string name="no_group_selected">Selecciona un grupo para ver sus días de entrenamiento.</string>
+    <string name="no_attendance_selected">Selecciona un deportista para tomar asistencia.</string>
+    <string name="sync_groups">Al sincronizar se actualizará la información de los grupos y sus asistencias.</string>
+    <string name="player_photo">imagen deportista</string>
+    <string name="lastNames">Apellidos:</string>
+    <string name="action_attendance">Si no tienes una conexión a internet en la próxima sincronización se enviará al servidor.</string>
+
+    <string name="not_connected">⚠️ No tienes conexión a internet</string>
+    <string name="take_attendance">Selecciona para tomar asistencia</string>
+    <string name="sync_info">Se enviará la información de las asistencias a la nube, para que puedan ser vistas en el programa GOLAPP</string>
+    <string name="sync">Sincronizar</string>
+    <string name="confirm">Confirmar</string>
+    <string name="dismiss">Cancelar</string>
 </resources>
