@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    namespace = "com.co.golapp.attendances"
+    namespace = "com.golapp.attendances"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.co.golapp.attendances"
+        applicationId = "com.golapp.attendances"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -27,6 +27,7 @@ android {
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -61,7 +62,7 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            excludes += "/META-INF/gradle/incremental.annotation.processors"
+            //excludes += "/META-INF/gradle/incremental.annotation.processors"
         }
     }
 }
@@ -90,12 +91,13 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.okhttp)
     implementation(libs.converter.moshi)
-    implementation(libs.moshi.kotlin.codegen)
+    ksp(libs.moshi.kotlin.codegen)
     implementation(libs.logging.interceptor)
 
     //Dagger hilt
     implementation(libs.hilt.android)
-    implementation(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // Room DB
     implementation(libs.androidx.room.runtime)
@@ -107,7 +109,6 @@ dependencies {
     implementation(libs.coil.network.okhttp)
 
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.androidx.hilt.navigation.compose)
 
     // Compose Navigation
     implementation(libs.androidx.navigation.compose)

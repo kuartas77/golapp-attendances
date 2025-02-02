@@ -43,6 +43,7 @@
     <string name="error_credential_is_not_valid">Credenciales no coinciden con nuestros registros</string>
     <string name="error_not_found">Lo sentimos, tenemos problemas en estos momentos, intentalo más tarde.</string>
     <string name="error_unknown">Ponte en contacto con el administrador</string>
+    <string name="error_connection">No se ha podido comunicar con el servidor, verifica la conexión a internet.</string>
     <string name="pick_date">Selecciona una fecha para tomar asistencia de:</string>
     <string name="pick_group_description">Selecciona un grupo para gestionar sus asistencias.</string>
     <string name="no_group_selected">Selecciona un grupo para ver sus días de entrenamiento.</string>
