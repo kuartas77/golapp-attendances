@@ -15,6 +15,12 @@
     <string name="title_groups">Grupos De Entrenamiento</string>
     <string name="body_groups">En esta sección podrás encontrar los grupos de entrenamiento, además podrás ver los integrantes de cada grupo.</string>
 
+    <string name="groups_info">Selecciona la opción grupos en esa sección podrás encontrar los grupos de entrenamiento, además podrás ver los integrantes de cada grupo.</string>
+    <string name="attendance_info">Al seleccionar un grupo podrás ver sus días de entrenamiento y así poder seleccionar un integrante para tomar asistencia en la fecha seleccionada.</string>
+    <string name="sync_groups">Al sincronizar se actualizará la información de los grupos y sus asistencias.</string>
+    <string name="action_attendance">Si no tienes una conexión a internet en la próxima sincronización se enviará al servidor.</string>
+    <string name="sync_info">Se enviará la información de las asistencias a la nube, para que puedan ser vistas en la plataforma GOLAPP</string>
+
     <string name="title_attendances">Asistencias</string>
     <string name="body_attendances">En esta sección podrás encontrar las asistencias a los entrenamientos de los integrantes de cada grupo y podrás modificarlas.</string>
 
@@ -48,14 +54,13 @@
     <string name="pick_group_description">Selecciona un grupo para gestionar sus asistencias.</string>
     <string name="no_group_selected">Selecciona un grupo para ver sus días de entrenamiento.</string>
     <string name="no_attendance_selected">Selecciona un deportista para tomar asistencia.</string>
-    <string name="sync_groups">Al sincronizar se actualizará la información de los grupos y sus asistencias.</string>
+
     <string name="player_photo">imagen deportista</string>
     <string name="lastNames">Apellidos:</string>
-    <string name="action_attendance">Si no tienes una conexión a internet en la próxima sincronización se enviará al servidor.</string>
 
     <string name="not_connected">⚠️ No tienes conexión a internet</string>
     <string name="take_attendance">Selecciona para tomar asistencia</string>
-    <string name="sync_info">Se enviará la información de las asistencias a la nube, para que puedan ser vistas en el programa GOLAPP</string>
+
     <string name="sync">Sincronizar</string>
     <string name="confirm">Confirmar</string>
     <string name="dismiss">Cancelar</string>

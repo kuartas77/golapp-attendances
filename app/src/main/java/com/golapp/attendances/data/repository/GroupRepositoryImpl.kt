@@ -1,6 +1,7 @@
 package com.golapp.attendances.data.repository
 
 import com.golapp.attendances.common.di.IoDispatcher
+import com.golapp.attendances.common.remote.NetworkMonitor
 import com.golapp.attendances.common.resultOf
 import com.golapp.attendances.data.local.datasources.AttendancesLocalDataSource
 import com.golapp.attendances.data.local.datasources.ClassDayLocalDataSource
@@ -26,18 +27,21 @@ class GroupRepositoryImpl @Inject constructor(
     private val classDayLocalDataSource: ClassDayLocalDataSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : GroupRepository {
+
     override suspend fun fetchGroupWithClassDaysList(): Flow<List<GroupWithClassDays>> = flow {
         resultOf {
-            groupsLocalDataSource.deleteGroups()
-            classDayLocalDataSource.deleteClassDays()
-            playerLocalDataSource.deletePlayers()
-            attendanceLocalDataSource.deleteAttendances()
+
+//            groupsLocalDataSource.deleteGroups()
+//            classDayLocalDataSource.deleteClassDays()
+//            playerLocalDataSource.deletePlayers()
+//            attendanceLocalDataSource.deleteAttendances()
 
             groupsRemoteDataSource.fetchGroups().collect { groupsWithClassPlayers ->
                 groupsWithClassPlayers.forEach { groupWithClassPlayers ->
                     insert(groupWithClassPlayers)
                 }
             }
+
             emit(groupsLocalDataSource.getGroupsWithClassDays())
 
         }.onFailure { emit(emptyList()) }
@@ -48,12 +52,16 @@ class GroupRepositoryImpl @Inject constructor(
             resultOf {
                 val localGroups = groupsLocalDataSource.getGroupsWithClassDaysOnMonth(month)
                 if (localGroups.isEmpty()) {
-                    groupsRemoteDataSource.fetchGroups().collect { groupsWithClassPlayers ->
-                        groupsWithClassPlayers.forEach { groupWithClassPlayers ->
-                            insert(groupWithClassPlayers)
+
+                    groupsRemoteDataSource.fetchGroups().flowOn(ioDispatcher)
+                        .collect { groupsWithClassPlayers ->
+                            groupsWithClassPlayers.forEach {
+                                insert(it)
+                            }
                         }
-                        emit(groupsLocalDataSource.getGroupsWithClassDaysOnMonth(month))
-                    }
+
+                    emit(groupsLocalDataSource.getGroupsWithClassDaysOnMonth(month))
+
                 } else {
                     emit(localGroups)
                 }
@@ -64,15 +72,24 @@ class GroupRepositoryImpl @Inject constructor(
 
     override suspend fun fetchGroupWithClassDaysById(groupId: Int): Flow<GroupWithClassDays> =
         flow {
-            val localGroup = groupsLocalDataSource.getGroupWithClassDaysById(groupId)
+            val remoteGroup = groupsRemoteDataSource.fetchGroup(groupId)
+            remoteGroup.flowOn(ioDispatcher).collect {
+                insert(it)
+            }
 
-            emit(localGroup)
+            emit(groupsLocalDataSource.getGroupWithClassDaysById(groupId))
 
         }.flowOn(ioDispatcher)
 
-    override suspend fun fetchGroupWithPlayers(groupId: Int): Flow<GroupWithPlayers> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun fetchGroupWithPlayers(groupId: Int): Flow<GroupWithPlayers> = flow {
+
+        val remoteGroup = groupsRemoteDataSource.fetchGroup(groupId)
+        remoteGroup.flowOn(ioDispatcher).collect {
+            insert(it)
+        }
+
+        emit(groupsLocalDataSource.getGroupWhitPlayersById(groupId))
+    }.flowOn(ioDispatcher)
 
     private suspend fun insert(groupWithClassPlayers: GroupWithClassPlayersEntity) {
         groupsLocalDataSource.insertGroup(groupWithClassPlayers.group)

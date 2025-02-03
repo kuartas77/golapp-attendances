@@ -9,7 +9,7 @@ import com.golapp.attendances.ui.navigation.graphs.GuestGraph
 import com.golapp.attendances.ui.navigation.graphs.HomeGraph
 import com.golapp.attendances.ui.screens.attendances.AttendancesScreen
 import com.golapp.attendances.ui.screens.auth.AuthenticationScreen
-import com.golapp.attendances.ui.screens.groups.GroupsScreen
+import com.golapp.attendances.ui.screens.groups.presentation.GroupsScreen
 import com.golapp.attendances.ui.screens.home.HomeScreen
 
 fun NavGraphBuilder.guestGraph(navController: NavController) {

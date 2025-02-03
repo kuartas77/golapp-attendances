@@ -1,5 +1,6 @@
 package com.golapp.attendances.data.di
 
+import com.golapp.attendances.common.remote.NetworkMonitor
 import com.golapp.attendances.data.local.datasources.AttendancesLocalDataSource
 import com.golapp.attendances.data.local.datasources.ClassDayLocalDataSource
 import com.golapp.attendances.data.local.datasources.GroupsLocalDataSource
@@ -31,7 +32,6 @@ object RepositoryModule {
         attendanceRemoteDataSource: AttendancesRemoteDataSource,
         classDayLocalDatasource: ClassDayLocalDataSource,
         groupLocalDataSource: GroupsLocalDataSource,
-
         ): AttendanceRepository {
         return AttendanceRepositoryImpl(
             attendanceLocalDataSource = attendanceLocalDataSource,
@@ -62,7 +62,7 @@ object RepositoryModule {
         groupsRemoteDataSource: GroupsRemoteDataSource,
         attendanceLocalDataSource: AttendancesLocalDataSource,
         playerLocalDataSource: PlayersLocalDataSource,
-        classDayLocalDatasource: ClassDayLocalDataSource
+        classDayLocalDatasource: ClassDayLocalDataSource,
     ): GroupRepository {
         return GroupRepositoryImpl(
             groupsLocalDataSource,

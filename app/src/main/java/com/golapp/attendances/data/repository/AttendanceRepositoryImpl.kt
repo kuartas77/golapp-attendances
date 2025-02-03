@@ -2,6 +2,7 @@ package com.golapp.attendances.data.repository
 
 import androidx.annotation.WorkerThread
 import com.golapp.attendances.common.di.IoDispatcher
+import com.golapp.attendances.common.remote.NetworkMonitor
 import com.golapp.attendances.data.local.datasources.AttendancesLocalDataSource
 import com.golapp.attendances.data.local.datasources.ClassDayLocalDataSource
 import com.golapp.attendances.data.local.datasources.GroupsLocalDataSource
