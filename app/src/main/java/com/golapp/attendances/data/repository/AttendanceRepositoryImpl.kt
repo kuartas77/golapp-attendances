@@ -2,7 +2,6 @@ package com.golapp.attendances.data.repository
 
 import androidx.annotation.WorkerThread
 import com.golapp.attendances.common.di.IoDispatcher
-import com.golapp.attendances.common.remote.NetworkMonitor
 import com.golapp.attendances.data.local.datasources.AttendancesLocalDataSource
 import com.golapp.attendances.data.local.datasources.ClassDayLocalDataSource
 import com.golapp.attendances.data.local.datasources.GroupsLocalDataSource
@@ -17,6 +16,7 @@ import com.golapp.attendances.domain.repository.AttendanceRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -38,7 +38,7 @@ class AttendanceRepositoryImpl @Inject constructor(
             classDay.schoolId
         )
 
-        if (attendanceLocalList.isEmpty()) {
+        if (attendanceLocalList.isEmpty() || attendanceLocalList.size < groupWithPlayers.players.size) {
             attendanceRemoteDataSource.fetchAttendances(
                 classDay.groupId,
                 classDay.month,

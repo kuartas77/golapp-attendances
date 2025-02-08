@@ -11,19 +11,30 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.golapp.attendances.R
+import com.golapp.attendances.common.Constants.SPACER_SMALL
+import com.golapp.attendances.ui.screens.home.HomeViewModel
 
 
 @Composable
 fun HeaderContent(
     modifier: Modifier = Modifier,
-    schoolName: String = "Golapp",
-    userName: String = "Juan"
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val userName = uiState.user?.name ?: ""
+    val schoolName = uiState.user?.schoolName ?: ""
+
     Surface(
         modifier = modifier.fillMaxWidth(),
         shadowElevation = 4.dp
@@ -35,11 +46,19 @@ fun HeaderContent(
         ) {
             Column {
 
-                Text(text = userName)
+                Text(
+                    text = userName,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
+                )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(SPACER_SMALL))
 
-                Text(text = schoolName)
+                Text(
+                    text = schoolName,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
+                )
             }
 
             Image(

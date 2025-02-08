@@ -86,7 +86,7 @@ class StoreLocalDataSourceImpl @Inject constructor(
 
 
     override suspend fun getToken(): String {
-        return preferenceDatasource.data.first()[stringPreferencesKey(USERNAME)] ?: ""
+        return preferenceDatasource.data.first()[stringPreferencesKey(TOKEN)] ?: ""
     }
 
     override suspend fun getType(): String {
@@ -98,7 +98,7 @@ class StoreLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getUserName(): String {
-        return preferenceDatasource.data.first()[stringPreferencesKey(TYPE)] ?: ""
+        return preferenceDatasource.data.first()[stringPreferencesKey(USERNAME)] ?: ""
     }
 
     override suspend fun getSchoolId(): Int {

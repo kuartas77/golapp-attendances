@@ -14,7 +14,7 @@ fun getMonthName(month: Int): String {
 
     return monthName.replaceFirstChar {
         if (it.isLowerCase()) it.titlecase(
-            java.util.Locale.ROOT
+            Locale.ROOT
         ) else it.toString()
     }
 }

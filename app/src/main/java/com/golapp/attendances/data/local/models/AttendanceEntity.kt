@@ -18,7 +18,7 @@ import androidx.room.PrimaryKey
 )
 data class AttendanceEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long? = 0,
+    val id: Long? = null,
     @ColumnInfo(name = "attendance_id")
     val attendanceId: Int? = null,
     @ColumnInfo(name = "school_id")

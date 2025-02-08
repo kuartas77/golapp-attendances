@@ -31,7 +31,7 @@ fun DtoAttendance.asDomain(): Attendance = Attendance(
     column = column,
     value = value,
     playerId = playerId,
-    id = 0
+    id = null
 )
 
 fun AttendanceEntity.asDomain(): Attendance = Attendance(
@@ -44,7 +44,7 @@ fun AttendanceEntity.asDomain(): Attendance = Attendance(
     column = column,
     value = value,
     playerId = playerId,
-    id = 0
+    id = id
 )
 
 @JvmName("ListAttendanceEntityAsDomain")

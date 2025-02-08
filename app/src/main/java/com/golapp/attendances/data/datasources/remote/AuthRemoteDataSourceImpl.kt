@@ -4,7 +4,6 @@ import com.golapp.attendances.data.remote.GolappAPI
 import com.golapp.attendances.data.remote.datasources.AuthRemoteDataSource
 import com.golapp.attendances.data.remote.dto.RequestAuth
 import com.golapp.attendances.data.remote.dto.ResponseLogin
-import timber.log.Timber
 import javax.inject.Inject
 
 class AuthRemoteDataSourceImpl @Inject constructor(

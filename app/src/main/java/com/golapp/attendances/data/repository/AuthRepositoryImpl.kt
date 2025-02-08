@@ -2,18 +2,17 @@ package com.golapp.attendances.data.repository
 
 import androidx.annotation.WorkerThread
 import com.golapp.attendances.common.di.IoDispatcher
-import com.golapp.attendances.common.remote.NetworkResult
 import com.golapp.attendances.common.resultOf
 import com.golapp.attendances.data.local.datasources.StoreLocalDataSource
 import com.golapp.attendances.data.remote.datasources.AuthRemoteDataSource
 import com.golapp.attendances.domain.models.ResultLogin
+import com.golapp.attendances.domain.models.User
 import com.golapp.attendances.domain.repository.AuthRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
-import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
 
@@ -56,6 +55,26 @@ class AuthRepositoryImpl @Inject constructor(
 
         return isAfter
     }
+
+    override suspend fun getUserData(): Flow<User> = flow {
+        resultOf {
+            emit(User(
+                name = storeLocalDataSource.getUserName(),
+                schoolId = storeLocalDataSource.getSchoolId(),
+                schoolName = storeLocalDataSource.getSchoolName(),
+                schoolSlug = storeLocalDataSource.getSchoolSlug(),
+                schoolLogo = storeLocalDataSource.getSchoolLogo()
+            ))
+        }.onFailure {
+            emit(User(
+                name = "",
+                schoolId = 0,
+                schoolName = "",
+                schoolSlug = "",
+                schoolLogo = ""
+            ))
+        }
+    }.flowOn(ioDispatcher)
 
     override suspend fun logout() {
         storeLocalDataSource.clear()

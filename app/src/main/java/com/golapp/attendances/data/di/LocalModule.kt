@@ -9,6 +9,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import com.golapp.attendances.BuildConfig
 import com.golapp.attendances.common.Constants.BD_NAME
 import com.golapp.attendances.common.Constants.PREFERENCES_NAME
 import com.golapp.attendances.data.datasources.local.AttendancesLocalDataSourceImpl
@@ -34,6 +36,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import java.util.concurrent.Executors
 import javax.inject.Singleton
 
 @Module
@@ -55,13 +58,20 @@ object LocalModule {
     @Provides
     @Singleton
     fun provideGolAppDatabase(@ApplicationContext context: Context): AttendancesDB {
-        return Room.databaseBuilder(
+        val builder = Room.databaseBuilder(
             context = context,
             klass = AttendancesDB::class.java,
             name = BD_NAME
         )
             .fallbackToDestructiveMigration()
-            .build()
+
+        if (BuildConfig.DEBUG) {
+            builder.setQueryCallback(RoomDatabase.QueryCallback { sqlQuery, bindArgs ->
+                println("SQL Query: $sqlQuery SQL Args: $bindArgs")
+            }, Executors.newSingleThreadExecutor())
+        }
+
+        return builder.build()
     }
 
     @Provides
