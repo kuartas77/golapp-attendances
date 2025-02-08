@@ -1,5 +1,6 @@
 package com.golapp.attendances.domain.repository
 
+import com.golapp.attendances.data.remote.dto.RequestAttendance
 import com.golapp.attendances.domain.models.Attendance
 import com.golapp.attendances.domain.models.AttendanceSync
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
@@ -15,4 +16,6 @@ interface AttendanceRepository {
     suspend fun insertAttendances(attendances: List<Attendance>)
     suspend fun deleteAttendance(attendance: Attendance)
     suspend fun deleteAttendances()
+    suspend fun sendAttendance(requestAttendance: RequestAttendance)
+    suspend fun sendAttendances(attendances: List<Attendance>)
 }

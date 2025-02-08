@@ -14,12 +14,12 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -207,7 +207,7 @@ private fun GroupItem(
     group: GroupWithClassDays,
     onClickItem: (GroupWithClassDays) -> Unit = {}
 ) {
-    OutlinedCard(
+    Card(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top)
@@ -220,13 +220,16 @@ private fun GroupItem(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .fillMaxWidth().padding(12.dp),
+                .fillMaxWidth()
+                .padding(12.dp),
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center
-            ) {
+                    .fillMaxSize()
+                    .weight(2f),
+                verticalArrangement = Arrangement.Center,
+
+                ) {
                 Text(
                     text = buildAnnotatedString {
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {

@@ -163,7 +163,10 @@ private fun navigationSuiteItems(
                     popUpTo(navController.graph.findStartDestination().id) {
                         saveState = true
                     }
+                    // Avoid multiple copies of the same destination when
+                    // re selecting the same item
                     launchSingleTop = true
+                    // Restore state when re selecting a previously selected item
                     restoreState = true
                 }
             },

@@ -80,23 +80,8 @@ class AttendancesViewModel @Inject constructor(
     }
 
     private fun takeAttendance(attendanceWithPlayer: AttendanceWithPlayer) {
-
-        val attendance = Attendance(
-            id = attendanceWithPlayer.id,
-            attendanceId = attendanceWithPlayer.attendanceId,
-            schoolId = attendanceWithPlayer.schoolId,
-            trainingGroupId = attendanceWithPlayer.trainingGroupId,
-            inscriptionId = attendanceWithPlayer.inscriptionId,
-            year = attendanceWithPlayer.year,
-            month = attendanceWithPlayer.month,
-            column = attendanceWithPlayer.column,
-            value = attendanceWithPlayer.value,
-            playerId = attendanceWithPlayer.playerId
-        )
-
         viewModelScope.launch {
-            val classDay = _uiState.value.classDaySelected
-            attendancesUseCases.takeAttendance(attendance)
+            attendancesUseCases.takeAttendance(attendanceWithPlayer)
         }
     }
 

@@ -131,11 +131,11 @@ object RemoteModule {
 
     @Provides
     fun provideAttendancesRemoteDatasource(api: GolappAPI): AttendancesRemoteDataSource =
-        AttendancesRemoteDataSourceImpl(api)
+        AttendancesRemoteDataSourceImpl(api, Dispatchers.IO)
 
     @Provides
     fun provideGroupsRemoteDatasource(api: GolappAPI): GroupsRemoteDataSource =
-        GroupsRemoteDataSourceImpl(api)
+        GroupsRemoteDataSourceImpl(api, Dispatchers.IO)
 
     @Provides
     fun provideAuthRemoteDatasource(api: GolappAPI): AuthRemoteDataSource =

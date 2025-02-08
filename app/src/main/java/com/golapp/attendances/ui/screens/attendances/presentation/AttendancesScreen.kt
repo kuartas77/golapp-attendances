@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -241,7 +242,7 @@ private fun AttendanceItem(
         attendanceValue = stringResource(R.string.take_attendance)
     }
 
-    OutlinedCard(
+    Card(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top)
@@ -348,7 +349,7 @@ private fun AttendanceItem(
     }
 }
 
-@Preview(showBackground = true)
+@Preview()
 @Composable
 private fun AttendanceItemPreview() {
     GolappAttendancesTheme {
@@ -397,6 +398,6 @@ fun AlertDialogSync(
 @Composable
 private fun AlertDialogSyncPreview() {
     GolappAttendancesTheme {
-        AlertDialogSync()
+        AlertDialogSync(showDialog = true)
     }
 }

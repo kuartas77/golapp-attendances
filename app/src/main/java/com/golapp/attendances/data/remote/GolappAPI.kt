@@ -3,7 +3,9 @@ package com.golapp.attendances.data.remote
 import com.golapp.attendances.common.Constants.ATTENDANCES
 import com.golapp.attendances.common.Constants.AUTH
 import com.golapp.attendances.common.Constants.GROUPS
+import com.golapp.attendances.common.Constants.UPDATE_ATTENDANCE
 import com.golapp.attendances.common.di.Authorized
+import com.golapp.attendances.data.remote.dto.RequestAttendance
 import com.golapp.attendances.data.remote.dto.RequestAuth
 import com.golapp.attendances.data.remote.dto.ResponseAttendances
 import com.golapp.attendances.data.remote.dto.ResponseGroup
@@ -37,4 +39,8 @@ interface GolappAPI {
         @Query("column") column: String,
         @Query("school_id") schoolId: Int
     ): Response<ResponseAttendances>
+
+    @Authorized
+    @POST(UPDATE_ATTENDANCE)
+    suspend fun sendAttendance(@Body request: RequestAttendance): Response<Unit>
 }

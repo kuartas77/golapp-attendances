@@ -1,7 +1,6 @@
 [versions]
 adaptiveLayout = "1.0.0"
 agp = "8.8.0"
-arrowOptics = "1.0.1"
 arrowStack = "1.1.3"
 coilCompose = "3.0.0-rc01"
 coreSplashscreen = "1.0.1"

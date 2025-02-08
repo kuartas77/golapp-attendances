@@ -8,6 +8,7 @@ import com.golapp.attendances.data.local.datasources.GroupsLocalDataSource
 import com.golapp.attendances.data.mappers.asDomain
 import com.golapp.attendances.data.mappers.asEntity
 import com.golapp.attendances.data.remote.datasources.AttendancesRemoteDataSource
+import com.golapp.attendances.data.remote.dto.RequestAttendance
 import com.golapp.attendances.domain.models.Attendance
 import com.golapp.attendances.domain.models.AttendanceSync
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
@@ -15,8 +16,6 @@ import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.domain.repository.AttendanceRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -44,7 +43,7 @@ class AttendanceRepositoryImpl @Inject constructor(
                 classDay.month,
                 classDay.column,
                 classDay.schoolId
-            ).flowOn(ioDispatcher).collect { attendanceList ->
+            ).collect { attendanceList ->
 
                 if (attendanceList.isEmpty()) {
                     val currentYear = LocalDate.now().year
@@ -95,4 +94,12 @@ class AttendanceRepositoryImpl @Inject constructor(
         attendanceLocalDataSource.deleteAttendance(attendance.asEntity())
 
     override suspend fun deleteAttendances() = attendanceLocalDataSource.deleteAttendances()
+
+    override suspend fun sendAttendance(requestAttendance: RequestAttendance) {
+        attendanceRemoteDataSource.sendAttendance(requestAttendance)
+    }
+
+    override suspend fun sendAttendances(attendances: List<Attendance>) {
+        TODO("Not yet implemented")
+    }
 }

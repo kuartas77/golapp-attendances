@@ -19,6 +19,7 @@ object Constants {
     const val CHECK = "check"
     const val GROUPS = "instructor/training_groups"
     const val ATTENDANCES = "instructor/attendances"
+    const val UPDATE_ATTENDANCE = "instructor/attendances/upsert"
 
     val SHAPE_SMALL = 4.dp
     val SHAPE_MEDIUM = 8.dp
