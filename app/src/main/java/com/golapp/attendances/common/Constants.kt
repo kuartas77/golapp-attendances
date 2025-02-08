@@ -9,6 +9,11 @@ object Constants {
     const val TOKEN = "access_token"
     const val TYPE = "token_type"
     const val EXPIRATION = "expiration"
+    const val USERNAME = "username"
+    const val SCHOOL_ID = "school_id"
+    const val SCHOOL_NAME = "school_name"
+    const val SCHOOL_SLUG = "school_slug"
+    const val SCHOOL_LOGO = "school_logo"
 
     const val AUTH = "login"
     const val CHECK = "check"

@@ -45,16 +45,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SHAPE_LARGE
 import com.golapp.attendances.common.Constants.SPACER_LARGE
+import com.golapp.attendances.common.Constants.SPACER_MEDIUM
 import com.golapp.attendances.common.Constants.SPACER_SMALL
 import com.golapp.attendances.common.ui.components.HeaderContent
 import com.golapp.attendances.common.ui.components.ScheduleTimeContent
-import com.golapp.attendances.domain.models.GroupWithClassDays
-import com.golapp.attendances.ui.theme.GolappAttendancesTheme
-import com.golapp.attendances.R
 import com.golapp.attendances.common.ui.components.SearchBar
 import com.golapp.attendances.common.ui.components.groupWithClassPreview
+import com.golapp.attendances.domain.models.GroupWithClassDays
+import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 
 
 @Composable
@@ -66,7 +67,7 @@ fun GroupsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Surface(
-        modifier = modifier.padding(horizontal = SPACER_LARGE),
+        modifier = modifier.padding(horizontal = SPACER_MEDIUM),
     ) {
         Column {
             HeaderContent()

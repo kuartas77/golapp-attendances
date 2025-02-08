@@ -28,15 +28,20 @@ class AuthRepositoryImpl @Inject constructor(
         password: String
     ): Flow<ResultLogin> = flow {
         resultOf {
-            Timber.tag("AuthRemoteDataSourceImpl").d("email: $email, password: $password")
             val responseLogin = authRemoteDataSource.authenticate(email, password)
 
             if(responseLogin.expires == 0L){
                 emit(ResultLogin(message = responseLogin.message, code = responseLogin.code))
             } else{
+                storeLocalDataSource.clear()
                 storeLocalDataSource.saveToken(responseLogin.token)
                 storeLocalDataSource.saveType(responseLogin.type)
                 storeLocalDataSource.saveExpiration(responseLogin.expires)
+                storeLocalDataSource.saveUserName(responseLogin.userDto?.name ?: "")
+                storeLocalDataSource.saveSchoolId(responseLogin.userDto?.schoolId ?: 0)
+                storeLocalDataSource.saveSchoolName(responseLogin.userDto?.schoolName ?: "")
+                storeLocalDataSource.saveSchoolSlug(responseLogin.userDto?.schoolSlug ?: "")
+                storeLocalDataSource.saveSchoolLogo(responseLogin.userDto?.schoolLogo ?: "")
                 emit(ResultLogin(idle = true, code =  200))
             }
         }.onFailure {
@@ -50,5 +55,9 @@ class AuthRepositoryImpl @Inject constructor(
         val isAfter = expirationDate.after(now)
 
         return isAfter
+    }
+
+    override suspend fun logout() {
+        storeLocalDataSource.clear()
     }
 }

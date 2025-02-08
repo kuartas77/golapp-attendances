@@ -25,7 +25,8 @@ class AuthRemoteDataSourceImpl @Inject constructor(
                 type = "",
                 expires = 0L,
                 message = response.message(),
-                code = response.code()
+                code = response.code(),
+                userDto = null
             )
         }
     }

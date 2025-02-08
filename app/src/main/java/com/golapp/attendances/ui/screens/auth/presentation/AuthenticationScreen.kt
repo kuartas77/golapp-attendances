@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.auth
+package com.golapp.attendances.ui.screens.auth.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
@@ -19,7 +20,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,12 +30,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.golapp.attendances.R
+import com.golapp.attendances.common.Constants.SHAPE_SMALL
 import com.golapp.attendances.common.ui.components.CustomButton
 import com.golapp.attendances.common.ui.components.CustomTextField
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
@@ -102,7 +102,7 @@ private fun Form(
         modifier = modifier
             .wrapContentHeight()
             .width(400.dp)
-            .padding(20.dp),
+            .padding(SHAPE_SMALL),
         shape = MaterialTheme.shapes.medium,
     ) {
         Column(
@@ -171,10 +171,11 @@ private fun Form(
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 private fun AuthenticationScreenPreview() {
     GolappAttendancesTheme {
-        AuthenticationScreen()
+        Form(uiState = AuthUiState())
     }
 }

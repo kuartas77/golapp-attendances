@@ -7,8 +7,8 @@ import androidx.navigation.navigation
 import com.golapp.attendances.ui.navigation.graphs.AttendanceGraph
 import com.golapp.attendances.ui.navigation.graphs.GuestGraph
 import com.golapp.attendances.ui.navigation.graphs.HomeGraph
-import com.golapp.attendances.ui.screens.attendances.AttendancesScreen
-import com.golapp.attendances.ui.screens.auth.AuthenticationScreen
+import com.golapp.attendances.ui.screens.attendances.presentation.AttendancesScreen
+import com.golapp.attendances.ui.screens.auth.presentation.AuthenticationScreen
 import com.golapp.attendances.ui.screens.groups.presentation.GroupsScreen
 import com.golapp.attendances.ui.screens.home.HomeScreen
 
@@ -41,7 +41,11 @@ fun NavGraphBuilder.homeGraph(navController: NavController) {
 fun NavGraphBuilder.attendanceGraph(navController: NavController) {
     navigation<AttendanceGraph.Screens>(startDestination = AttendanceGraph.Groups) {
         composable<AttendanceGraph.Groups> {
-            GroupsScreen()
+            GroupsScreen(
+                onClickClassDay = { classDayId ->
+                    navController.navigate(AttendanceGraph.Attendances(classDayId))
+                }
+            )
         }
 
         composable<AttendanceGraph.Attendances> {
