@@ -33,6 +33,7 @@ import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -49,13 +50,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.golapp.attendances.R
 import com.golapp.attendances.common.ui.components.GolappRadioButton
 import com.golapp.attendances.common.ui.components.attendanceWithPlayerPreview
-import com.golapp.attendances.common.ui.getMonthName
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
+
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -64,7 +66,7 @@ fun ThreePaneScaffoldScope.DetailPanelAttendance(
     navigator: ThreePaneScaffoldNavigator<AttendanceWithPlayer>,
     viewModel: AttendancesViewModel = hiltViewModel()
 ) {
-//    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AnimatedPane {
 
@@ -92,7 +94,9 @@ fun ThreePaneScaffoldScope.DetailPanelAttendance(
                     },
                     onTakeAttendance = {
                         viewModel.onEvent(AttendancesUiEvent.OnTakeAttendance(it))
-                    }
+                    },
+                    uiState = uiState
+
                 )
             }
         } ?: Column(
@@ -115,9 +119,11 @@ fun ThreePaneScaffoldScope.DetailPanelAttendance(
 private fun DetailScreen(
     modifier: Modifier = Modifier,
     attendance: AttendanceWithPlayer,
+    uiState: AttendancesUiState = AttendancesUiState(),
     backButton: @Composable () -> Unit = {},
     onTakeAttendance: (AttendanceWithPlayer) -> Unit = {},
 ) {
+    val month = uiState.classDaySelected?.monthName ?: ""
     val attendancesList = remember { getListOfAttendance() }
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(attendance.value) }
 
@@ -220,7 +226,7 @@ private fun DetailScreen(
                                         append(stringResource(R.string.month))
                                     }
                                     append(" ")
-                                    append(getMonthName(attendance.month))
+                                    append(month)
                                 },
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,

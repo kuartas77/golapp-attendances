@@ -21,7 +21,7 @@ object GroupsUseCasesModule {
     fun provideGroupUseCases(groupRepository: GroupRepository): GroupUseCases {
         return GroupUseCases(
             syncGroups = SyncGroupsUseCaseImpl(groupRepository),
-            getGroupList = GetGroupListUseCaseImpl(groupRepository),
+            getGroupListOnMonth = GetGroupListUseCaseImpl(groupRepository),
             getGroupWithClassDaysById = GetGroupWithClassDaysByIdUseCaseImpl(groupRepository),
             getGroupWithPlayersById = GetGroupWithPlayersByIdUseCaseImpl(groupRepository)
         )

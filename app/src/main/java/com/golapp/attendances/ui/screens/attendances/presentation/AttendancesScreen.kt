@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,8 +16,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,11 +27,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
@@ -38,13 +38,13 @@ import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -63,6 +63,7 @@ import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SHAPE_LARGE
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM
 import com.golapp.attendances.common.Constants.SPACER_SMALL
+import com.golapp.attendances.common.ui.components.AlertDialogSync
 import com.golapp.attendances.common.ui.components.HeaderContent
 import com.golapp.attendances.common.ui.components.SearchBar
 import com.golapp.attendances.common.ui.components.attendanceWithPlayerPreview
@@ -249,14 +250,15 @@ private fun AttendanceItem(
             .height(120.dp)
             .padding(top = 8.dp)
             .clickable { onClickItem() },
-        shape = CutCornerShape(topEnd = SHAPE_LARGE),
+        shape = CutCornerShape(topEnd = SHAPE_LARGE, bottomStart = SHAPE_LARGE),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .height(120.dp)
+                .padding(8.dp),
         ) {
             Column(
                 modifier = Modifier
@@ -276,20 +278,6 @@ private fun AttendanceItem(
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodySmall
                 )
-                Spacer(modifier = modifier.height(SPACER_MEDIUM))
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(stringResource(R.string.names))
-                        }
-                        append(" ")
-                        append(attendance.player.fullNames)
-                    },
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Spacer(modifier = modifier.height(SPACER_MEDIUM))
                 Text(
                     text = buildAnnotatedString {
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -304,8 +292,35 @@ private fun AttendanceItem(
                     style = MaterialTheme.typography.bodySmall
                 )
                 Spacer(modifier = modifier.height(SPACER_MEDIUM))
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(stringResource(R.string.names))
+                        }
+                        append(" ")
+                        append(attendance.player.names)
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(stringResource(R.string.lastNames))
+                        }
+                        append(" ")
+                        append(attendance.player.lastNames)
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.bodySmall
+                )
 
-                SuggestionChip(
+                AssistChip(
+                    modifier = modifier.wrapContentHeight(),
                     onClick = { onClickItem() },
                     enabled = true,
                     label = {
@@ -320,7 +335,7 @@ private fun AttendanceItem(
                     colors = AssistChipDefaults.assistChipColors(
                         containerColor = MaterialTheme.colorScheme.surface
                     ),
-                    icon = {
+                    leadingIcon = {
                         Icon(
                             painter = painterResource(R.drawable.id_calendar),
                             contentDescription = "calendar",
@@ -332,7 +347,7 @@ private fun AttendanceItem(
             }
 
             Surface(
-                shape = MaterialTheme.shapes.medium,
+                shape = MaterialTheme.shapes.large,
                 modifier = Modifier.size(width = 100.dp, height = 140.dp)
             ) {
 
@@ -354,50 +369,5 @@ private fun AttendanceItem(
 private fun AttendanceItemPreview() {
     GolappAttendancesTheme {
         AttendanceItem(attendance = attendanceWithPlayerPreview())
-    }
-}
-
-@Composable
-fun AlertDialogSync(
-    showDialog: Boolean = false,
-    onConfirm: () -> Unit = {},
-    onDismissRequest: () -> Unit = {}
-) {
-    var openDialog by remember { mutableStateOf(false) }
-
-    LaunchedEffect(showDialog) {
-        if (showDialog) openDialog = true
-    }
-
-    if (openDialog) {
-        AlertDialog(
-            onDismissRequest = { onDismissRequest() },
-            icon = {
-                Icon(
-                    painter = painterResource(R.drawable.ic_sync),
-                    contentDescription = "Sync Attendances"
-                )
-            },
-            title = { Text(text = stringResource(R.string.sync)) },
-            text = {
-                Text(stringResource(R.string.sync_info))
-            },
-            confirmButton = {
-                TextButton(onClick = { onConfirm() }) { Text(stringResource(R.string.confirm)) }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    onDismissRequest()
-                }) { Text(stringResource(R.string.dismiss)) }
-            }
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun AlertDialogSyncPreview() {
-    GolappAttendancesTheme {
-        AlertDialogSync(showDialog = true)
     }
 }

@@ -45,6 +45,9 @@ interface AttendanceDao {
         schoolId: Int
     ): Flow<List<AttendanceWithPlayerEntity>>
 
+    @Query("SELECT * FROM attendances WHERE id = :id")
+    suspend fun getAttendanceById(id: Long): AttendanceEntity
+
     @Query("SELECT * FROM attendance_sync")
     suspend fun getAttendancesSync(): List<AttendanceSyncEntity>
 

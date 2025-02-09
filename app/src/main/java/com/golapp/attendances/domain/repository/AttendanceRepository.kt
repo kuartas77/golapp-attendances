@@ -16,6 +16,9 @@ interface AttendanceRepository {
     suspend fun insertAttendances(attendances: List<Attendance>)
     suspend fun deleteAttendance(attendance: Attendance)
     suspend fun deleteAttendances()
+    suspend fun deleteAttendanceSync(attendanceSync: AttendanceSync)
+    suspend fun getAttendanceById(id: Long): Attendance
+    suspend fun getAttendancesSync(): List<AttendanceSync>
     suspend fun sendAttendance(requestAttendance: RequestAttendance)
-    suspend fun sendAttendances(attendances: List<Attendance>)
+    suspend fun syncAttendances()
 }

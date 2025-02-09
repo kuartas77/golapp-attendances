@@ -49,4 +49,8 @@ class AttendancesLocalDataSourceImpl @Inject constructor(
         schoolId: Int
     ): Flow<List<AttendanceWithPlayer>> =
         attendanceDao.getAttendances(groupId, month, column, schoolId).map { it.asDomain() }
+
+    override suspend fun getAttendanceById(id: Long): AttendanceEntity =
+        attendanceDao.getAttendanceById(id)
+
 }

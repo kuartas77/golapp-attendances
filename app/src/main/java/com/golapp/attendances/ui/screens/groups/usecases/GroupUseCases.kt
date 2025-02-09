@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 data class GroupUseCases @Inject constructor(
     val syncGroups: SyncGroupsUseCase,
-    val getGroupList: GetGroupListUseCase,
+    val getGroupListOnMonth: GetGroupListUseCase,
     val getGroupWithClassDaysById: GetGroupWithClassDaysByIdUseCase,
     val getGroupWithPlayersById: GetGroupWithPlayersByIdUseCase
 )

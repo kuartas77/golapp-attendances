@@ -35,7 +35,7 @@ class GroupsViewModel @Inject constructor(
     private fun loadGroups(query: String = "") {
         viewModelScope.launch {
             _uiState.update { it.copy(query = query, isLoading = true) }
-            groupUseCases.getGroupList(month = currentMonth).collect { groups ->
+            groupUseCases.getGroupListOnMonth(month = currentMonth).collect { groups ->
                 if (groups.isEmpty()) {
                     _uiState.update { it.copy(isLoading = false) }
                     sendEvent(UiEvent.ShowSnackbar(UiText.StringResource(R.string.no_groups_found)))

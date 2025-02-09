@@ -1,6 +1,7 @@
 package com.golapp.attendances.ui.screens.groups.presentation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,6 +33,9 @@ import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -50,6 +54,7 @@ import com.golapp.attendances.common.Constants.SHAPE_LARGE
 import com.golapp.attendances.common.Constants.SPACER_LARGE
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM
 import com.golapp.attendances.common.Constants.SPACER_SMALL
+import com.golapp.attendances.common.ui.components.AlertDialogSync
 import com.golapp.attendances.common.ui.components.HeaderContent
 import com.golapp.attendances.common.ui.components.ScheduleTimeContent
 import com.golapp.attendances.common.ui.components.SearchBar
@@ -141,7 +146,8 @@ private fun ThreePaneScaffoldScope.ListPanelGroups(
 ) {
     val listState = rememberLazyListState()
     val groups = uiState.listGroups
-
+    var showDialog by remember { mutableStateOf(false) }
+//
     AnimatedPane {
         Column(
             modifier = modifier
@@ -153,7 +159,7 @@ private fun ThreePaneScaffoldScope.ListPanelGroups(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { onEvent(GroupsUiEvent.SyncGroups) },
+                    onClick = { showDialog = !showDialog },
                     content = {
                         Icon(
                             painter = painterResource(R.drawable.ic_sync),
@@ -199,6 +205,17 @@ private fun ThreePaneScaffoldScope.ListPanelGroups(
             }
         }
     }
+
+    AnimatedVisibility(visible = showDialog) {
+        AlertDialogSync(
+            showDialog = showDialog,
+            onConfirm = {
+                showDialog = false
+                onEvent(GroupsUiEvent.SyncGroups)
+            },
+            onDismissRequest = { showDialog = false }
+        )
+    }
 }
 
 @Composable
@@ -214,7 +231,7 @@ private fun GroupItem(
             .height(120.dp)
             .padding(top = 8.dp)
             .clickable { onClickItem(group) },
-        shape = CutCornerShape(topEnd = SHAPE_LARGE),
+        shape = CutCornerShape(topEnd = SHAPE_LARGE, bottomStart = SHAPE_LARGE),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Row(

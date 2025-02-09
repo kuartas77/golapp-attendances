@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.kotlin.parcelize)
 }
@@ -97,7 +97,13 @@ dependencies {
     //Dagger hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
+    kspTest(libs.hilt.compiler)
+    androidTestImplementation(libs.androidx.hilt.work)
 
     // Room DB
     implementation(libs.androidx.room.runtime)
@@ -124,11 +130,10 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
 
-    implementation(platform(libs.arrow.stack))
-    implementation(libs.arrow.core)
-    implementation(libs.arrow.core.retrofit)
-
     implementation(libs.timber)
+
+
+
 //    implementation("")
 //    implementation("")
 //    implementation("")

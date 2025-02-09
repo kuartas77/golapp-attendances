@@ -31,15 +31,21 @@ class GroupRepositoryImpl @Inject constructor(
     override suspend fun fetchGroupWithClassDaysList(): Flow<List<GroupWithClassDays>> = flow {
         resultOf {
 
-//            groupsLocalDataSource.deleteGroups()
-//            classDayLocalDataSource.deleteClassDays()
-//            playerLocalDataSource.deletePlayers()
-//            attendanceLocalDataSource.deleteAttendances()
+            val localGroups = groupsLocalDataSource.getGroupsWithClassDays()
 
             groupsRemoteDataSource.fetchGroups().collect { groupsWithClassPlayers ->
-                groupsWithClassPlayers.forEach { groupWithClassPlayers ->
-                    insert(groupWithClassPlayers)
+
+                if(groupsWithClassPlayers.isNotEmpty()) {
+                    groupsLocalDataSource.deleteGroups()
+                    classDayLocalDataSource.deleteClassDays()
+                    playerLocalDataSource.deletePlayers()
+                    attendanceLocalDataSource.deleteAttendances()
+
+                    groupsWithClassPlayers.forEach { groupWithClassPlayers ->
+                        insert(groupWithClassPlayers)
+                    }
                 }
+                emit(groupsLocalDataSource.getGroupsWithClassDays())
             }
 
             emit(groupsLocalDataSource.getGroupsWithClassDays())

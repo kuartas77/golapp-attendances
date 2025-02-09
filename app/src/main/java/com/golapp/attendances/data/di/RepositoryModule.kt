@@ -1,6 +1,7 @@
 package com.golapp.attendances.data.di
 
-import com.golapp.attendances.common.remote.NetworkMonitor
+import android.content.Context
+import androidx.work.WorkManager
 import com.golapp.attendances.data.local.datasources.AttendancesLocalDataSource
 import com.golapp.attendances.data.local.datasources.ClassDayLocalDataSource
 import com.golapp.attendances.data.local.datasources.GroupsLocalDataSource
@@ -18,6 +19,7 @@ import com.golapp.attendances.domain.repository.GroupRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
@@ -27,18 +29,25 @@ import javax.inject.Singleton
 object RepositoryModule {
     @Provides
     @Singleton
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager {
+        return WorkManager.getInstance(context)
+    }
+
+    @Provides
+    @Singleton
     fun provideAttendanceRepository(
         attendanceLocalDataSource: AttendancesLocalDataSource,
         attendanceRemoteDataSource: AttendancesRemoteDataSource,
         classDayLocalDatasource: ClassDayLocalDataSource,
         groupLocalDataSource: GroupsLocalDataSource,
-        ): AttendanceRepository {
+        workManager: WorkManager
+    ): AttendanceRepository {
         return AttendanceRepositoryImpl(
             attendanceLocalDataSource = attendanceLocalDataSource,
             attendanceRemoteDataSource = attendanceRemoteDataSource,
             classDayLocalDataSource = classDayLocalDatasource,
             groupLocalDataSource = groupLocalDataSource,
-            ioDispatcher = Dispatchers.IO
+            workManager = workManager
         )
     }
 

@@ -4,6 +4,7 @@ import com.golapp.attendances.data.local.models.AttendanceEntity
 import com.golapp.attendances.data.local.models.AttendanceSyncEntity
 import com.golapp.attendances.data.local.models.AttendanceWithPlayerEntity
 import com.golapp.attendances.data.remote.dto.DtoAttendance
+import com.golapp.attendances.data.remote.dto.RequestAttendance
 import com.golapp.attendances.data.remote.dto.ResponseAttendances
 import com.golapp.attendances.domain.models.Attendance
 import com.golapp.attendances.domain.models.AttendanceSync
@@ -70,6 +71,36 @@ fun Attendance.asEntity(): AttendanceEntity = AttendanceEntity(
     playerId = playerId,
     id = id
 )
+
+fun Attendance.asDto(): DtoAttendance {
+    val attendanceId = attendanceId ?: 0
+    return DtoAttendance(
+        attendanceId = attendanceId,
+        schoolId = schoolId,
+        trainingGroupId = trainingGroupId,
+        inscriptionId = inscriptionId,
+        year = year,
+        month = month,
+        column = column,
+        value = value,
+        playerId = playerId
+    )
+}
+
+fun Attendance.asRequest(): RequestAttendance {
+    return RequestAttendance(
+        attendanceId = attendanceId ?: 0,
+        groupId = trainingGroupId,
+        inscriptionId = inscriptionId,
+        year = year,
+        month = month,
+        column = column,
+        value = value ?: "",
+        attendanceDate = null,
+        observations = null
+    )
+}
+
 
 @JvmName("ListAttendanceAsEntity")
 fun List<Attendance>.asEntity(): List<AttendanceEntity> = map { it.asEntity() }
