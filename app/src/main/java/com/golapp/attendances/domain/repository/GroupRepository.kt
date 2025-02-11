@@ -9,4 +9,5 @@ interface GroupRepository {
     suspend fun fetchGroupsWithClassDaysOnMonth(month: Int): Flow<List<GroupWithClassDays>>
     suspend fun fetchGroupWithClassDaysById(groupId: Int): Flow<GroupWithClassDays>
     suspend fun fetchGroupWithPlayers(groupId: Int): Flow<GroupWithPlayers>
+    suspend fun deleteGroups()
 }

@@ -7,6 +7,9 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.kotlin.parcelize)
+
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -32,12 +35,14 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
             buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
+            signingConfig = signingConfigs.getByName("debug")
         }
         debug {
             isDebuggable = true
@@ -62,7 +67,6 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            //excludes += "/META-INF/gradle/incremental.annotation.processors"
         }
     }
 }
@@ -132,6 +136,8 @@ dependencies {
 
     implementation(libs.timber)
 
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation("com.google.firebase:firebase-crashlytics")
 
 
 //    implementation("")

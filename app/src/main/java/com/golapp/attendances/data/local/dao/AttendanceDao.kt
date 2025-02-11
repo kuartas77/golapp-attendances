@@ -28,7 +28,7 @@ interface AttendanceDao {
     suspend fun getAttendanceWithPlayerById(attendanceId: Int): AttendanceWithPlayerEntity?
 
     @Transaction
-    @Query("SELECT * FROM attendances WHERE training_group_id = :groupId AND month = :month AND `column` = :column AND school_id = :schoolId")
+    @Query("SELECT * FROM attendances WHERE group_id = :groupId AND month = :month AND `column` = :column AND school_id = :schoolId")
     suspend fun getAttendancesWithPlayers(
         groupId: Int,
         month: Int,
@@ -37,7 +37,7 @@ interface AttendanceDao {
     ): List<AttendanceWithPlayerEntity>
 
     @Transaction
-    @Query("SELECT * FROM attendances WHERE training_group_id = :groupId AND month = :month AND `column` = :column AND school_id = :schoolId")
+    @Query("SELECT * FROM attendances WHERE group_id = :groupId AND month = :month AND `column` = :column AND school_id = :schoolId")
     fun getAttendances(
         groupId: Int,
         month: Int,
@@ -59,4 +59,7 @@ interface AttendanceDao {
 
     @Delete
     suspend fun deleteAttendanceSync(attendanceSyncEntity: AttendanceSyncEntity)
+
+    @Query("SELECT * FROM attendances")
+    suspend fun getAllAttendances(): List<AttendanceEntity>
 }

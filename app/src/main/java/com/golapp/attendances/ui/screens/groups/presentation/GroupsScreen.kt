@@ -147,7 +147,7 @@ private fun ThreePaneScaffoldScope.ListPanelGroups(
     val listState = rememberLazyListState()
     val groups = uiState.listGroups
     var showDialog by remember { mutableStateOf(false) }
-//
+
     AnimatedPane {
         Column(
             modifier = modifier
@@ -213,6 +213,7 @@ private fun ThreePaneScaffoldScope.ListPanelGroups(
                 showDialog = false
                 onEvent(GroupsUiEvent.SyncGroups)
             },
+            textBody = R.string.sync_info_groups,
             onDismissRequest = { showDialog = false }
         )
     }
@@ -232,7 +233,8 @@ private fun GroupItem(
             .padding(top = 8.dp)
             .clickable { onClickItem(group) },
         shape = CutCornerShape(topEnd = SHAPE_LARGE, bottomStart = SHAPE_LARGE),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

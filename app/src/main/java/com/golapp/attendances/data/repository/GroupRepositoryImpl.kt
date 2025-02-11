@@ -22,7 +22,6 @@ import javax.inject.Inject
 class GroupRepositoryImpl @Inject constructor(
     private val groupsLocalDataSource: GroupsLocalDataSource,
     private val groupsRemoteDataSource: GroupsRemoteDataSource,
-    private val attendanceLocalDataSource: AttendancesLocalDataSource,
     private val playerLocalDataSource: PlayersLocalDataSource,
     private val classDayLocalDataSource: ClassDayLocalDataSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
@@ -31,21 +30,16 @@ class GroupRepositoryImpl @Inject constructor(
     override suspend fun fetchGroupWithClassDaysList(): Flow<List<GroupWithClassDays>> = flow {
         resultOf {
 
-            val localGroups = groupsLocalDataSource.getGroupsWithClassDays()
-
             groupsRemoteDataSource.fetchGroups().collect { groupsWithClassPlayers ->
 
                 if(groupsWithClassPlayers.isNotEmpty()) {
-                    groupsLocalDataSource.deleteGroups()
-                    classDayLocalDataSource.deleteClassDays()
-                    playerLocalDataSource.deletePlayers()
-                    attendanceLocalDataSource.deleteAttendances()
+
+                    deleteGroups()
 
                     groupsWithClassPlayers.forEach { groupWithClassPlayers ->
                         insert(groupWithClassPlayers)
                     }
                 }
-                emit(groupsLocalDataSource.getGroupsWithClassDays())
             }
 
             emit(groupsLocalDataSource.getGroupsWithClassDays())
@@ -96,6 +90,10 @@ class GroupRepositoryImpl @Inject constructor(
 
         emit(groupsLocalDataSource.getGroupWhitPlayersById(groupId))
     }.flowOn(ioDispatcher)
+
+    override suspend fun deleteGroups() {
+        groupsLocalDataSource.deleteGroups()
+    }
 
     private suspend fun insert(groupWithClassPlayers: GroupWithClassPlayersEntity) {
         groupsLocalDataSource.insertGroup(groupWithClassPlayers.group)

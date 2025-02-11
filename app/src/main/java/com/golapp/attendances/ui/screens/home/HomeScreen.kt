@@ -1,11 +1,11 @@
 package com.golapp.attendances.ui.screens.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SHAPE_LARGE
 import com.golapp.attendances.common.Constants.SPACER_LARGE
@@ -32,13 +33,17 @@ import com.golapp.attendances.common.ui.components.HeaderContent
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
-    val list = listOf<ImageText>(
-        ImageText(R.drawable.ic_team, stringResource(R.string.groups_info)),
-        ImageText(R.drawable.ic_team, stringResource(R.string.attendance_info)),
-        ImageText(R.drawable.ic_team, stringResource(R.string.sync_groups)),
-        ImageText(R.drawable.ic_team, stringResource(R.string.action_attendance)),
-        ImageText(R.drawable.ic_team, stringResource(R.string.sync_info)),
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
+
+    val list = listOf<String>(
+        stringResource(R.string.groups_info),
+        stringResource(R.string.attendance_info),
+        stringResource(R.string.sync_groups),
+        stringResource(R.string.action_attendance),
+        stringResource(R.string.sync_info),
     )
 
     Surface(
@@ -64,15 +69,20 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                         painter = painterResource(id = R.drawable.logo),
                         contentDescription = "Image Header Content"
                     )
-                    Text("ASISTENCIAS", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text(
+                        stringResource(R.string.attendances).uppercase(),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(SPACER_MEDIUM))
 
-            LazyColumn {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(list.size) {
-                    ItemsText(imageText = list[it])
+                    ItemsText(text = list[it])
                 }
             }
         }
@@ -82,7 +92,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun ItemsText(
     modifier: Modifier = Modifier,
-    imageText: ImageText
+    text: String
 ) {
     Surface(
         modifier = modifier
@@ -94,13 +104,10 @@ private fun ItemsText(
     ) {
         Row {
             Column(
-                modifier = Modifier.background(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    shape = MaterialTheme.shapes.large
-                )
+                modifier = Modifier
             ) {
                 Text(
-                    text = imageText.text,
+                    text = text,
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.sp,
                     textAlign = TextAlign.Center,

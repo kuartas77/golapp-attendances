@@ -8,6 +8,7 @@
     <string name="home">Inicio</string>
     <string name="training">Grupos</string>
     <string name="attendances">Asistencias</string>
+    <string name="settings">Config</string>
     <string name="title_groups">Grupos De Entrenamiento</string>
     <string name="body_groups">Grupos</string>
     <string name="groups_info">En el módulo de grupos, tendrás acceso a los grupos de entrenamiento que te han sido asignados y también podrás visualizar a los miembros de cada uno de estos.</string>
@@ -15,6 +16,7 @@
     <string name="sync_groups">Al llevar a cabo la sincronización, se enviará la información sobre las asistencias registradas.</string>
     <string name="action_attendance">Si en la próxima sincronización no cuentas con una conexión a internet, se realizará el envío una vez se restablezca la conexión a internet.</string>
     <string name="sync_info">Toda la información relacionada con las asistencias que se ha ingresado aquí será enviada al servidor, permitiendo su acceso a través de la plataforma GOLAPP.</string>
+    <string name="sync_info_groups">Atención! Está acción actualizará los grupos de entrenamiento y se borrarán los registros de asistencia, sin embargo se obtendrán de nuevo del servidor.</string>
     <string name="title_attendances">Asistencias</string>
     <string name="body_attendances">En esta sección podrás encontrar las asistencias a los entrenamientos de los integrantes de cada grupo y podrás modificarlas.</string>
     <string name="title_attendances_p">Asistencias, Mes: %1$s, Fecha: %2$s, Día: %3$s</string>
@@ -46,9 +48,11 @@
     <string name="no_attendance_selected">Selecciona un deportista para tomar asistencia.</string>
     <string name="player_photo">imagen deportista</string>
     <string name="lastNames">Apellidos:</string>
-    <string name="not_connected">⚠️ No tienes conexión a internet</string>
+    <string name="not_connected">⚠️ Se perdió la conexión a internet</string>
     <string name="take_attendance">Selecciona para tomar asistencia</string>
     <string name="sync">Sincronizar</string>
     <string name="confirm">Confirmar</string>
     <string name="dismiss">Cancelar</string>
+    <string name="title_settings">Configuración</string>
+    <string name="log_out">Cerrar sesión</string>
 </resources>

@@ -1,6 +1,21 @@
 package com.golapp.attendances.data.local.models
 
-@androidx.room.Entity(tableName = "players")
+import androidx.room.ForeignKey
+import androidx.room.Index
+
+@androidx.room.Entity(
+    tableName = "players",
+    indices = [Index("group_id")],
+    foreignKeys = [
+        ForeignKey(
+            entity = GroupEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["group_id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE
+        )
+    ]
+)
 data class PlayerEntity(
     @androidx.room.PrimaryKey
     @androidx.room.ColumnInfo(name = "player_id")

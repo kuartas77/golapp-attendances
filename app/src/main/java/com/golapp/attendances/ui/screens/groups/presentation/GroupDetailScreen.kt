@@ -203,7 +203,7 @@ private fun DetailScreen(
 
                 Column(
                     modifier = Modifier.background(
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        color = MaterialTheme.colorScheme.surface,
                         shape = MaterialTheme.shapes.large
                     )
                 ) {
@@ -238,7 +238,8 @@ private fun ItemDay(
             .padding(8.dp)
             .clickable { navigateToAttendances(item.classDayId) },
         shape = CutCornerShape(SHAPE_MEDIUM),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Column(
             modifier = Modifier

@@ -53,4 +53,8 @@ class AttendancesLocalDataSourceImpl @Inject constructor(
     override suspend fun getAttendanceById(id: Long): AttendanceEntity =
         attendanceDao.getAttendanceById(id)
 
+    override suspend fun getAllAttendances(): List<AttendanceEntity> =
+        attendanceDao.getAllAttendances()
+
+
 }

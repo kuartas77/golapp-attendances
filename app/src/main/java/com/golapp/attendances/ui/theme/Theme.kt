@@ -9,18 +9,19 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = Color(0xFF101E42),
+    secondary = Color(0xFFFFCC05),
+    background = Color(0xFFF6F6F6),
+    surface = Color(0xFFF6F6F6),
+    onPrimary = Color.Black,
+    onSecondary = Color.White,
+    onBackground = Color.Black,
+    onSurface = Color.Black,
+    surfaceContainer = Color(0xE6F8F9FA),
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -33,20 +34,32 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+private val DarkColorScheme = darkColorScheme(
+    primary = Color(0xFFFFCC05),
+    secondary = Color(0xFF101E42),
+    background = Color.Black,
+    surface = Color.Black,
+    onPrimary = Color.Black,
+    onSecondary = Color.White,
+    onBackground = Color.White,
+    onSurface = Color.White,
+)
+
 @Composable
 fun GolappAttendancesTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    androidTheme: Boolean = false,
-    disableDynamicTheming: Boolean = false,
+    // Dynamic color is available on Android 12+
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (androidTheme) {
-        if (darkTheme) DarkColorScheme else LightColorScheme
-    } else if (!disableDynamicTheming && supportsDynamicTheming()) {
-        val context = LocalContext.current
-        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-    } else {
-        if (darkTheme) DarkColorScheme else LightColorScheme
+    val colorScheme = when {
+        dynamicColor && supportsDynamicTheming() -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
     }
 
     MaterialTheme(

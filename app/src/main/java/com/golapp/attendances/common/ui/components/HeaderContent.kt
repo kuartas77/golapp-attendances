@@ -4,10 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,14 +20,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.golapp.attendances.R
-import com.golapp.attendances.common.Constants.SPACER_SMALL
-import com.golapp.attendances.ui.screens.home.HomeViewModel
+import com.golapp.attendances.ui.screens.MainViewModel
 
 
 @Composable
 fun HeaderContent(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: MainViewModel = hiltViewModel()
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -49,14 +47,14 @@ fun HeaderContent(
                 Text(
                     text = userName,
                     fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
                     fontSize = 12.sp,
                 )
-
-                Spacer(modifier = Modifier.height(SPACER_SMALL))
 
                 Text(
                     text = schoolName,
                     fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
                     fontSize = 12.sp,
                 )
             }

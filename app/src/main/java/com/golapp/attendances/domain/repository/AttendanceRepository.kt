@@ -21,4 +21,5 @@ interface AttendanceRepository {
     suspend fun getAttendancesSync(): List<AttendanceSync>
     suspend fun sendAttendance(requestAttendance: RequestAttendance)
     suspend fun syncAttendances()
+    suspend fun getAllAttendances(): List<Attendance>
 }

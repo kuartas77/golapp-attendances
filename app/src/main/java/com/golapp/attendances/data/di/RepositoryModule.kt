@@ -55,11 +55,13 @@ object RepositoryModule {
     @Singleton
     fun provideAuthRepository(
         authRemoteDatasource: AuthRemoteDataSource,
-        storeLocalDatasource: StoreLocalDataSource
+        storeLocalDatasource: StoreLocalDataSource,
+        attendancesLocalDataSource: GroupsLocalDataSource
     ): AuthRepository {
         return AuthRepositoryImpl(
             authRemoteDatasource,
             storeLocalDatasource,
+            attendancesLocalDataSource,
             Dispatchers.IO
         )
     }
@@ -69,14 +71,12 @@ object RepositoryModule {
     fun provideGroupRepository(
         groupsLocalDataSource: GroupsLocalDataSource,
         groupsRemoteDataSource: GroupsRemoteDataSource,
-        attendanceLocalDataSource: AttendancesLocalDataSource,
         playerLocalDataSource: PlayersLocalDataSource,
         classDayLocalDatasource: ClassDayLocalDataSource,
     ): GroupRepository {
         return GroupRepositoryImpl(
             groupsLocalDataSource,
             groupsRemoteDataSource,
-            attendanceLocalDataSource,
             playerLocalDataSource,
             classDayLocalDatasource,
             Dispatchers.IO

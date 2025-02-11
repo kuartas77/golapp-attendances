@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "7d55f3f2b95463042e2628c8e2290529",
+    "identityHash": "ea44fb95a459670c120a02a89b111365",
     "entities": [
       {
         "tableName": "groups",
@@ -62,7 +62,7 @@
       },
       {
         "tableName": "attendances",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `attendance_id` INTEGER, `school_id` INTEGER NOT NULL, `training_group_id` INTEGER NOT NULL, `inscription_id` INTEGER NOT NULL, `year` INTEGER NOT NULL, `month` INTEGER NOT NULL, `column` TEXT NOT NULL, `value` TEXT, `player_id` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `attendance_id` INTEGER, `school_id` INTEGER NOT NULL, `group_id` INTEGER NOT NULL, `inscription_id` INTEGER NOT NULL, `year` INTEGER NOT NULL, `month` INTEGER NOT NULL, `column` TEXT NOT NULL, `value` TEXT, `player_id` INTEGER NOT NULL, FOREIGN KEY(`group_id`) REFERENCES `groups`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -84,7 +84,7 @@
           },
           {
             "fieldPath": "trainingGroupId",
-            "columnName": "training_group_id",
+            "columnName": "group_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -133,27 +133,27 @@
         },
         "indices": [
           {
-            "name": "index_attendances_school_id_training_group_id_inscription_id_player_id_month_column",
+            "name": "index_attendances_school_id_group_id_inscription_id_player_id_month_column",
             "unique": true,
             "columnNames": [
               "school_id",
-              "training_group_id",
+              "group_id",
               "inscription_id",
               "player_id",
               "month",
               "column"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_attendances_school_id_training_group_id_inscription_id_player_id_month_column` ON `${TABLE_NAME}` (`school_id`, `training_group_id`, `inscription_id`, `player_id`, `month`, `column`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_attendances_school_id_group_id_inscription_id_player_id_month_column` ON `${TABLE_NAME}` (`school_id`, `group_id`, `inscription_id`, `player_id`, `month`, `column`)"
           },
           {
-            "name": "index_attendances_training_group_id",
+            "name": "index_attendances_group_id",
             "unique": false,
             "columnNames": [
-              "training_group_id"
+              "group_id"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_attendances_training_group_id` ON `${TABLE_NAME}` (`training_group_id`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_attendances_group_id` ON `${TABLE_NAME}` (`group_id`)"
           },
           {
             "name": "index_attendances_player_id",
@@ -165,7 +165,19 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_attendances_player_id` ON `${TABLE_NAME}` (`player_id`)"
           }
         ],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "groups",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "group_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "attendance_sync",
@@ -189,7 +201,7 @@
       },
       {
         "tableName": "players",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`player_id` INTEGER NOT NULL, `group_id` INTEGER NOT NULL, `unique_code` TEXT NOT NULL, `names` TEXT NOT NULL, `last_names` TEXT NOT NULL, `category` TEXT NOT NULL, `full_names` TEXT NOT NULL, `photo_url` TEXT NOT NULL, `inscription_id` INTEGER NOT NULL, PRIMARY KEY(`player_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`player_id` INTEGER NOT NULL, `group_id` INTEGER NOT NULL, `unique_code` TEXT NOT NULL, `names` TEXT NOT NULL, `last_names` TEXT NOT NULL, `category` TEXT NOT NULL, `full_names` TEXT NOT NULL, `photo_url` TEXT NOT NULL, `inscription_id` INTEGER NOT NULL, PRIMARY KEY(`player_id`), FOREIGN KEY(`group_id`) REFERENCES `groups`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "playerId",
@@ -252,8 +264,30 @@
             "player_id"
           ]
         },
-        "indices": [],
-        "foreignKeys": []
+        "indices": [
+          {
+            "name": "index_players_group_id",
+            "unique": false,
+            "columnNames": [
+              "group_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_players_group_id` ON `${TABLE_NAME}` (`group_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "groups",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "group_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "class_days",
@@ -343,7 +377,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7d55f3f2b95463042e2628c8e2290529')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ea44fb95a459670c120a02a89b111365')"
     ]
   }
 }

@@ -1,13 +1,8 @@
 package com.golapp.attendances.data.repository
 
 import androidx.annotation.WorkerThread
-import androidx.work.BackoffPolicy
-import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.golapp.attendances.common.di.IoDispatcher
 import com.golapp.attendances.data.local.datasources.AttendancesLocalDataSource
 import com.golapp.attendances.data.local.datasources.ClassDayLocalDataSource
 import com.golapp.attendances.data.local.datasources.GroupsLocalDataSource
@@ -21,9 +16,7 @@ import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.domain.repository.AttendanceRepository
 import com.golapp.attendances.domain.sync.AttendanceSyncWorker
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import java.time.Duration
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -116,12 +109,14 @@ class AttendanceRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncAttendances() {
-        val worker = OneTimeWorkRequestBuilder<AttendanceSyncWorker>().setConstraints(
-            Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-        ).setBackoffCriteria(BackoffPolicy.EXPONENTIAL, Duration.ofMinutes(5)).build()
-
-        workManager.beginUniqueWork("sync_attendance_id", ExistingWorkPolicy.REPLACE, worker)
+        workManager.beginUniqueWork(
+            AttendanceSyncWorker.TAG,
+            ExistingWorkPolicy.REPLACE,
+            AttendanceSyncWorker.oneTimeWorkRequest()
+        )
             .enqueue()
     }
 
+    override suspend fun getAllAttendances(): List<Attendance> =
+        attendanceLocalDataSource.getAllAttendances().asDomain()
 }

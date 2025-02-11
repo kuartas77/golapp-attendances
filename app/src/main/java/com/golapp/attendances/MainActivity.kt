@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration.Indefinite
 import androidx.compose.material3.SnackbarHost
@@ -23,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
@@ -67,7 +69,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val appState = rememberAppState(networkMonitor = networkMonitor)
             GolappAttendancesTheme {
-                MainScreen(appState)
+                MainScreen(appState = appState)
             }
         }
     }
@@ -92,7 +94,8 @@ fun MainScreen(
     val screens = remember {
         listOf(
             Destinations.Home,
-            Destinations.Groups
+            Destinations.Groups,
+            Destinations.Settings
         )
     }
 
@@ -112,6 +115,10 @@ fun MainScreen(
             currentDestination = appState.currentDestination,
             navController = appState.navController,
             screens = screens
+        ),
+        navigationSuiteColors = NavigationSuiteDefaults.colors(
+            navigationBarContainerColor = MaterialTheme.colorScheme.surface,
+            navigationBarContentColor = MaterialTheme.colorScheme.onSurface,
         )
     ) {
         Scaffold(
@@ -136,9 +143,9 @@ fun MainScreen(
                         navController = appState.navController,
                         startDestination = GuestGraph.Screens
                     ) {
-                        guestGraph(appState.navController)
-                        homeGraph(appState.navController)
-                        attendanceGraph(appState.navController)
+                        guestGraph(appState)
+                        homeGraph(appState)
+                        attendanceGraph(appState)
                     }
                 }
             }
@@ -180,7 +187,7 @@ private fun navigationSuiteItems(
             label = {
                 Text(text = stringResource(screen.label))
             },
-            alwaysShowLabel = isSelected
+            alwaysShowLabel = false,
         )
     }
 }

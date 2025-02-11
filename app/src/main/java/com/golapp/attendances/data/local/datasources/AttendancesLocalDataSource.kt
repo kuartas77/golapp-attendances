@@ -29,4 +29,6 @@ interface AttendancesLocalDataSource {
     ): Flow<List<AttendanceWithPlayer>>
 
     suspend fun getAttendanceById(id: Long): AttendanceEntity
+
+    suspend fun getAllAttendances(): List<AttendanceEntity>
 }
