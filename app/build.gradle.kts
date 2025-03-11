@@ -20,7 +20,7 @@ android {
         applicationId = "com.golapp.attendances"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
+        versionCode = 4
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -31,6 +31,7 @@ android {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
         multiDexEnabled = true
+        ndk.debugSymbolLevel = "FULL"
     }
 
     buildTypes {
@@ -42,12 +43,12 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
-            signingConfig = signingConfigs.getByName("debug")
         }
         debug {
             isDebuggable = true
             isMinifyEnabled = false
-            buildConfigField("String", "API_URL", "\"http://10.0.2.2/api/\"")
+            buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
+            //buildConfigField("String", "API_URL", "\"http://10.0.2.2/api/\"")
         }
     }
     compileOptions {
@@ -136,8 +137,8 @@ dependencies {
 
     implementation(libs.timber)
 
-    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
-    implementation("com.google.firebase:firebase-crashlytics")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
 
 
 //    implementation("")

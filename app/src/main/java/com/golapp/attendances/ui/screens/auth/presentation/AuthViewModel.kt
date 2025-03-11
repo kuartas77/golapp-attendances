@@ -2,6 +2,7 @@ package com.golapp.attendances.ui.screens.auth.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.golapp.attendances.BuildConfig
 import com.golapp.attendances.R
 import com.golapp.attendances.common.di.IoDispatcher
 import com.golapp.attendances.common.ui.events.UiText
@@ -33,7 +34,13 @@ class AuthViewModel @Inject constructor(
             if (authenticationUseCases.validateTokenExpiry()) {
                 _uiState.update { it.copy(isLoggedIn = true) }
             } else {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isLoggedIn = false,
+                        errorEmail = UiText.StringResource(resId = R.string.session_expired)
+                    )
+                }
             }
         }
     }
@@ -96,8 +103,8 @@ sealed interface AuthUiEvent {
 }
 
 data class AuthUiState(
-    val email: String = "juan_londono84151@elpoli.edu.co",
-    val password: String = "Coco-.lizo10170",
+    val email: String = if (BuildConfig.DEBUG) "juan_londono84151@elpoli.edu.co" else "",
+    val password: String = if (BuildConfig.DEBUG) "Coco-.lizo1017" else "",
     val isLoading: Boolean = false,
     val isError: Boolean = false,
     val isLoggedIn: Boolean = false,

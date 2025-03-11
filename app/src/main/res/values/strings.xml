@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Golapp Asistencias</string>
+    <string name="app_name">Asistencias</string>
 
     <string name="something_went_wrong">Algo salió mal. Por favor, vuelva a intentarlo</string>
     <string name="connectivity_error">¡Por favor revisa tu conexión a internet
@@ -56,6 +56,7 @@
     <string name="pick_group_description">Selecciona un grupo para gestionar sus asistencias.</string>
     <string name="no_group_selected">Selecciona un grupo para ver sus días de entrenamiento.</string>
     <string name="no_attendance_selected">Selecciona un deportista para tomar asistencia.</string>
+    <string name="session_expired">La sesión ha expirado, ingresa de nuevo.</string>
 
     <string name="player_photo">imagen deportista</string>
     <string name="lastNames">Apellidos:</string>

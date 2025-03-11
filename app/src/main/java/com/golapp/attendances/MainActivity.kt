@@ -1,6 +1,9 @@
 package com.golapp.attendances
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.view.View
+import android.view.animation.DecelerateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration.Indefinite
 import androidx.compose.material3.SnackbarHost
@@ -24,7 +26,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
@@ -63,9 +65,29 @@ class MainActivity : ComponentActivity() {
     lateinit var networkMonitor: NetworkMonitor
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        installSplashScreen().apply {
+            setOnExitAnimationListener{splashScreen ->
+                // access to the splash screen and moving it down
+                ObjectAnimator.ofFloat(
+                    splashScreen.view,
+                    View.TRANSLATION_Y,
+                    // from top to down
+                    0f, splashScreen.view.height.toFloat()
+                ).apply {
+                    // deceleration interpolator, duration
+                    interpolator = DecelerateInterpolator()
+                    duration = 500L
+                    // do not forget to remove the splash screen
+                    doOnEnd { splashScreen.remove() }
+                    start()
+                }
+            }
+        }
+        
         enableEdgeToEdge()
+
         setContent {
             val appState = rememberAppState(networkMonitor = networkMonitor)
             GolappAttendancesTheme {
@@ -115,10 +137,6 @@ fun MainScreen(
             currentDestination = appState.currentDestination,
             navController = appState.navController,
             screens = screens
-        ),
-        navigationSuiteColors = NavigationSuiteDefaults.colors(
-            navigationBarContainerColor = MaterialTheme.colorScheme.surface,
-            navigationBarContentColor = MaterialTheme.colorScheme.onSurface,
         )
     ) {
         Scaffold(
