@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "860118696484",
+    "project_id": "asistencias-golapp",
+    "storage_bucket": "asistencias-golapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:860118696484:android:1ec36b0671a78ec5184eb1",
+        "android_client_info": {
+          "package_name": "com.golapp.attendances"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDU5M-j176YZG6YIKjiaZJ0mXbxFgiYTuk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

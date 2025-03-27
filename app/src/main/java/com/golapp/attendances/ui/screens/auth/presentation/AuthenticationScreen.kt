@@ -1,0 +1,180 @@
+package com.golapp.attendances.ui.screens.auth.presentation
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.golapp.attendances.R
+import com.golapp.attendances.common.Constants.SHAPE_SMALL
+import com.golapp.attendances.common.ui.components.CustomButton
+import com.golapp.attendances.common.ui.components.CustomTextField
+import com.golapp.attendances.ui.theme.GolappAttendancesTheme
+
+@Composable
+fun AuthenticationScreen(
+    modifier: Modifier = Modifier,
+    viewModel: AuthViewModel = hiltViewModel(),
+    onDetectLogin: () -> Unit = {}
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.isLoggedIn) {
+        if (uiState.isLoggedIn) {
+            onDetectLogin()
+        }
+    }
+
+    Scaffold { padding ->
+        Surface(
+            modifier = modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.soccer_field),
+                contentDescription = "background",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    content = {
+                        if (uiState.isLoading) {
+                            CircularProgressIndicator()
+                        } else {
+                            Form(uiState = uiState, onEvent = viewModel::onEvent)
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun Form(
+    modifier: Modifier = Modifier,
+    uiState: AuthUiState,
+    onEvent: (AuthUiEvent) -> Unit = {}
+) {
+    val focusManager = LocalFocusManager.current
+
+    Surface(
+        modifier = modifier
+            .wrapContentHeight()
+            .width(400.dp)
+            .padding(SHAPE_SMALL),
+        shape = MaterialTheme.shapes.medium,
+    ) {
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .height(100.dp)
+                    .width(400.dp)
+                    .padding(horizontal = 40.dp)
+            )
+
+            CustomTextField.Email(
+                value = uiState.email,
+                onValueChange = { onEvent(AuthUiEvent.EmailChanged(it)) },
+                contentDescription = stringResource(R.string.input_email),
+                label = stringResource(R.string.input_email),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                errorMessage = uiState.errorEmail?.asString(),
+                isEnabled = uiState.isLoading.not(),
+                keyboardActions = KeyboardActions(onAny = {
+                    focusManager.moveFocus(FocusDirection.Next)
+                }),
+                leadingIcon = Icons.Outlined.Email
+            )
+
+            CustomTextField.Password(
+                value = uiState.password,
+                onValueChange = { onEvent(AuthUiEvent.PasswordChanged(it)) },
+                contentDescription = stringResource(R.string.input_password),
+                label = stringResource(R.string.input_password),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                errorMessage = uiState.errorPassword?.asString(),
+                isEnabled = uiState.isLoading.not(),
+                keyboardActions = KeyboardActions(onAny = {
+                    focusManager.clearFocus()
+                }),
+            )
+
+            CustomButton(
+                text = stringResource(R.string.login_button),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 8.dp, bottom = 8.dp),
+                isEnabled = uiState.isLoading.not(),
+                onClick = { onEvent(AuthUiEvent.LoginClicked) }
+            )
+
+            if (uiState.error != null) {
+                Text(
+                    text = uiState.error,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+        }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun AuthenticationScreenPreview() {
+    GolappAttendancesTheme {
+        Form(uiState = AuthUiState())
+    }
+}

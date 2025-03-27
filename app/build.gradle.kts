@@ -4,20 +4,23 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.kotlin.parcelize)
+
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
-    namespace = "com.co.golapp.attendances"
+    namespace = "com.golapp.attendances"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.co.golapp.attendances"
+        applicationId = "com.golapp.attendances"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
+        versionCode = 4
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -27,11 +30,14 @@ android {
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
+        multiDexEnabled = true
+        ndk.debugSymbolLevel = "FULL"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -41,7 +47,8 @@ android {
         debug {
             isDebuggable = true
             isMinifyEnabled = false
-            buildConfigField("String", "API_URL", "\"http://10.0.2.2/api/\"")
+            buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
+            //buildConfigField("String", "API_URL", "\"http://10.0.2.2/api/\"")
         }
     }
     compileOptions {
@@ -61,7 +68,6 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            excludes += "/META-INF/gradle/incremental.annotation.processors"
         }
     }
 }
@@ -90,12 +96,19 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.okhttp)
     implementation(libs.converter.moshi)
-    implementation(libs.moshi.kotlin.codegen)
+    ksp(libs.moshi.kotlin.codegen)
     implementation(libs.logging.interceptor)
 
     //Dagger hilt
     implementation(libs.hilt.android)
-    implementation(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
+    kspTest(libs.hilt.compiler)
+    androidTestImplementation(libs.androidx.hilt.work)
 
     // Room DB
     implementation(libs.androidx.room.runtime)
@@ -107,7 +120,6 @@ dependencies {
     implementation(libs.coil.network.okhttp)
 
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.androidx.hilt.navigation.compose)
 
     // Compose Navigation
     implementation(libs.androidx.navigation.compose)
@@ -123,11 +135,12 @@ dependencies {
 
     implementation(libs.androidx.datastore.preferences)
 
-    implementation(platform(libs.arrow.stack))
-    implementation(libs.arrow.core)
-    implementation(libs.arrow.core.retrofit)
-
     implementation(libs.timber)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+
+
 //    implementation("")
 //    implementation("")
 //    implementation("")
