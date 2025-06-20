@@ -18,7 +18,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import timber.log.Timber
 
 @Composable
 fun rememberAppState(
@@ -49,13 +48,13 @@ class GolAppState(
             .currentBackStackEntryAsState().value?.destination
 
     val isGuestDestination: Boolean
-        @Composable get() = currentDestination?.hierarchy?.any { it.route == navController.graph[GuestGraph.Screens].route } == true
+        @Composable get() = currentDestination?.hierarchy?.any { it.route == navController.graph[GuestGraph.Guest].route } == true
 
     val isOffline = networkMonitor.isOnline
         .map(Boolean::not)
         .stateIn(
             scope = coroutineScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = false
         )
 }

@@ -28,6 +28,7 @@ import com.golapp.attendances.data.local.datasources.ClassDayLocalDataSource
 import com.golapp.attendances.data.local.datasources.GroupsLocalDataSource
 import com.golapp.attendances.data.local.datasources.PlayersLocalDataSource
 import com.golapp.attendances.data.local.datasources.StoreLocalDataSource
+import com.golapp.attendances.data.remote.GolappAPI
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -103,6 +104,6 @@ object LocalModule {
         ClassDayLocalDataSourceImpl(classDayDao)
 
     @Provides
-    fun provideStoreLocalDatasource(preferenceDataStore: DataStore<Preferences>): StoreLocalDataSource =
-        StoreLocalDataSourceImpl(preferenceDataStore)
+    fun provideStoreLocalDatasource(preferenceDataStore: DataStore<Preferences>, api: GolappAPI): StoreLocalDataSource =
+        StoreLocalDataSourceImpl(preferenceDataStore, api)
 }

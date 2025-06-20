@@ -36,6 +36,7 @@ class AuthRepositoryImpl @Inject constructor(
             } else{
                 storeLocalDataSource.clear()
                 storeLocalDataSource.saveToken(responseLogin.token)
+                storeLocalDataSource.saveRefreshToken(responseLogin.refreshToken)
                 storeLocalDataSource.saveType(responseLogin.type)
                 storeLocalDataSource.saveExpiration(responseLogin.expires)
                 storeLocalDataSource.saveUserName(responseLogin.userDto?.name ?: "")

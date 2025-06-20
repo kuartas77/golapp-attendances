@@ -8,11 +8,14 @@ sealed class HomeGraph {
 
     @Serializable
     object Home
+}
 
+sealed class UserGraph {
     @Serializable
-    object Profile
+    object Account
 
     @Serializable
     object Settings
-
 }
+
+

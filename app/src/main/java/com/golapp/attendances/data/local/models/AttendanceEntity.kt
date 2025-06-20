@@ -23,6 +23,13 @@ import androidx.room.PrimaryKey
             childColumns = ["group_id"],
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = PlayerEntity::class,
+            parentColumns = ["player_id"],
+            childColumns = ["player_id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE
         )
     ]
 )

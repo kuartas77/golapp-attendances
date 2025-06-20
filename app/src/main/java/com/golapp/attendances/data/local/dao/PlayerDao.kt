@@ -16,4 +16,7 @@ interface PlayerDao {
 
     @Query("DELETE FROM players")
     suspend fun deletePlayers(): Int
+
+    @Query("DELETE FROM players WHERE group_id = :groupId")
+    suspend fun deletePlayersByGroupId(groupId: Int)
 }

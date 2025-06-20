@@ -20,4 +20,7 @@ interface ClassDayDao {
 
     @Query("DELETE FROM class_days")
     suspend fun deleteClassDays()
+
+    @Query("DELETE FROM class_days WHERE group_id = :groupId")
+    suspend fun deleteClassDaysByGroupId(groupId: Int)
 }

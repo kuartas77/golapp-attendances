@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,10 +31,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -42,7 +43,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -52,6 +52,7 @@ import com.golapp.attendances.common.ui.components.groupWithClassPreview
 import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.domain.models.GroupWithClassDays
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
@@ -60,39 +61,41 @@ fun ThreePaneScaffoldScope.DetailGroupPanel(
     navigator: ThreePaneScaffoldNavigator<GroupWithClassDays>,
     navigateToAttendances: (String) -> Unit
 ) {
-    AnimatedPane {
-        navigator.currentDestination?.content?.let { group ->
-            DetailScreen(
-                group = group,
-                backButton = {
-                    AnimatedVisibility(
-                        visible = navigator.canNavigateBack()
-                    ) {
-                        IconButton(
-                            onClick = {
+    val scope = rememberCoroutineScope()
+    navigator.currentDestination?.contentKey?.let { group ->
+        DetailScreen(
+            group = group,
+            backButton = {
+                AnimatedVisibility(
+                    visible = navigator.canNavigateBack()
+                ) {
+                    IconButton(
+                        onClick = {
+                            scope.launch {
                                 navigator.navigateBack()
-                            },
-                            content = {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                             }
-                        )
-                    }
-                },
-                navigateToAttendances = navigateToAttendances
-            )
-        } ?: Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            content = {
-                Text(
-                    text = stringResource(R.string.no_group_selected),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontStyle = FontStyle.Italic,
-                )
-            }
+                        },
+                        content = {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        }
+                    )
+                }
+            },
+            navigateToAttendances = navigateToAttendances
         )
-    }
+    } ?: Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        content = {
+            Text(
+                text = stringResource(R.string.no_group_selected),
+                style = MaterialTheme.typography.bodySmall,
+                fontStyle = FontStyle.Italic,
+            )
+        }
+    )
+
 }
 
 @OptIn(
@@ -113,7 +116,7 @@ private fun DetailScreen(
                 windowInsets = WindowInsets(0.dp),
                 title = {
                     Text(
-                        text = group.fullGroup,
+                        text = stringResource(R.string.info_group),
                         style = MaterialTheme.typography.titleMedium
                     )
                 },
@@ -123,104 +126,59 @@ private fun DetailScreen(
     ) { paddingValues ->
 
         Surface(
-            modifier = Modifier
+            modifier = modifier
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
             Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
+                modifier = modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    modifier = Modifier.padding(8.dp),
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(stringResource(R.string.members))
-                                append(" ")
-                            }
-                            append(group.playerCount.toString())
-                        },
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = modifier.height(4.dp))
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(stringResource(R.string.schedules))
-                                append(" ")
-                            }
-                            append(group.explodeSchedules)
-                        },
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = modifier.height(4.dp))
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(stringResource(R.string.days))
-                                append(" ")
-                            }
-                            append(group.days)
-                        },
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = modifier.height(4.dp))
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(stringResource(R.string.trainings))
-                                append(" ")
-                            }
-                            append(group.classDays.size.toString())
-                        },
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+                Header(modifier, group)
 
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.pick_date))
-                        append(" ")
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(group.classDays.first().monthName)
-                        }
-                    },
-
-                    modifier = Modifier.padding(8.dp),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontStyle = FontStyle.Italic
-                )
+                HorizontalDivider(modifier = modifier.padding(start = 12.dp, end = 12.dp))
 
                 Column(
-                    modifier = Modifier.background(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = MaterialTheme.shapes.large
-                    )
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                 ) {
-                    FlowRow(
-                        modifier = Modifier.padding(6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(2.dp),
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
+
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.pick_date))
+                            append(" ")
+                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append(group.classDays.first().monthName)
+                            }
+                        },
+
+                        modifier = Modifier.padding(8.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontStyle = FontStyle.Italic
+                    )
+
+                    Column(
+                        modifier = Modifier.background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.large
+                        )
                     ) {
-                        group.classDays.forEach { classDay ->
-                            ItemDay(
-                                item = classDay,
-                                navigateToAttendances = navigateToAttendances,
-                            )
+                        FlowRow(
+                            modifier = Modifier.padding(6.dp),
+                            horizontalArrangement = Arrangement.spacedBy(2.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                        ) {
+                            group.classDays.forEach { classDay ->
+                                ItemDay(
+                                    item = classDay,
+                                    navigateToAttendances = navigateToAttendances,
+                                )
+                            }
                         }
                     }
-                }
 
+                }
             }
         }
     }
@@ -228,12 +186,91 @@ private fun DetailScreen(
 }
 
 @Composable
+private fun Header(modifier: Modifier, group: GroupWithClassDays) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(12.dp)
+    ) {
+        Column {
+            Text(
+                stringResource(R.string.nombre_del_grupo),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(group.fullGroup, style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+
+    HorizontalDivider(modifier = modifier.padding(start = 12.dp, end = 12.dp))
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = modifier.weight(1f)) {
+            Text(
+                stringResource(R.string.days),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(group.days, style = MaterialTheme.typography.bodyMedium)
+        }
+
+        Column(modifier = modifier.weight(1f)) {
+            Text(
+                stringResource(R.string.schedules),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(group.explodeSchedules, style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+
+    HorizontalDivider(modifier = modifier.padding(start = 12.dp, end = 12.dp))
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = modifier.weight(1f)) {
+            Text(
+                stringResource(R.string.trainings),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                group.classDays.size.toString(),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        Column(modifier = modifier.weight(1f)) {
+            Text(
+                stringResource(R.string.members),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                group.playerCount.toString(),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
 private fun ItemDay(
+    modifier: Modifier = Modifier,
     item: ClassDay,
     navigateToAttendances: (String) -> Unit
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .wrapContentSize()
             .padding(8.dp)
             .clickable { navigateToAttendances(item.classDayId) },
@@ -242,7 +279,7 @@ private fun ItemDay(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .size(90.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -250,17 +287,17 @@ private fun ItemDay(
             Icon(
                 painter = painterResource(R.drawable.id_calendar),
                 contentDescription = "calendar",
-                modifier = Modifier.size(24.dp),
+                modifier = modifier.size(24.dp),
             )
             Text(
                 text = item.date.toString(),
-                modifier = Modifier,
+                modifier = modifier,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodyMedium,
             )
             Text(
                 text = item.day,
-                modifier = Modifier,
+                modifier = modifier,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.bodyMedium,
             )

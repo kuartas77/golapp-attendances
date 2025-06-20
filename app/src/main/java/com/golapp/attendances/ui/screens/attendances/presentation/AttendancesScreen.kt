@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,6 +66,7 @@ import com.golapp.attendances.common.ui.components.SearchBar
 import com.golapp.attendances.common.ui.components.attendanceWithPlayerPreview
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun AttendancesScreen(
@@ -106,8 +108,10 @@ fun ListAttendances(
     uiState: AttendancesUiState = AttendancesUiState(),
     onEvent: (AttendancesUiEvent) -> Unit = {}
 ) {
-
-    val navigator = rememberListDetailPaneScaffoldNavigator<AttendanceWithPlayer>()
+    val scope = rememberCoroutineScope()
+    val navigator = rememberListDetailPaneScaffoldNavigator<AttendanceWithPlayer>(
+        isDestinationHistoryAware = false
+    )
 
     val backBehavior = if (navigator.canNavigateBack()) {
         BackNavigationBehavior.PopUntilContentChange
@@ -116,7 +120,9 @@ fun ListAttendances(
     }
 
     BackHandler(navigator.canNavigateBack()) {
-        navigator.navigateBack(backBehavior)
+        scope.launch {
+            navigator.navigateBack(backBehavior)
+        }
     }
 
     ListDetailPaneScaffold(
@@ -124,11 +130,13 @@ fun ListAttendances(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
         listPane = {
-            ListPanelAttendances(
-                uiState = uiState,
-                onEvent = onEvent,
-                navigator = navigator
-            )
+            AnimatedPane {
+                ListPanelAttendances(
+                    uiState = uiState,
+                    onEvent = onEvent,
+                    navigator = navigator
+                )
+            }
         },
         detailPane = {
             DetailPanelAttendance(navigator = navigator)
@@ -147,59 +155,59 @@ private fun ThreePaneScaffoldScope.ListPanelAttendances(
     val listState = rememberLazyListState()
     val attendances = uiState.listAttendances
     var showDialog by remember { mutableStateOf(false) }
-
-    AnimatedPane {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(8.dp)
+    val scope = rememberCoroutineScope()
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            IconButton(
+                onClick = { showDialog = !showDialog },
+                content = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_sync),
+                        contentDescription = "Sync Attendances"
+                    )
+                }
+            )
+            SearchBar(
+                hint = stringResource(
+                    id = R.string.title_attendances_p,
+                    uiState.classDaySelected?.monthName.toString(),
+                    uiState.classDaySelected?.date.toString(),
+                    uiState.classDaySelected?.day.toString()
+                ),
+                onSearchClicked = { onEvent(AttendancesUiEvent.OnSearchAttendance(it)) },
+                onTextChange = { onEvent(AttendancesUiEvent.OnSearchAttendance(it)) },
+                cornerShape = MaterialTheme.shapes.medium,
+            )
+        }
+        Spacer(modifier = modifier.height(SPACER_SMALL))
+        if (attendances.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                content = { Text(text = stringResource(R.string.no_attendances_found)) }
+            )
+        }
+        LazyColumn(
+            state = listState,
+            modifier = modifier.fillMaxSize()
+        ) {
+            items(
+                count = attendances.count(),
+                key = { it }
             ) {
-                IconButton(
-                    onClick = { showDialog = !showDialog },
-                    content = {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_sync),
-                            contentDescription = "Sync Attendances"
-                        )
-                    }
-                )
-                SearchBar(
-                    hint = stringResource(
-                        id = R.string.title_attendances_p,
-                        uiState.classDaySelected?.monthName.toString(),
-                        uiState.classDaySelected?.date.toString(),
-                        uiState.classDaySelected?.day.toString()
-                    ),
-                    onSearchClicked = { onEvent(AttendancesUiEvent.OnSearchAttendance(it)) },
-                    onTextChange = { onEvent(AttendancesUiEvent.OnSearchAttendance(it)) },
-                    cornerShape = MaterialTheme.shapes.medium,
-                )
-            }
-            Spacer(modifier = modifier.height(SPACER_SMALL))
-            if (attendances.isEmpty()) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    content = { Text(text = stringResource(R.string.no_attendances_found)) }
-                )
-            }
-            LazyColumn(
-                state = listState,
-                modifier = modifier.fillMaxSize()
-            ) {
-                items(
-                    count = attendances.count(),
-                    key = { it }
-                ) {
-                    val attendance = attendances[it]
-                    AttendanceItem(attendance = attendance) {
-                        onEvent(AttendancesUiEvent.OnSelectAttendance(attendance))
+                val attendance = attendances[it]
+                AttendanceItem(attendance = attendance) {
+                    onEvent(AttendancesUiEvent.OnSelectAttendance(attendance))
+                    scope.launch {
                         navigator.navigateTo(
                             ListDetailPaneScaffoldRole.Detail,
                             attendance
@@ -208,6 +216,7 @@ private fun ThreePaneScaffoldScope.ListPanelAttendances(
                 }
             }
         }
+
     }
 
     AnimatedVisibility(visible = showDialog) {
@@ -215,7 +224,7 @@ private fun ThreePaneScaffoldScope.ListPanelAttendances(
             showDialog = showDialog,
             onConfirm = {
                 showDialog = false
-                // TODO: Sync attendances
+                onEvent(AttendancesUiEvent.SyncAttendances)
             },
             onDismissRequest = { showDialog = false }
         )

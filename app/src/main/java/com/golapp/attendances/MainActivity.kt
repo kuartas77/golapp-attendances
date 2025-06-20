@@ -1,12 +1,11 @@
 package com.golapp.attendances
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
-import android.view.View
-import android.view.animation.DecelerateInterpolator
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -38,12 +37,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.golapp.attendances.common.remote.NetworkMonitor
@@ -57,37 +54,22 @@ import com.golapp.attendances.ui.navigation.homeGraph
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.collections.forEach
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
+    private val viewModel: SplashViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-
-        installSplashScreen().apply {
-            setOnExitAnimationListener{splashScreen ->
-                // access to the splash screen and moving it down
-                ObjectAnimator.ofFloat(
-                    splashScreen.view,
-                    View.TRANSLATION_Y,
-                    // from top to down
-                    0f, splashScreen.view.height.toFloat()
-                ).apply {
-                    // deceleration interpolator, duration
-                    interpolator = DecelerateInterpolator()
-                    duration = 500L
-                    // do not forget to remove the splash screen
-                    doOnEnd { splashScreen.remove() }
-                    start()
-                }
-            }
-        }
-        
         enableEdgeToEdge()
-
+        splashScreen.setKeepOnScreenCondition { viewModel.isLoading.value }
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE
+        )
         setContent {
             val appState = rememberAppState(networkMonitor = networkMonitor)
             GolappAttendancesTheme {
@@ -159,7 +141,7 @@ fun MainScreen(
                 ) {
                     NavHost(
                         navController = appState.navController,
-                        startDestination = GuestGraph.Screens
+                        startDestination = GuestGraph.Guest
                     ) {
                         guestGraph(appState)
                         homeGraph(appState)
@@ -179,13 +161,15 @@ private fun navigationSuiteItems(
 ): NavigationSuiteScope.() -> Unit = {
     screens.forEach { screen ->
         val isSelected =
-            currentDestination?.hierarchy?.any { it.route == screen.route } == true
+            currentDestination?.hierarchy?.any {
+                it.route?.contains(screen.route::class.simpleName.toString()) == true
+            } == true
+
         item(
             selected = isSelected,
-            enabled = !isSelected,
             onClick = {
                 navController.navigate(screen.route) {
-                    popUpTo(navController.graph.findStartDestination().id) {
+                    popUpTo(Destinations.Home.route) {
                         saveState = true
                     }
                     // Avoid multiple copies of the same destination when
@@ -205,7 +189,7 @@ private fun navigationSuiteItems(
             label = {
                 Text(text = stringResource(screen.label))
             },
-            alwaysShowLabel = false,
+            alwaysShowLabel = true,
         )
     }
 }

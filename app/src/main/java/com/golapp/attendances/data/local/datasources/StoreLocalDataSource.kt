@@ -1,7 +1,10 @@
 package com.golapp.attendances.data.local.datasources
 
+import com.golapp.attendances.data.remote.dto.ResponseLogin
+
 interface StoreLocalDataSource {
     suspend fun saveToken(token: String)
+    suspend fun saveRefreshToken(refreshToken: String)
     suspend fun saveType(type: String)
     suspend fun saveExpiration(expiration: Long)
     suspend fun saveUserName(name: String)
@@ -10,6 +13,7 @@ interface StoreLocalDataSource {
     suspend fun saveSchoolSlug(schoolSlug: String)
     suspend fun saveSchoolLogo(schoolLogo: String)
     suspend fun getToken(): String
+    suspend fun getRefreshToken(): String
     suspend fun getType(): String
     suspend fun getExpiration(): Long
     suspend fun getUserName(): String
@@ -18,5 +22,5 @@ interface StoreLocalDataSource {
     suspend fun getSchoolSlug(): String
     suspend fun getSchoolLogo(): String
     suspend fun clear()
-
+    suspend fun refreshToken()
 }

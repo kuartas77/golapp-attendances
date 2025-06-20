@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 sealed class GuestGraph {
     @Serializable
-    object Screens
+    object Guest
 
     @Serializable
     object Authentication

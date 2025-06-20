@@ -4,21 +4,20 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.golapp.attendances.common.ui.GolAppState
+import com.golapp.attendances.ui.navigation.Destinations.Settings
 import com.golapp.attendances.ui.navigation.graphs.AttendanceGraph
 import com.golapp.attendances.ui.navigation.graphs.GuestGraph
 import com.golapp.attendances.ui.navigation.graphs.HomeGraph
-import com.golapp.attendances.ui.screens.MainViewModel
+import com.golapp.attendances.ui.navigation.graphs.UserGraph
 import com.golapp.attendances.ui.screens.attendances.presentation.AttendancesScreen
 import com.golapp.attendances.ui.screens.auth.presentation.AuthenticationScreen
 import com.golapp.attendances.ui.screens.groups.presentation.GroupsScreen
 import com.golapp.attendances.ui.screens.home.HomeScreen
 import com.golapp.attendances.ui.screens.settings.presentation.SettingsScreen
-import kotlinx.coroutines.delay
 
 fun NavGraphBuilder.guestGraph(appState: GolAppState) {
     val navController = appState.navController
-    val mainViewModel = appState.mainViewModel
-    navigation<GuestGraph.Screens>(startDestination = GuestGraph.Authentication) {
+    navigation<GuestGraph.Guest>(startDestination = GuestGraph.Authentication) {
         composable<GuestGraph.Authentication> {
             AuthenticationScreen {
                 navController.navigate(HomeGraph.Screens) {
@@ -36,33 +35,35 @@ fun NavGraphBuilder.homeGraph(appState: GolAppState) {
         composable<HomeGraph.Home> {
             HomeScreen()
         }
+    }
 
-        composable<HomeGraph.Settings> {
+    navigation<UserGraph.Account>(startDestination = UserGraph.Settings){
+        composable<UserGraph.Settings> {
             SettingsScreen {
                 mainViewModel.logout()
-                navController.navigate(GuestGraph.Screens) {
-                    popUpTo(0){
+                navController.navigate(GuestGraph.Guest) {
+                    popUpTo(0) {
                         inclusive = true
                     }
                 }
             }
         }
     }
+
 }
 
 fun NavGraphBuilder.attendanceGraph(appState: GolAppState) {
     val navController = appState.navController
-    val mainViewModel = appState.mainViewModel
-    navigation<AttendanceGraph.Screens>(startDestination = AttendanceGraph.Groups) {
+    navigation<AttendanceGraph.Attendances>(startDestination = AttendanceGraph.Groups) {
         composable<AttendanceGraph.Groups> {
             GroupsScreen(
                 onClickClassDay = { classDayId ->
-                    navController.navigate(AttendanceGraph.Attendances(classDayId))
+                    navController.navigate(AttendanceGraph.GroupsAttendances(classDayId))
                 }
             )
         }
 
-        composable<AttendanceGraph.Attendances> {
+        composable<AttendanceGraph.GroupsAttendances> {
             AttendancesScreen()
         }
     }

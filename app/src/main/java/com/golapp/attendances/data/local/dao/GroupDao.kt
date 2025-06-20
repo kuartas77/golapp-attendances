@@ -37,4 +37,7 @@ interface GroupDao {
 
     @Query("DELETE FROM groups")
     suspend fun deleteGroups()
+
+    @Query("DELETE FROM groups WHERE id = :groupId")
+    suspend fun deleteGroupById(groupId: Int)
 }

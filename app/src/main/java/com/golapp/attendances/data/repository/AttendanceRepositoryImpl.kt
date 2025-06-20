@@ -31,6 +31,7 @@ class AttendanceRepositoryImpl @Inject constructor(
 
     override suspend fun verifyAttendancesByClassDayId(classDay: ClassDay) {
         val groupWithPlayers = groupLocalDataSource.getGroupWhitPlayersById(classDay.groupId)
+
         val attendanceLocalList = attendanceLocalDataSource.getAttendancesWithPlayers(
             classDay.groupId,
             classDay.month,
@@ -38,7 +39,7 @@ class AttendanceRepositoryImpl @Inject constructor(
             classDay.schoolId
         )
 
-        if (attendanceLocalList.isEmpty() || attendanceLocalList.size < groupWithPlayers.players.size) {
+        if (attendanceLocalList.isEmpty() || attendanceLocalList.size != groupWithPlayers.players.size) {
             attendanceRemoteDataSource.fetchAttendances(
                 classDay.groupId,
                 classDay.month,
@@ -109,6 +110,13 @@ class AttendanceRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncAttendances() {
+
+        getAllAttendances().forEach { attendance ->
+            if (attendance.id != null) {
+                insertAttendanceSync(AttendanceSync(id = attendance.id))
+            }
+        }
+
         workManager.beginUniqueWork(
             AttendanceSyncWorker.TAG,
             ExistingWorkPolicy.REPLACE,

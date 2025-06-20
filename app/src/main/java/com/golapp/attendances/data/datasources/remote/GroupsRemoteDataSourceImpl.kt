@@ -3,6 +3,7 @@ package com.golapp.attendances.data.datasources.remote
 import com.golapp.attendances.common.di.IoDispatcher
 import com.golapp.attendances.common.resultOf
 import com.golapp.attendances.data.local.models.GroupWithClassPlayersEntity
+import com.golapp.attendances.data.local.models.StatisticsEntity
 import com.golapp.attendances.data.mappers.asEntity
 import com.golapp.attendances.data.remote.GolappAPI
 import com.golapp.attendances.data.remote.datasources.GroupsRemoteDataSource
@@ -35,6 +36,18 @@ class GroupsRemoteDataSourceImpl @Inject constructor(
             if (response.isSuccessful && body != null) {
                 emit(body.asEntity())
             }
+        }
+    }.flowOn(ioDispatcher)
+
+    override suspend fun fetchStatistics(): Flow<List<StatisticsEntity>> = flow {
+        resultOf {
+            val response = api.fetchStatistics()
+            val body = response.body()
+            if (response.isSuccessful && body != null) {
+                emit(body.asEntity())
+            }
+        }.onFailure {
+            emit(emptyList())
         }
     }.flowOn(ioDispatcher)
 

@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -23,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.golapp.attendances.R
 import com.golapp.attendances.ui.screens.MainViewModel
 
@@ -32,7 +35,6 @@ fun HeaderContent(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = hiltViewModel()
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val userName = uiState.user?.name ?: ""
     val schoolLogoUrl = uiState.user?.schoolLogo ?: ""
@@ -49,8 +51,10 @@ fun HeaderContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             AsyncImage(
-                model = schoolLogoUrl,
+                model = ImageRequest.Builder(LocalContext.current).data(schoolLogoUrl)
+                    .crossfade(true).build(),
                 contentDescription = schoolName,
                 placeholder = painterResource(R.drawable.ic_ball),
                 error = painterResource(R.drawable.ic_ball),

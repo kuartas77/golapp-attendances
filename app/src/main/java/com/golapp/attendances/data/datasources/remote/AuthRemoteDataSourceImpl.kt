@@ -21,11 +21,12 @@ class AuthRemoteDataSourceImpl @Inject constructor(
         } else {
             ResponseLogin(
                 token = "",
+                refreshToken = "",
                 type = "",
                 expires = 0L,
                 message = response.message(),
                 code = response.code(),
-                userDto = null
+                userDto = null,
             )
         }
     }

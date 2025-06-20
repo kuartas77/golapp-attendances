@@ -6,4 +6,5 @@ interface PlayersLocalDataSource {
     suspend fun insertPlayer(player: PlayerEntity)
     suspend fun insertPlayerList(playerList: List<PlayerEntity>)
     suspend fun deletePlayers(): Int
+    suspend fun deletePlayersByGroupId(groupId: Int)
 }
