@@ -14,4 +14,5 @@ class PlayersLocalDataSourceImpl @Inject constructor(
         playerDao.insertPlayerList(playerList)
 
     override suspend fun deletePlayers() = playerDao.deletePlayers()
+    override suspend fun deletePlayersByGroupId(groupId: Int) = playerDao.deletePlayersByGroupId(groupId)
 }

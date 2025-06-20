@@ -16,10 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SPACER_LARGE
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM
+import com.golapp.attendances.common.Constants.SPACER_MEDIUM_LARGE
 import com.golapp.attendances.common.ui.components.HeaderContent
 import com.golapp.attendances.ui.screens.settings.presentation.components.SettingsItem
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
@@ -31,24 +33,36 @@ fun SettingsScreen(modifier: Modifier = Modifier, onLogout: () -> Unit) {
         modifier = modifier.padding(horizontal = SPACER_MEDIUM)
     ) {
         Column(
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier.fillMaxWidth().padding(SPACER_MEDIUM_LARGE),
             verticalArrangement = Arrangement.spacedBy(SPACER_LARGE)
         ) {
             HeaderContent()
             Spacer(modifier = Modifier.height(SPACER_MEDIUM))
-            Text(
-                text = stringResource(R.string.title_settings),
-                fontWeight = FontWeight.Medium,
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.primary
-            )
-            SettingsItem(
-                text = stringResource(R.string.log_out),
-                Icons.AutoMirrored.Filled.ExitToApp,
-                onLogout
-            )
+            Configuration(onLogout)
+            Spacer(modifier = Modifier.height(SPACER_MEDIUM))
+//            Text(
+//                text = stringResource(R.string.general),
+//                fontWeight = FontWeight.Medium,
+//                fontSize = 16.sp,
+//                color = MaterialTheme.colorScheme.primary
+//            )
         }
     }
+}
+
+@Composable
+private fun Configuration(onLogout: () -> Unit) {
+    Text(
+        text = stringResource(R.string.title_settings),
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp,
+        color = MaterialTheme.colorScheme.primary
+    )
+    SettingsItem(
+        text = stringResource(R.string.log_out),
+        Icons.AutoMirrored.Filled.ExitToApp,
+        onLogout
+    )
 }
 
 

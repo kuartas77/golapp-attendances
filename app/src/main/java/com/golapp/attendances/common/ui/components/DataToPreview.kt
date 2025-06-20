@@ -11,8 +11,8 @@ fun groupWithClassPreview(): GroupWithClassDays {
         name = "Grupo de prueba",
         days = "Miércoles,Viernes",
         explodeSchedules = "10:05AM - 11:00AM",
-        fullScheduleGroup = "2024 => Grupo de prueba Marte 1 (2008) Miércoles,Viernes 10:05AM - 11:00AM",
-        fullGroup = "2024 => Grupo de prueba Marte 1 (2008)",
+        fullScheduleGroup = "Grupo de prueba Marte 1 (2008) Miércoles,Viernes 10:05AM - 11:00AM",
+        fullGroup = "Grupo de prueba Marte 1 (2008)",
         playerCount = 1,
         classDays = listOf(
             ClassDay(

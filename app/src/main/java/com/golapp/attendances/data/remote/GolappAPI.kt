@@ -3,6 +3,8 @@ package com.golapp.attendances.data.remote
 import com.golapp.attendances.common.Constants.ATTENDANCES
 import com.golapp.attendances.common.Constants.AUTH
 import com.golapp.attendances.common.Constants.GROUPS
+import com.golapp.attendances.common.Constants.REFRESH
+import com.golapp.attendances.common.Constants.STATISTICS
 import com.golapp.attendances.common.Constants.UPDATE_ATTENDANCE
 import com.golapp.attendances.common.di.Authorized
 import com.golapp.attendances.data.remote.dto.RequestAttendance
@@ -11,9 +13,11 @@ import com.golapp.attendances.data.remote.dto.ResponseAttendances
 import com.golapp.attendances.data.remote.dto.ResponseGroup
 import com.golapp.attendances.data.remote.dto.ResponseGroups
 import com.golapp.attendances.data.remote.dto.ResponseLogin
+import com.golapp.attendances.data.remote.dto.ResponseStatistics
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -43,4 +47,12 @@ interface GolappAPI {
     @Authorized
     @POST(UPDATE_ATTENDANCE)
     suspend fun sendAttendance(@Body request: RequestAttendance): Response<Unit>
+
+    @Authorized
+    @GET(STATISTICS)
+    suspend fun fetchStatistics(): Response<ResponseStatistics>
+
+    @Authorized
+    @POST(REFRESH)
+    suspend fun refreshToken(@Header("Authorization") refreshToken: String): Response<ResponseLogin>
 }

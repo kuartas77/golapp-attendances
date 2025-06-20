@@ -12,4 +12,5 @@ interface GroupsLocalDataSource {
     suspend fun getGroupWithClassDaysById(groupId: Int): GroupWithClassDays
     suspend fun getGroupWhitPlayersById(groupId: Int): GroupWithPlayers
     suspend fun deleteGroups()
+    suspend fun deleteGroupById(groupId: Int)
 }

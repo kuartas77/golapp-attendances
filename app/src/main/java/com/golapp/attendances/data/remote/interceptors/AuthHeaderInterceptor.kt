@@ -20,7 +20,28 @@ class AuthHeaderInterceptor @Inject constructor(
         containedOnInvocation(invocation).forEach { annotation ->
             request = handleAnnotation(annotation, request)
         }
-        return chain.proceed(request)
+
+        var response = chain.proceed(request)
+
+        if (response.code == 401) {
+
+            storeLocalDataSource.refreshToken()
+
+            val type = storeLocalDataSource.getType()
+            val token = storeLocalDataSource.getToken()
+
+            response.close()
+            val request = request.newBuilder()
+                .addHeader("Authorization", "$type $token")
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .build()
+
+            return chain.proceed(request)  // re-request
+
+        }
+
+        return response
     }
 
     private fun containedOnInvocation(invocation: Invocation): Set<Annotation> {
@@ -31,6 +52,7 @@ class AuthHeaderInterceptor @Inject constructor(
         annotation: Annotation,
         request: Request,
     ): Request {
+
         return when (annotation) {
             is Authorized -> addHeaders(request)
             else -> addContentTypeHeader(request)

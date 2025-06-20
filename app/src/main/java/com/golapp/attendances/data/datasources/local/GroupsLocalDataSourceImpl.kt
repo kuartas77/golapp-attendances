@@ -35,4 +35,5 @@ class GroupsLocalDataSourceImpl @Inject constructor(
 
 
     override suspend fun deleteGroups() = groupDao.deleteGroups()
+    override suspend fun deleteGroupById(groupId: Int) = groupDao.deleteGroupById(groupId)
 }

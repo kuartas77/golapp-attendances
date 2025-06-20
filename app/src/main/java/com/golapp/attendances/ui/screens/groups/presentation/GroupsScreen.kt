@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,6 +62,7 @@ import com.golapp.attendances.common.ui.components.SearchBar
 import com.golapp.attendances.common.ui.components.groupWithClassPreview
 import com.golapp.attendances.domain.models.GroupWithClassDays
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -107,6 +109,7 @@ fun ListGroups(
     onClickClassDay: (String) -> Unit = {}
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<GroupWithClassDays>()
+    val scope = rememberCoroutineScope()
     val backBehavior = if (navigator.canNavigateBack()) {
         BackNavigationBehavior.PopUntilContentChange
     } else {
@@ -114,7 +117,9 @@ fun ListGroups(
     }
 
     BackHandler(navigator.canNavigateBack()) {
-        navigator.navigateBack(backBehavior)
+        scope.launch {
+            navigator.navigateBack(backBehavior)
+        }
     }
 
     ListDetailPaneScaffold(
@@ -122,15 +127,19 @@ fun ListGroups(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
         listPane = {
-            ListPanelGroups(
-                uiState = uiState,
-                onEvent = onEvent,
-                navigator = navigator
-            )
+            AnimatedPane {
+                ListPanelGroups(
+                    uiState = uiState,
+                    onEvent = onEvent,
+                    navigator = navigator
+                )
+            }
         },
         detailPane = {
-            DetailGroupPanel(navigator = navigator) {
-                onClickClassDay(it)
+            AnimatedPane {
+                DetailGroupPanel(navigator = navigator) {
+                    onClickClassDay(it)
+                }
             }
         }
     )
@@ -147,54 +156,55 @@ private fun ThreePaneScaffoldScope.ListPanelGroups(
     val listState = rememberLazyListState()
     val groups = uiState.listGroups
     var showDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
-    AnimatedPane {
-        Column(
-            modifier = modifier
-                .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+    Column(
+        modifier = modifier
+            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+    ) {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = { showDialog = !showDialog },
-                    content = {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_sync),
-                            contentDescription = "Sync Groups"
-                        )
-                    }
-                )
-                SearchBar(
-                    hint = stringResource(id = R.string.groups),
-                    onSearchClicked = { onEvent(GroupsUiEvent.OnSearchGroup(it)) },
-                    onTextChange = { onEvent(GroupsUiEvent.OnSearchGroup(it)) },
-                    cornerShape = MaterialTheme.shapes.medium,
-                )
-            }
-            Spacer(modifier = modifier.height(SPACER_SMALL))
+            IconButton(
+                onClick = { showDialog = !showDialog },
+                content = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_sync),
+                        contentDescription = "Sync Groups"
+                    )
+                }
+            )
+            SearchBar(
+                hint = stringResource(id = R.string.groups),
+                onSearchClicked = { onEvent(GroupsUiEvent.OnSearchGroup(it)) },
+                onTextChange = { onEvent(GroupsUiEvent.OnSearchGroup(it)) },
+                cornerShape = MaterialTheme.shapes.medium,
+            )
+        }
+        Spacer(modifier = modifier.height(SPACER_SMALL))
 
-            if (uiState.listGroups.isEmpty()) {
-                Column(
-                    modifier = modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    content = { Text(text = stringResource(R.string.no_groups_found)) }
-                )
-            } else {
-                LazyColumn(
-                    state = listState,
-                    modifier = modifier.fillMaxSize()
+        if (uiState.listGroups.isEmpty()) {
+            Column(
+                modifier = modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                content = { Text(text = stringResource(R.string.no_groups_found)) }
+            )
+        } else {
+            LazyColumn(
+                state = listState,
+                modifier = modifier.fillMaxSize()
+            ) {
+                items(
+                    count = groups.count(),
+                    key = { it }
                 ) {
-                    items(
-                        count = groups.count(),
-                        key = { it }
-                    ) {
-                        val group = groups[it]
-                        GroupItem(group = group) {
-                            onEvent(GroupsUiEvent.OnSelectGroup(group))
+                    val group = groups[it]
+                    GroupItem(group = group) {
+                        onEvent(GroupsUiEvent.OnSelectGroup(group))
+                        scope.launch {
                             navigator.navigateTo(
                                 ListDetailPaneScaffoldRole.Detail,
                                 group

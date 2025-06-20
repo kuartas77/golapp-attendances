@@ -9,5 +9,5 @@ import javax.inject.Inject
 class SyncGroupsUseCaseImpl @Inject constructor(
     private val groupRepository: GroupRepository
 ) : SyncGroupsUseCase {
-    override suspend fun invoke(): Flow<List<GroupWithClassDays>> = groupRepository.fetchGroupWithClassDaysList()
+    override suspend fun invoke() = groupRepository.syncGroups()
 }

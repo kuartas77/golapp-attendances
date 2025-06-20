@@ -103,7 +103,7 @@ sealed interface AuthUiEvent {
 }
 
 data class AuthUiState(
-    val email: String = if (BuildConfig.DEBUG) "juan_londono84151@elpoli.edu.co" else "",
+    val email: String = if (BuildConfig.DEBUG) "kuartas77@gmail.com" else "",
     val password: String = if (BuildConfig.DEBUG) "Coco-.lizo1017" else "",
     val isLoading: Boolean = false,
     val isError: Boolean = false,

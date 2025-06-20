@@ -44,7 +44,7 @@ import com.golapp.attendances.data.local.models.PlayerEntity
         PlayerEntity::class,
         ClassDayEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 

@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 
 sealed class AttendanceGraph {
     @Serializable
-    object Screens
+    object Attendances
 
     @Serializable
     object Groups
 
     @Serializable
-    data class Attendances(val classDayId: String)
+    data class GroupsAttendances(val classDayId: String)
 }

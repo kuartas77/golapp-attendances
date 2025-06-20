@@ -20,7 +20,7 @@ android {
         applicationId = "com.golapp.attendances"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
+        versionCode = 5
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -31,11 +31,12 @@ android {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
         multiDexEnabled = true
-        ndk.debugSymbolLevel = "FULL"
+        ndk.debugSymbolLevel = "full"
     }
 
     buildTypes {
-        release {
+        getByName("release") {
+            isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -43,12 +44,14 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
+            ndk {
+                debugSymbolLevel = "full"
+            }
         }
-        debug {
+        getByName("debug") {
             isDebuggable = true
             isMinifyEnabled = false
             buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
-            //buildConfigField("String", "API_URL", "\"http://10.0.2.2/api/\"")
         }
     }
     compileOptions {
@@ -68,6 +71,12 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+        dex {
+            useLegacyPackaging = true
+        }
+        jniLibs {
+            useLegacyPackaging = true
         }
     }
 }

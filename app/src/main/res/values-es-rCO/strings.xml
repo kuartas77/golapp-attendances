@@ -2,29 +2,31 @@
 <resources>
     <string name="app_name">Asistencias</string>
     <string name="something_went_wrong">Algo salió mal. Por favor, vuelva a intentarlo</string>
-    <string name="connectivity_error">¡Por favor revisa tu conexión a internet</string>
-    <string name="server_error">Tenemos problemas de conexión con el servidor.</string>
-    <string name="unknown_error">Ha ocurrido un error.</string>
+    <string name="connectivity_error">¡Por favor revisa tu conexión a internet
+        e intenta nuevamente!</string>
+    <string name="server_error">Tenemos problemas de conexión con el servidor.
+        \nPor favor intenta nuevamente.</string>
+    <string name="unknown_error">Ha ocurrido un error.\nPor favor intenta nuevamente.</string>
     <string name="home">Inicio</string>
     <string name="training">Grupos</string>
     <string name="attendances">Asistencias</string>
     <string name="settings">Config</string>
     <string name="title_groups">Grupos De Entrenamiento</string>
-    <string name="body_groups">Grupos</string>
+    <string name="body_groups">En esta sección podrás encontrar los grupos de entrenamiento, además podrás ver los integrantes de cada grupo.</string>
     <string name="groups_info">En el módulo de grupos, tendrás acceso a los grupos de entrenamiento que te han sido asignados y también podrás visualizar a los miembros de cada uno de estos.</string>
     <string name="attendance_info">Al elegir un grupo, podrás observar los días que entrenan, lo que te permitirá seleccionar a un miembro para registrar su asistencia en la fecha que hayas escogido.</string>
     <string name="sync_groups">Al llevar a cabo la sincronización, se enviará la información sobre las asistencias registradas.</string>
     <string name="action_attendance">Si en la próxima sincronización no cuentas con una conexión a internet, se realizará el envío una vez se restablezca la conexión a internet.</string>
-    <string name="sync_info">Toda la información relacionada con las asistencias que se ha ingresado aquí será enviada al servidor, permitiendo su acceso a través de la plataforma GOLAPP.</string>
+    <string name="sync_info">Toda la información de la toma de asistencias será enviada al servidor, permitiendo su acceso a través de la plataforma GOLAPP.</string>
     <string name="sync_info_groups">Atención! Está acción actualizará los grupos de entrenamiento y se borrarán los registros de asistencia, sin embargo se obtendrán de nuevo del servidor.</string>
     <string name="title_attendances">Asistencias</string>
     <string name="body_attendances">En esta sección podrás encontrar las asistencias a los entrenamientos de los integrantes de cada grupo y podrás modificarlas.</string>
     <string name="title_attendances_p">Asistencias, Mes: %1$s, Fecha: %2$s, Día: %3$s</string>
-    <string name="month">"Mes: "</string>
-    <string name="members">"Integrantes: "</string>
-    <string name="days">"Días: "</string>
-    <string name="schedules">"Mes: "</string>
-    <string name="trainings">"Entrenamientos en el mes: "</string>
+    <string name="month">Mes</string>
+    <string name="members">Integrantes</string>
+    <string name="days">Días</string>">
+    <string name="schedules">Horarios</string>
+    <string name="trainings">Entrenamientos/Mes</string>
     <string name="groups">Grupos</string>
     <string name="no_groups_found">No ha sido posible encontrar grupos, verifica la conexión a internet!.</string>
     <string name="no_attendances_found">No ha sido posible encontrar asistencias con ese código.</string>
@@ -42,7 +44,7 @@
     <string name="error_not_found">Lo sentimos, tenemos problemas en estos momentos, intentalo más tarde.</string>
     <string name="error_unknown">Ponte en contacto con el administrador</string>
     <string name="error_connection">No fue posible establecer una comunicación con el servidor, verifica tu conexión a internet.</string>
-    <string name="pick_date">Lo sentimos, tenemos problemas en estos momentos, intentalo más tarde.</string>
+    <string name="pick_date">Selecciona una fecha para tomar asistencia de</string>
     <string name="pick_group_description">Selecciona un grupo para gestionar sus asistencias.</string>
     <string name="no_group_selected">Selecciona un grupo para ver sus días de entrenamiento.</string>
     <string name="no_attendance_selected">Selecciona un deportista para tomar asistencia.</string>
@@ -56,4 +58,10 @@
     <string name="dismiss">Cancelar</string>
     <string name="title_settings">Configuración</string>
     <string name="log_out">Cerrar sesión</string>
+    <string name="nombre_del_grupo">Nombre del Grupo</string>
+    <string name="asistencia">Asistencia</string>
+    <string name="info_group">Información Del Grupo</string>
+    <string name="general">General</string>
+    <string name="taken">Tomadas</string>
+    <string name="pendindg">Pendientes</string>
 </resources>

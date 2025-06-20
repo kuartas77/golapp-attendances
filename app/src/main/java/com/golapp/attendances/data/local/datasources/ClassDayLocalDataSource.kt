@@ -8,4 +8,5 @@ interface ClassDayLocalDataSource {
     suspend fun insertClassDayList(classDayList: List<ClassDayEntity>)
     suspend fun getClassDayById(classDayId: String): ClassDay
     suspend fun deleteClassDays()
+    suspend fun deleteClassDaysByGroupId(groupId: Int)
 }

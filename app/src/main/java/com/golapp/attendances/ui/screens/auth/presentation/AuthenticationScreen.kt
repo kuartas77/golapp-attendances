@@ -42,9 +42,9 @@ import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 @Composable
 fun AuthenticationScreen(
     modifier: Modifier = Modifier,
-    viewModel: AuthViewModel = hiltViewModel(),
     onDetectLogin: () -> Unit = {}
 ) {
+    val viewModel: AuthViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.isLoggedIn) {
