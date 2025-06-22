@@ -1,26 +1,35 @@
 package com.golapp.attendances.ui.navigation
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.golapp.attendances.R
-import com.golapp.attendances.ui.navigation.graphs.AttendanceGraph
-import com.golapp.attendances.ui.navigation.graphs.HomeGraph
-import com.golapp.attendances.ui.navigation.graphs.UserGraph
+import com.golapp.attendances.ui.navigation.graphs.GroupAttendances
+import com.golapp.attendances.ui.navigation.graphs.Groups
+import com.golapp.attendances.ui.navigation.graphs.Home
+import com.golapp.attendances.ui.navigation.graphs.Settings
+import kotlin.reflect.KClass
 
 
-sealed class Destinations<T: Any>(val route: T, val icon: Int, val label: Int) {
-    data object Home : Destinations<HomeGraph.Home>(
-        HomeGraph.Home,
-        R.drawable.ic_home,
-        R.string.home
-    )
-
-    data object Groups : Destinations<AttendanceGraph.Groups>(
-        AttendanceGraph.Groups,
-        R.drawable.ic_team,
-        R.string.groups
-    )
-    data object Settings : Destinations<UserGraph.Settings>(
-        UserGraph.Settings,
-        R.drawable.ic_settings,
-        R.string.settings
+enum class Destinations(
+    val route: KClass<*>,
+    val baseRoute: KClass<*> = route,
+    @DrawableRes val icon: Int,
+    @StringRes val label: Int
+) {
+    HOME(
+        route = Home::class,
+        icon = R.drawable.ic_home,
+        label = R.string.home
+    ),
+    GROUPS(
+        route = Groups::class,
+        icon = R.drawable.ic_team,
+        label = R.string.groups,
+        baseRoute = GroupAttendances::class
+    ),
+    SETTINGS(
+        route = Settings::class,
+        icon = R.drawable.ic_settings,
+        label = R.string.settings
     )
 }

@@ -7,7 +7,7 @@ import androidx.navigation.toRoute
 import com.golapp.attendances.common.di.IoDispatcher
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.domain.models.ClassDay
-import com.golapp.attendances.ui.navigation.graphs.AttendanceGraph
+import com.golapp.attendances.ui.navigation.graphs.Attendances
 import com.golapp.attendances.ui.screens.attendances.usecases.AttendancesUseCases
 import com.golapp.attendances.ui.screens.groups.usecases.GroupUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +28,7 @@ class AttendancesViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    private val attendanceRoute: AttendanceGraph.GroupsAttendances = savedStateHandle.toRoute()
+    private val attendanceRoute: Attendances = savedStateHandle.toRoute()
     private val _uiState = MutableStateFlow(AttendancesUiState())
     val uiState = _uiState.onSubscription { loadAttendances() }.stateIn(
         scope = viewModelScope,
@@ -36,51 +36,54 @@ class AttendancesViewModel @Inject constructor(
         initialValue = AttendancesUiState(isLoading = true)
     )
 
-    /**
-     *  1. cargar el classday de DB, para poder realizar la peticion de asistencias
-     *  2. cargar el grupo del classday del mes actual
-     *  3. cargar las asistencias de DB de ese classday
-     *  4. si no hay asistencias en DB, cargarlas de la API
-     *  5. si hay asistencias en la API, actualizarlas
-     *  6. si no hay asistencias en la API crearlas en la DB con los players del grupo
-     **/
     private fun loadAttendances() {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            attendancesUseCases.getClassDayById(attendanceRoute.classDayId).let { classDay ->
-                _uiState.update { it.copy(classDaySelected = classDay) }
-                async {
-                    attendancesUseCases.verifyAttendancesByClassId(classDay)
 
-                    attendancesUseCases.getAttendancesByClassDay(classDay).collect { attendances ->
-                        _uiState.update {
-                            it.copy(
-                                listAttendances = attendances,
-                                isLoading = false
-                            )
-                        }
+            val classDay = attendancesUseCases.getClassDayById(attendanceRoute.classDayId)
+            _uiState.update { it.copy(classDaySelected = classDay) }
+
+            async {
+                attendancesUseCases.verifyAttendancesByClassId(classDay)
+                attendancesUseCases.getAttendancesByClassDay(classDay).collect { attendances ->
+                    _uiState.update {
+                        it.copy(listAttendances = attendances, isLoading = false)
                     }
-                }.await()
-            }
+                }
+            }.await()
         }
     }
 
     private fun filterList(query: String) {
-        _uiState.update { it.copy(query = query) }
-        if (query.isNotBlank()) {
-            _uiState.update {
-                it.copy(
-                    listAttendances = it.listAttendances.filter {
-                        it.player.uniqueCode.contains(
-                            query,
-                            ignoreCase = true
-                        )
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val classDay = _uiState.value.classDaySelected
+            if (classDay != null) {
+                attendancesUseCases.getAttendancesByClassDay(classDay).collect { attendances ->
+                    if (query.isBlank() || query.isEmpty()) {
+                        _uiState.update {
+                            it.copy(listAttendances = attendances, isLoading = false)
+                        }
+                    } else {
+                        val filteredCode = attendances.filter {
+                            it.player.uniqueCode.contains(
+                                query,
+                                ignoreCase = true
+                            )
+                        }
+                        val filteredName = attendances.filter {
+                            it.player.fullNames.contains(
+                                query,
+                                ignoreCase = true
+                            )
+                        }
+
+                        val filtered = filteredCode.plus(filteredName)
+
+                        _uiState.update { it.copy(listAttendances = filtered, isLoading = false) }
                     }
-                )
-            }
-        } else {
-            _uiState.update {
-                it.copy(listAttendances = it.listAttendances, isLoading = false)
+
+                }
             }
         }
     }

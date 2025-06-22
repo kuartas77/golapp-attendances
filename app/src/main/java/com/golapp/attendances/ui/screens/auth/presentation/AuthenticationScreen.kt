@@ -41,7 +41,6 @@ import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 
 @Composable
 fun AuthenticationScreen(
-    modifier: Modifier = Modifier,
     onDetectLogin: () -> Unit = {}
 ) {
     val viewModel: AuthViewModel = hiltViewModel()
@@ -55,7 +54,7 @@ fun AuthenticationScreen(
 
     Scaffold { padding ->
         Surface(
-            modifier = modifier
+            modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
         ) {

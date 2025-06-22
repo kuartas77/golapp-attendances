@@ -1,6 +1,5 @@
 package com.golapp.attendances.ui.screens.groups.presentation
 
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.golapp.attendances.R
@@ -45,7 +44,7 @@ class GroupsViewModel @Inject constructor(
                     sendEvent(UiEvent.ShowSnackbar(UiText.StringResource(R.string.no_groups_found)))
                 } else if (query.isNotEmpty()) {
                     val filteredGroups =
-                        groups.filter { it.name.contains(query, ignoreCase = true) }
+                        groups.filter { it.fullGroup.contains(query, ignoreCase = true) }
                     _uiState.update { it.copy(listGroups = filteredGroups, isLoading = false) }
                 } else {
                     _uiState.update { it.copy(listGroups = groups, isLoading = false) }
@@ -75,6 +74,7 @@ class GroupsViewModel @Inject constructor(
             is GroupsUiEvent.OnSearchGroup -> loadGroups(event.query)
             is GroupsUiEvent.OnSelectGroup -> getSelectedGroup(event.group.id)
             GroupsUiEvent.SyncGroups -> syncGroups()
+            GroupsUiEvent.OnClearText -> loadGroups()
         }
     }
 }
@@ -89,6 +89,7 @@ data class GroupsUiState(
 
 sealed interface GroupsUiEvent {
     data class OnSearchGroup(val query: String) : GroupsUiEvent
+    data object OnClearText : GroupsUiEvent
     data class OnSelectGroup(val group: GroupWithClassDays) : GroupsUiEvent
     data object SyncGroups : GroupsUiEvent
 }

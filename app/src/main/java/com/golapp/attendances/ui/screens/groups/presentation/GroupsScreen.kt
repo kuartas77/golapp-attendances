@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,9 +54,11 @@ import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SHAPE_LARGE
 import com.golapp.attendances.common.Constants.SPACER_LARGE
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM
+import com.golapp.attendances.common.Constants.SPACER_MEDIUM_LARGE
 import com.golapp.attendances.common.Constants.SPACER_SMALL
 import com.golapp.attendances.common.ui.components.AlertDialogSync
 import com.golapp.attendances.common.ui.components.HeaderContent
+import com.golapp.attendances.common.ui.components.Loader
 import com.golapp.attendances.common.ui.components.ScheduleTimeContent
 import com.golapp.attendances.common.ui.components.SearchBar
 import com.golapp.attendances.common.ui.components.groupWithClassPreview
@@ -67,34 +69,26 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun GroupsScreen(
-    modifier: Modifier = Modifier,
-    viewModel: GroupsViewModel = hiltViewModel(),
-    onClickClassDay: (String) -> Unit = {},
+    onClickClassDay: (String) -> Unit = {}
 ) {
+    val viewModel: GroupsViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Surface(
-        modifier = modifier.padding(horizontal = SPACER_MEDIUM),
+        modifier = Modifier.padding(horizontal = SPACER_MEDIUM),
     ) {
         Column {
             HeaderContent()
 
             Spacer(modifier = Modifier.height(SPACER_SMALL))
 
-            if (uiState.isLoading) {
-                Column(
-                    modifier = modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    content = { CircularProgressIndicator() }
-                )
-            } else {
-                ListGroups(
-                    uiState = uiState,
-                    onEvent = viewModel::onEvent,
-                    onClickClassDay = onClickClassDay
-                )
-            }
+            Loader(show = uiState.isLoading)
+
+            ListGroups(
+                uiState = uiState,
+                onEvent = viewModel::onEvent,
+                onClickClassDay = onClickClassDay
+            )
         }
     }
 }
@@ -154,38 +148,17 @@ private fun ThreePaneScaffoldScope.ListPanelGroups(
     navigator: ThreePaneScaffoldNavigator<GroupWithClassDays>
 ) {
     val listState = rememberLazyListState()
-    val groups = uiState.listGroups
-    var showDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val groups = uiState.listGroups
 
     Column(
         modifier = modifier
             .padding(top = 8.dp, start = 8.dp, end = 8.dp)
     ) {
-        Row(
-            modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = { showDialog = !showDialog },
-                content = {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_sync),
-                        contentDescription = "Sync Groups"
-                    )
-                }
-            )
-            SearchBar(
-                hint = stringResource(id = R.string.groups),
-                onSearchClicked = { onEvent(GroupsUiEvent.OnSearchGroup(it)) },
-                onTextChange = { onEvent(GroupsUiEvent.OnSearchGroup(it)) },
-                cornerShape = MaterialTheme.shapes.medium,
-            )
-        }
+        SearchBar(uiState = uiState, onEvent = onEvent)
         Spacer(modifier = modifier.height(SPACER_SMALL))
 
-        if (uiState.listGroups.isEmpty()) {
+        if (groups.isEmpty()) {
             Column(
                 modifier = modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -216,6 +189,41 @@ private fun ThreePaneScaffoldScope.ListPanelGroups(
         }
     }
 
+
+}
+
+@Composable
+fun SearchBar(
+    modifier: Modifier = Modifier,
+    uiState: GroupsUiState,
+    onEvent: (GroupsUiEvent) -> Unit,
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = { showDialog = !showDialog },
+            content = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_sync),
+                    contentDescription = "Sync Groups"
+                )
+            }
+        )
+        SearchBar(
+            hint = stringResource(id = R.string.groups),
+            onSearchClicked = { onEvent(GroupsUiEvent.OnSearchGroup(it)) },
+            onTextChange = { onEvent(GroupsUiEvent.OnSearchGroup(it)) },
+            onClearClick = { onEvent(GroupsUiEvent.OnClearText) },
+            cornerShape = MaterialTheme.shapes.medium,
+            state = remember { mutableStateOf(TextFieldValue(uiState.query)) }
+        )
+    }
+
     AnimatedVisibility(visible = showDialog) {
         AlertDialogSync(
             showDialog = showDialog,
@@ -240,10 +248,10 @@ private fun GroupItem(
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top)
             .height(120.dp)
-            .padding(top = 8.dp)
+            .padding(top = SPACER_LARGE)
             .clickable { onClickItem(group) },
         shape = CutCornerShape(topEnd = SHAPE_LARGE, bottomStart = SHAPE_LARGE),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = SPACER_MEDIUM_LARGE),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Row(

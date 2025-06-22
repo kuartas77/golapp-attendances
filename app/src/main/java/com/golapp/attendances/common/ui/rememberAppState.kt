@@ -2,17 +2,26 @@ package com.golapp.attendances.common.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.get
+import androidx.navigation.navOptions
+import androidx.tracing.trace
 import com.golapp.attendances.common.remote.NetworkMonitor
-import com.golapp.attendances.ui.navigation.graphs.GuestGraph
+import com.golapp.attendances.ui.navigation.Destinations
+import com.golapp.attendances.ui.navigation.graphs.Authentication
+import com.golapp.attendances.ui.navigation.graphs.navigateToGroups
+import com.golapp.attendances.ui.navigation.graphs.navigateToHome
+import com.golapp.attendances.ui.navigation.graphs.navigateToSettings
 import com.golapp.attendances.ui.screens.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -43,12 +52,33 @@ class GolAppState(
     coroutineScope: CoroutineScope,
     networkMonitor: NetworkMonitor,
 ) {
+    val topLevelDestinations: List<Destinations> = Destinations.entries
+
+    private val previousDestination = mutableStateOf<NavDestination?>(null)
+
     val currentDestination: NavDestination?
-        @Composable get() = navController
-            .currentBackStackEntryAsState().value?.destination
+        @Composable get() {
+            // Collect the currentBackStackEntryFlow as a state
+            val currentEntry = navController.currentBackStackEntryFlow
+                .collectAsState(initial = null)
+
+            // Fallback to previousDestination if currentEntry is null
+            return currentEntry.value?.destination.also { destination ->
+                if (destination != null) {
+                    previousDestination.value = destination
+                }
+            } ?: previousDestination.value
+        }
+
+    val currentTopLevelDestination: Destinations?
+        @Composable get() {
+            return Destinations.entries.firstOrNull { topLevelDestination ->
+                currentDestination?.hasRoute(route = topLevelDestination.route) == true
+            }
+        }
 
     val isGuestDestination: Boolean
-        @Composable get() = currentDestination?.hierarchy?.any { it.route == navController.graph[GuestGraph.Guest].route } == true
+        @Composable get() = currentDestination?.hierarchy?.any { it.route == navController.graph[Authentication].route } == true
 
     val isOffline = networkMonitor.isOnline
         .map(Boolean::not)
@@ -57,4 +87,22 @@ class GolAppState(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = false
         )
+
+    fun navigateToDestination(destinations: Destinations) {
+        trace("Navigation: ${destinations.name}") {
+            val topLevelNavOptions = navOptions {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+
+            when (destinations) {
+                Destinations.HOME -> navController.navigateToHome(topLevelNavOptions)
+                Destinations.GROUPS -> navController.navigateToGroups(topLevelNavOptions)
+                Destinations.SETTINGS -> navController.navigateToSettings(topLevelNavOptions)
+            }
+        }
+    }
 }

@@ -20,7 +20,6 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,6 +62,7 @@ import com.golapp.attendances.common.Constants.SPACER_MEDIUM
 import com.golapp.attendances.common.Constants.SPACER_SMALL
 import com.golapp.attendances.common.ui.components.AlertDialogSync
 import com.golapp.attendances.common.ui.components.HeaderContent
+import com.golapp.attendances.common.ui.components.Loader
 import com.golapp.attendances.common.ui.components.SearchBar
 import com.golapp.attendances.common.ui.components.attendanceWithPlayerPreview
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
@@ -70,32 +71,24 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AttendancesScreen(
-    modifier: Modifier = Modifier,
     viewModel: AttendancesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Surface(
-        modifier = modifier.padding(horizontal = SPACER_MEDIUM),
+        modifier = Modifier.padding(horizontal = SPACER_MEDIUM),
     ) {
         Column {
             HeaderContent()
 
             Spacer(modifier = Modifier.height(SPACER_SMALL))
 
-            if (uiState.isLoading) {
-                Column(
-                    modifier = modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    content = { CircularProgressIndicator() }
-                )
-            } else {
-                ListAttendances(
-                    uiState = uiState,
-                    onEvent = viewModel::onEvent
-                )
-            }
+            Loader(show = uiState.isLoading)
+
+            ListAttendances(
+                uiState = uiState,
+                onEvent = viewModel::onEvent
+            )
         }
     }
 }
@@ -185,6 +178,7 @@ private fun ThreePaneScaffoldScope.ListPanelAttendances(
                 onSearchClicked = { onEvent(AttendancesUiEvent.OnSearchAttendance(it)) },
                 onTextChange = { onEvent(AttendancesUiEvent.OnSearchAttendance(it)) },
                 cornerShape = MaterialTheme.shapes.medium,
+                state = remember { mutableStateOf(TextFieldValue(uiState.query)) }
             )
         }
         Spacer(modifier = modifier.height(SPACER_SMALL))

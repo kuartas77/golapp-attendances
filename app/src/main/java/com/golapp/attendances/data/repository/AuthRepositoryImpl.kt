@@ -31,9 +31,9 @@ class AuthRepositoryImpl @Inject constructor(
         resultOf {
             val responseLogin = authRemoteDataSource.authenticate(email, password)
 
-            if(responseLogin.expires == 0L){
+            if (responseLogin.expires == 0L) {
                 emit(ResultLogin(message = responseLogin.message, code = responseLogin.code))
-            } else{
+            } else {
                 storeLocalDataSource.clear()
                 storeLocalDataSource.saveToken(responseLogin.token)
                 storeLocalDataSource.saveRefreshToken(responseLogin.refreshToken)
@@ -44,7 +44,7 @@ class AuthRepositoryImpl @Inject constructor(
                 storeLocalDataSource.saveSchoolName(responseLogin.userDto?.schoolName ?: "")
                 storeLocalDataSource.saveSchoolSlug(responseLogin.userDto?.schoolSlug ?: "")
                 storeLocalDataSource.saveSchoolLogo(responseLogin.userDto?.schoolLogo ?: "")
-                emit(ResultLogin(idle = true, code =  200))
+                emit(ResultLogin(idle = true, code = 200))
             }
         }.onFailure {
             emit(ResultLogin(message = it.message))
@@ -61,21 +61,25 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun getUserData(): Flow<User> = flow {
         resultOf {
-            emit(User(
-                name = storeLocalDataSource.getUserName(),
-                schoolId = storeLocalDataSource.getSchoolId(),
-                schoolName = storeLocalDataSource.getSchoolName(),
-                schoolSlug = storeLocalDataSource.getSchoolSlug(),
-                schoolLogo = storeLocalDataSource.getSchoolLogo()
-            ))
+            emit(
+                User(
+                    name = storeLocalDataSource.getUserName(),
+                    schoolId = storeLocalDataSource.getSchoolId(),
+                    schoolName = storeLocalDataSource.getSchoolName(),
+                    schoolSlug = storeLocalDataSource.getSchoolSlug(),
+                    schoolLogo = storeLocalDataSource.getSchoolLogo()
+                )
+            )
         }.onFailure {
-            emit(User(
-                name = "",
-                schoolId = 0,
-                schoolName = "",
-                schoolSlug = "",
-                schoolLogo = ""
-            ))
+            emit(
+                User(
+                    name = "",
+                    schoolId = 0,
+                    schoolName = "",
+                    schoolSlug = "",
+                    schoolLogo = ""
+                )
+            )
         }
     }.flowOn(ioDispatcher)
 

@@ -104,6 +104,9 @@ object LocalModule {
         ClassDayLocalDataSourceImpl(classDayDao)
 
     @Provides
-    fun provideStoreLocalDatasource(preferenceDataStore: DataStore<Preferences>, api: GolappAPI): StoreLocalDataSource =
+    fun provideStoreLocalDatasource(
+        preferenceDataStore: DataStore<Preferences>,
+        api: GolappAPI
+    ): StoreLocalDataSource =
         StoreLocalDataSourceImpl(preferenceDataStore, api)
 }

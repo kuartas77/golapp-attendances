@@ -10,5 +10,6 @@ import javax.inject.Inject
 class GetAttendancesByClassDayUseCaseImpl @Inject constructor(
     private val attendanceRepository: AttendanceRepository
 ) : GetAttendancesByClassDayUseCase {
-    override suspend fun invoke(classDay: ClassDay): Flow<List<AttendanceWithPlayer>>  = attendanceRepository.getAttendances(classDay)
+    override suspend fun invoke(classDay: ClassDay): Flow<List<AttendanceWithPlayer>> =
+        attendanceRepository.getAttendances(classDay)
 }

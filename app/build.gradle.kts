@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.room)
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
@@ -20,22 +21,27 @@ android {
         applicationId = "com.golapp.attendances"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
+        versionCode = 7
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
         multiDexEnabled = true
-        ndk.debugSymbolLevel = "full"
     }
+
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
+
+    ndkVersion = "29.0.13599879 rc2"
 
     buildTypes {
         getByName("release") {
+            ndk {
+                debugSymbolLevel = "symbol_table"
+            }
             isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
@@ -44,9 +50,6 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
-            ndk {
-                debugSymbolLevel = "full"
-            }
         }
         getByName("debug") {
             isDebuggable = true
