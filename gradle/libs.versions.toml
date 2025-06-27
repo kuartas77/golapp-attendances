@@ -1,6 +1,6 @@
 [versions]
 adaptiveLayout = "1.1.0"
-agp = "8.10.1"
+agp = "8.11.0"
 coilCompose = "3.0.0-rc01"
 coreSplashscreen = "1.0.1"
 datastorePreferences = "1.1.7"
