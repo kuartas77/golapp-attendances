@@ -3,7 +3,6 @@ package com.golapp.attendances.ui.navigation.graphs
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
-import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.golapp.attendances.ui.screens.attendances.presentation.AttendancesScreen
@@ -24,7 +23,7 @@ fun NavController.navigateToGroups(navOptions: NavOptions) = navigate(Groups, na
 
 fun NavController.navigateToGroups(
     classDayId: String,
-    navOptions: NavOptionsBuilder.() -> Unit = {}
+    navOptions: NavOptions? = null
 ) = navigate(Attendances(classDayId), navOptions)
 
 fun NavGraphBuilder.groupsScreen(
