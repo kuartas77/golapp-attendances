@@ -9,8 +9,8 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.room)
 
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {

@@ -30,6 +30,8 @@ timber = "5.0.1"
 tracing = "1.3.0"
 kotlinPlugin = "1.8.10"
 workRuntimeKtx = "2.10.2"
+googleServices = "4.4.3"
+firebaseCrashlytics = "3.0.4"
 
 [libraries]
 androidx-adaptive-layout = { module = "androidx.compose.material3.adaptive:adaptive-layout", version.ref = "adaptiveLayout" }
@@ -84,3 +86,5 @@ hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndro
 room = { id = "androidx.room", version.ref = "roomVersion" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlinPlugin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
