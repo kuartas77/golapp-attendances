@@ -3,7 +3,7 @@ package com.golapp.attendances.ui.screens.groups.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.golapp.attendances.R
-import com.golapp.attendances.common.di.IoDispatcher
+import com.golapp.attendances.data.di.IoDispatcher
 import com.golapp.attendances.common.ui.events.UiEvent
 import com.golapp.attendances.common.ui.events.UiText
 import com.golapp.attendances.common.ui.events.sendEvent
@@ -23,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GroupsViewModel @Inject constructor(
     private val groupUseCases: GroupUseCases,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val currentMonth = LocalDate.now().monthValue

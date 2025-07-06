@@ -36,7 +36,6 @@ import com.golapp.attendances.common.Constants.SHAPE_LARGE
 import com.golapp.attendances.common.Constants.SPACER_LARGE
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM
 import com.golapp.attendances.common.Constants.SPACER_SMALL
-import com.golapp.attendances.common.ui.components.HeaderContent
 import com.golapp.attendances.domain.models.Statistics
 
 @Composable
@@ -49,12 +48,7 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState()),
     ) {
         Column {
-            HeaderContent()
-
-            Spacer(modifier = Modifier.height(SPACER_MEDIUM))
-
             SectionInfo()
-
         }
     }
 }
@@ -65,7 +59,7 @@ private fun SectionInfo() {
     val viewModel: HomeViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listStatistics = uiState.listStatistics
-    val textListInfo = listOf<String>(
+    val textListInfo = listOf(
         stringResource(R.string.groups_info),
         stringResource(R.string.attendance_info),
         stringResource(R.string.sync_groups),

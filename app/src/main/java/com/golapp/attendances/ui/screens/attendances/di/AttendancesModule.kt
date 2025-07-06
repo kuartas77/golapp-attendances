@@ -1,7 +1,9 @@
 package com.golapp.attendances.ui.screens.attendances.di
 
-import com.golapp.attendances.common.remote.NetworkMonitor
+import com.golapp.attendances.data.util.remote.NetworkMonitor
 import com.golapp.attendances.domain.repository.AttendanceRepository
+import com.golapp.attendances.domain.repository.ClassDayRepository
+import com.golapp.attendances.domain.repository.GroupRepository
 import com.golapp.attendances.ui.screens.attendances.usecases.AttendancesUseCases
 import com.golapp.attendances.ui.screens.attendances.usecases.GetAttendancesByClassDayUseCaseImpl
 import com.golapp.attendances.ui.screens.attendances.usecases.GetClassDayByIdUseCaseImpl
@@ -22,13 +24,15 @@ object AttendancesModule {
     @Singleton
     fun provideAttendancesUseCases(
         attendanceRepository: AttendanceRepository,
+        groupRepository: GroupRepository,
+        classDayRepository: ClassDayRepository,
         networkMonitor: NetworkMonitor
     ): AttendancesUseCases {
         return AttendancesUseCases(
-            getClassDayById = GetClassDayByIdUseCaseImpl(attendanceRepository),
+            getClassDayById = GetClassDayByIdUseCaseImpl(classDayRepository),
             getAttendancesByClassDay = GetAttendancesByClassDayUseCaseImpl(attendanceRepository),
             takeAttendance = TakeAttendanceUseCaseImpl(attendanceRepository, networkMonitor),
-            verifyAttendancesByClassId = VerifyAttendancesByClassIdUseCaseImpl(attendanceRepository),
+            verifyAttendancesByClassId = VerifyAttendancesByClassIdUseCaseImpl(attendanceRepository, groupRepository),
             syncAttendance = SyncAttendanceUseCaseImpl(attendanceRepository)
         )
     }

@@ -1,7 +1,7 @@
 package com.golapp.attendances.data.remote.interceptors
 
-import com.golapp.attendances.common.remote.NetworkMonitor
-import com.golapp.attendances.common.remote.SuspendInterceptor
+import com.golapp.attendances.data.util.remote.NetworkMonitor
+import com.golapp.attendances.data.util.remote.SuspendInterceptor
 import okhttp3.CacheControl
 import okhttp3.Interceptor
 import okhttp3.Response

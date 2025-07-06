@@ -29,7 +29,6 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
-import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
 import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
@@ -42,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -56,12 +56,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SHAPE_LARGE
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM
 import com.golapp.attendances.common.Constants.SPACER_SMALL
 import com.golapp.attendances.common.ui.components.AlertDialogSync
-import com.golapp.attendances.common.ui.components.HeaderContent
 import com.golapp.attendances.common.ui.components.Loader
 import com.golapp.attendances.common.ui.components.SearchBar
 import com.golapp.attendances.common.ui.components.attendanceWithPlayerPreview
@@ -79,9 +79,6 @@ fun AttendancesScreen(
         modifier = Modifier.padding(horizontal = SPACER_MEDIUM),
     ) {
         Column {
-            HeaderContent()
-
-            Spacer(modifier = Modifier.height(SPACER_SMALL))
 
             Loader(show = uiState.isLoading)
 
@@ -139,7 +136,7 @@ fun ListAttendances(
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-private fun ThreePaneScaffoldScope.ListPanelAttendances(
+private fun ListPanelAttendances(
     modifier: Modifier = Modifier,
     uiState: AttendancesUiState = AttendancesUiState(),
     onEvent: (AttendancesUiEvent) -> Unit,
@@ -241,6 +238,9 @@ private fun AttendanceItem(
     } ?: run {
         attendanceValue = stringResource(R.string.take_attendance)
     }
+
+    val imageRequest = ImageRequest.Builder(LocalContext.current).data(attendance.player.photoUrl)
+        .build()
 
     Card(
         modifier = modifier
@@ -352,7 +352,7 @@ private fun AttendanceItem(
             ) {
 
                 AsyncImage(
-                    model = attendance.player.photoUrl,
+                    model = imageRequest,
                     contentDescription = stringResource(R.string.player_photo),
                     placeholder = painterResource(R.drawable.user),
                     error = painterResource(R.drawable.user),

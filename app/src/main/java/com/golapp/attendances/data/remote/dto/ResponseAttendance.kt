@@ -1,10 +1,10 @@
 package com.golapp.attendances.data.remote.dto
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class ResponseAttendances(
-    @field:Json(name = "data")
+    @SerialName("data")
     val attendances: List<DtoAttendance>
 )

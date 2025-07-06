@@ -1,4 +1,4 @@
-package com.golapp.attendances.common
+package com.golapp.attendances.data.util
 
 import kotlin.coroutines.cancellation.CancellationException
 

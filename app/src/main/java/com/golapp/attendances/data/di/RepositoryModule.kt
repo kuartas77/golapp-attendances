@@ -12,9 +12,11 @@ import com.golapp.attendances.data.remote.datasources.AuthRemoteDataSource
 import com.golapp.attendances.data.remote.datasources.GroupsRemoteDataSource
 import com.golapp.attendances.data.repository.AttendanceRepositoryImpl
 import com.golapp.attendances.data.repository.AuthRepositoryImpl
+import com.golapp.attendances.data.repository.ClassDayRepositoryImpl
 import com.golapp.attendances.data.repository.GroupRepositoryImpl
 import com.golapp.attendances.domain.repository.AttendanceRepository
 import com.golapp.attendances.domain.repository.AuthRepository
+import com.golapp.attendances.domain.repository.ClassDayRepository
 import com.golapp.attendances.domain.repository.GroupRepository
 import dagger.Module
 import dagger.Provides
@@ -38,15 +40,11 @@ object RepositoryModule {
     fun provideAttendanceRepository(
         attendanceLocalDataSource: AttendancesLocalDataSource,
         attendanceRemoteDataSource: AttendancesRemoteDataSource,
-        classDayLocalDatasource: ClassDayLocalDataSource,
-        groupLocalDataSource: GroupsLocalDataSource,
         workManager: WorkManager
     ): AttendanceRepository {
         return AttendanceRepositoryImpl(
             attendanceLocalDataSource = attendanceLocalDataSource,
             attendanceRemoteDataSource = attendanceRemoteDataSource,
-            classDayLocalDataSource = classDayLocalDatasource,
-            groupLocalDataSource = groupLocalDataSource,
             workManager = workManager
         )
     }
@@ -81,5 +79,13 @@ object RepositoryModule {
             classDayLocalDatasource,
             Dispatchers.IO
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideClassDayRepository(
+        classDayLocalDatasource: ClassDayLocalDataSource
+    ): ClassDayRepository {
+        return ClassDayRepositoryImpl(classDayLocalDatasource)
     }
 }

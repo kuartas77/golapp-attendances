@@ -1,8 +1,8 @@
 package com.golapp.attendances.data.repository
 
 import androidx.annotation.WorkerThread
-import com.golapp.attendances.common.di.IoDispatcher
-import com.golapp.attendances.common.resultOf
+import com.golapp.attendances.data.di.IoDispatcher
+import com.golapp.attendances.data.util.resultOf
 import com.golapp.attendances.data.local.datasources.GroupsLocalDataSource
 import com.golapp.attendances.data.local.datasources.StoreLocalDataSource
 import com.golapp.attendances.data.remote.datasources.AuthRemoteDataSource
@@ -22,7 +22,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val authRemoteDataSource: AuthRemoteDataSource,
     private val storeLocalDataSource: StoreLocalDataSource,
     private val attendancesLocalDataSource: GroupsLocalDataSource,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : AuthRepository {
     override suspend fun login(
         email: String,

@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.golapp.attendances.common.di.IoDispatcher
+import com.golapp.attendances.data.di.IoDispatcher
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.ui.navigation.graphs.Attendances
@@ -24,8 +24,7 @@ import javax.inject.Inject
 class AttendancesViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val attendancesUseCases: AttendancesUseCases,
-    private val groupUseCases: GroupUseCases,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val attendanceRoute: Attendances = savedStateHandle.toRoute()

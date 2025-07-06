@@ -1,6 +1,6 @@
 package com.golapp.attendances.ui.screens.attendances.usecases
 
-import com.golapp.attendances.common.remote.NetworkMonitor
+import com.golapp.attendances.data.util.remote.NetworkMonitor
 import com.golapp.attendances.data.remote.dto.RequestAttendance
 import com.golapp.attendances.domain.models.Attendance
 import com.golapp.attendances.domain.models.AttendanceSync

@@ -3,9 +3,14 @@ package com.golapp.attendances.common.ui.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -14,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -23,9 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
-import coil3.request.crossfade
 import com.golapp.attendances.R
 import com.golapp.attendances.ui.screens.MainViewModel
 
@@ -39,10 +43,19 @@ fun HeaderContent(
     val userName = uiState.user?.name ?: ""
     val schoolLogoUrl = uiState.user?.schoolLogo ?: ""
     val schoolName = uiState.user?.schoolName ?: ""
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(LocalPlatformContext.current)
+            .data(schoolLogoUrl)
+            .build(),
+    )
 
     Surface(
-        modifier = modifier.fillMaxWidth(),
-        shadowElevation = 4.dp
+        modifier = modifier.fillMaxWidth()
+            .windowInsetsPadding(
+            WindowInsets.safeDrawing.only(
+                WindowInsetsSides.Top
+            )
+        ),
     ) {
         Row(
             modifier = modifier
@@ -52,12 +65,9 @@ fun HeaderContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current).data(schoolLogoUrl)
-                    .crossfade(true).build(),
+            Image(
+                painter = painter,
                 contentDescription = schoolName,
-                placeholder = painterResource(R.drawable.ic_ball),
-                error = painterResource(R.drawable.ic_ball),
                 contentScale = ContentScale.Fit,
                 modifier = modifier.size(48.dp, 36.dp)
             )

@@ -6,7 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.golapp.attendances.common.ui.GolAppState
 import com.golapp.attendances.ui.navigation.graphs.Authentication
-import com.golapp.attendances.ui.navigation.graphs.GroupAttendances
+import com.golapp.attendances.ui.navigation.graphs.Groups
 import com.golapp.attendances.ui.navigation.graphs.authenticationScreens
 import com.golapp.attendances.ui.navigation.graphs.groupsScreen
 import com.golapp.attendances.ui.navigation.graphs.homeScreen
@@ -53,8 +53,8 @@ fun GolappNavHost(
         groupsScreen(
             onClickClassDay = {
                 navController.navigateToGroups(it, navOptions {
-                    popUpTo(GroupAttendances) {
-                        inclusive = true
+                    popUpTo(Groups) {
+                        inclusive = false
                     }
                 })
             }

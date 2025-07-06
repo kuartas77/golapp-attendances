@@ -16,7 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.get
 import androidx.navigation.navOptions
 import androidx.tracing.trace
-import com.golapp.attendances.common.remote.NetworkMonitor
+import com.golapp.attendances.data.util.remote.NetworkMonitor
 import com.golapp.attendances.ui.navigation.Destinations
 import com.golapp.attendances.ui.navigation.graphs.Authentication
 import com.golapp.attendances.ui.navigation.graphs.navigateToGroups

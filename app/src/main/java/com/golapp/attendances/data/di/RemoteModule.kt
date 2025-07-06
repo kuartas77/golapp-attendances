@@ -3,14 +3,16 @@ package com.golapp.attendances.data.di
 import android.content.Context
 import androidx.compose.ui.util.trace
 import coil3.ImageLoader
+import coil3.disk.DiskCache
+import coil3.disk.directory
 import coil3.memory.MemoryCache
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.CachePolicy
 import coil3.request.crossfade
 import coil3.util.DebugLogger
 import com.golapp.attendances.BuildConfig
-import com.golapp.attendances.common.remote.ConnectivityManagerNetworkMonitor
-import com.golapp.attendances.common.remote.NetworkMonitor
+import com.golapp.attendances.data.util.remote.ConnectivityManagerNetworkMonitor
+import com.golapp.attendances.data.util.remote.NetworkMonitor
 import com.golapp.attendances.data.datasources.remote.AttendancesRemoteDataSourceImpl
 import com.golapp.attendances.data.datasources.remote.AuthRemoteDataSourceImpl
 import com.golapp.attendances.data.datasources.remote.GroupsRemoteDataSourceImpl
@@ -22,17 +24,20 @@ import com.golapp.attendances.data.remote.datasources.GroupsRemoteDataSource
 import com.golapp.attendances.data.remote.interceptors.AuthCoilInterceptor
 import com.golapp.attendances.data.remote.interceptors.AuthHeaderInterceptor
 import com.golapp.attendances.data.remote.interceptors.NetworkMonitorInterceptor
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.json.Json
 import okhttp3.Call
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -41,7 +46,7 @@ object RemoteModule {
     @Provides
     @Singleton
     fun provideNetworkMonitor(@ApplicationContext context: Context): NetworkMonitor =
-        ConnectivityManagerNetworkMonitor(context, Dispatchers.IO)
+        ConnectivityManagerNetworkMonitor(context)
 
     @Provides
     @Singleton
@@ -83,12 +88,13 @@ object RemoteModule {
     @Provides
     @Singleton
     fun provideGolappAPI(
-        okhttpCallFactory: dagger.Lazy<Call.Factory>
+        okhttpCallFactory: Lazy<Call.Factory>
     ): GolappAPI {
+        val contentType = "application/json; charset=UTF8".toMediaType()
         return trace("GolappNetwork") {
             Retrofit.Builder()
                 .baseUrl(BuildConfig.API_URL)
-                .addConverterFactory(MoshiConverterFactory.create())
+                .addConverterFactory(Json.asConverterFactory(contentType))
                 .callFactory { okhttpCallFactory.get().newCall(it) }
                 .build()
                 .create(GolappAPI::class.java)
@@ -102,22 +108,28 @@ object RemoteModule {
         headerCoilInterceptor: AuthCoilInterceptor
     ): ImageLoader = trace("GolappImageLoader") {
         ImageLoader.Builder(context)
-            .crossfade(true)
             .memoryCachePolicy(CachePolicy.ENABLED)
             .memoryCache {
                 MemoryCache.Builder()
-                    .maxSizePercent(context, 0.25)
+                    .maxSizePercent(context, 0.1)
                     .strongReferencesEnabled(true)
                     .build()
             }
             .diskCachePolicy(CachePolicy.ENABLED)
+            .diskCache {
+                DiskCache.Builder()
+                    .maxSizePercent(0.02)
+                    .directory(context.cacheDir.resolve("image_cache"))
+                    .build()
+            }
             .components {
                 add(
                     OkHttpNetworkFetcherFactory(
-                        OkHttpClient.Builder()
-                            .addNetworkInterceptor(
-                                headerCoilInterceptor
-                            ).build()
+                        callFactory = {
+                            OkHttpClient().newBuilder()
+                                .addNetworkInterceptor(headerCoilInterceptor)
+                                .build()
+                        }
                     )
                 )
             }
@@ -126,12 +138,13 @@ object RemoteModule {
                     logger(DebugLogger())
                 }
             }
+            .crossfade(true)
             .build()
     }
 
     @Provides
     fun provideAttendancesRemoteDatasource(api: GolappAPI): AttendancesRemoteDataSource =
-        AttendancesRemoteDataSourceImpl(api, Dispatchers.IO)
+        AttendancesRemoteDataSourceImpl(api)
 
     @Provides
     fun provideGroupsRemoteDatasource(api: GolappAPI): GroupsRemoteDataSource =

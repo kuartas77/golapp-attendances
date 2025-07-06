@@ -9,7 +9,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
-import com.golapp.attendances.common.resultOf
+import com.golapp.attendances.data.util.resultOf
 import com.golapp.attendances.data.mappers.asRequest
 import com.golapp.attendances.domain.models.AttendanceSync
 import com.golapp.attendances.domain.repository.AttendanceRepository

@@ -5,12 +5,12 @@ plugins {
 
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
-    alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.room)
 
-    alias(libs.plugins.google.services)
-    alias(libs.plugins.firebase.crashlytics)
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -39,6 +39,7 @@ android {
 
     buildTypes {
         getByName("release") {
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = true
             ndk {
                 debugSymbolLevel = "symbol_table"
             }
@@ -52,6 +53,7 @@ android {
             buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
         }
         getByName("debug") {
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = false
             isDebuggable = true
             isMinifyEnabled = false
             buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
@@ -64,6 +66,7 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
     buildFeatures {
         compose = true
         buildConfig = true
@@ -107,8 +110,7 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.okhttp)
-    implementation(libs.converter.moshi)
-    ksp(libs.moshi.kotlin.codegen)
+    implementation(libs.converter.kotlinx.serialization)
     implementation(libs.logging.interceptor)
 
     //Dagger hilt

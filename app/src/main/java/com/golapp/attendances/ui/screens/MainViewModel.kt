@@ -22,7 +22,7 @@ class MainViewModel @Inject constructor(
         .onSubscription { getUserData() }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Lazily,
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = HomeUiState(isLoading = true)
         )
 
@@ -37,6 +37,7 @@ class MainViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
+            _uiState.value = HomeUiState(isLoading = false, isLoggedIn = false)
         }
     }
 }

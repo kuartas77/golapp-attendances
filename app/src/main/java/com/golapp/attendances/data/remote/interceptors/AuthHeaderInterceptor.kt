@@ -1,7 +1,7 @@
 package com.golapp.attendances.data.remote.interceptors
 
-import com.golapp.attendances.common.di.Authorized
-import com.golapp.attendances.common.remote.SuspendInterceptor
+import com.golapp.attendances.data.di.Authorized
+import com.golapp.attendances.data.util.remote.SuspendInterceptor
 import com.golapp.attendances.data.local.datasources.StoreLocalDataSource
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -21,7 +21,7 @@ class AuthHeaderInterceptor @Inject constructor(
             request = handleAnnotation(annotation, request)
         }
 
-        var response = chain.proceed(request)
+        val response = chain.proceed(request)
 
         if (response.code == 401) {
 

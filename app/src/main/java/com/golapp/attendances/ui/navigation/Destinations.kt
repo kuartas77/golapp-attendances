@@ -13,8 +13,8 @@ import kotlin.reflect.KClass
 enum class Destinations(
     val route: KClass<*>,
     val baseRoute: KClass<*> = route,
-    @DrawableRes val icon: Int,
-    @StringRes val label: Int
+    @param:DrawableRes val icon: Int,
+    @param:StringRes val label: Int
 ) {
     HOME(
         route = Home::class,

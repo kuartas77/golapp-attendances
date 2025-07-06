@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.golapp.attendances.BuildConfig
 import com.golapp.attendances.R
-import com.golapp.attendances.common.di.IoDispatcher
+import com.golapp.attendances.data.di.IoDispatcher
 import com.golapp.attendances.common.ui.events.UiText
 import com.golapp.attendances.ui.screens.auth.usecases.AuthenticationUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authenticationUseCases: AuthenticationUseCases,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthUiState(isLoading = true))

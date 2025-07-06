@@ -26,7 +26,6 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
-import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
 import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
@@ -57,7 +56,6 @@ import com.golapp.attendances.common.Constants.SPACER_MEDIUM
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM_LARGE
 import com.golapp.attendances.common.Constants.SPACER_SMALL
 import com.golapp.attendances.common.ui.components.AlertDialogSync
-import com.golapp.attendances.common.ui.components.HeaderContent
 import com.golapp.attendances.common.ui.components.Loader
 import com.golapp.attendances.common.ui.components.ScheduleTimeContent
 import com.golapp.attendances.common.ui.components.SearchBar
@@ -78,9 +76,6 @@ fun GroupsScreen(
         modifier = Modifier.padding(horizontal = SPACER_MEDIUM),
     ) {
         Column {
-            HeaderContent()
-
-            Spacer(modifier = Modifier.height(SPACER_SMALL))
 
             Loader(show = uiState.isLoading)
 
@@ -141,7 +136,7 @@ fun ListGroups(
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-private fun ThreePaneScaffoldScope.ListPanelGroups(
+private fun ListPanelGroups(
     modifier: Modifier = Modifier,
     uiState: GroupsUiState,
     onEvent: (GroupsUiEvent) -> Unit,

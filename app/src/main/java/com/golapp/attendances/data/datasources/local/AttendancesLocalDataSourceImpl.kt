@@ -7,6 +7,7 @@ import com.golapp.attendances.data.local.models.AttendanceSyncEntity
 import com.golapp.attendances.data.mappers.asDomain
 import com.golapp.attendances.domain.models.AttendanceSync
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
+import com.golapp.attendances.domain.models.ClassDay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -42,13 +43,13 @@ class AttendancesLocalDataSourceImpl @Inject constructor(
 
     override suspend fun deleteAttendances() = attendanceDao.deleteAttendances()
 
-    override fun getAttendances(
-        groupId: Int,
-        month: Int,
-        column: String,
-        schoolId: Int
-    ): Flow<List<AttendanceWithPlayer>> =
-        attendanceDao.getAttendances(groupId, month, column, schoolId).map { it.asDomain() }
+    override fun getAttendances(classDay: ClassDay): Flow<List<AttendanceWithPlayer>> =
+        attendanceDao.getAttendances(
+            classDay.groupId,
+            classDay.month,
+            classDay.column,
+            classDay.schoolId
+        ).map { it.asDomain() }
 
     override suspend fun getAttendanceById(id: Long): AttendanceEntity =
         attendanceDao.getAttendanceById(id)

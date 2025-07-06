@@ -9,7 +9,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import com.golapp.attendances.BuildConfig
 import com.golapp.attendances.common.Constants.BD_NAME
 import com.golapp.attendances.common.Constants.PREFERENCES_NAME
@@ -64,10 +63,10 @@ object LocalModule {
             klass = AttendancesDB::class.java,
             name = BD_NAME
         )
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(false)
 
         if (BuildConfig.DEBUG) {
-            builder.setQueryCallback(RoomDatabase.QueryCallback { sqlQuery, bindArgs ->
+            builder.setQueryCallback({ sqlQuery, bindArgs ->
                 println("SQL Query: $sqlQuery SQL Args: $bindArgs")
             }, Executors.newSingleThreadExecutor())
         }

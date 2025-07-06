@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.sp
 import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM_LARGE
-import com.golapp.attendances.common.ui.components.HeaderContent
 import com.golapp.attendances.ui.screens.settings.presentation.components.SettingsItem
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 
@@ -30,7 +29,6 @@ fun SettingsScreen(onLogout: () -> Unit) {
         modifier = Modifier.padding(horizontal = SPACER_MEDIUM)
     ) {
         Column {
-            HeaderContent()
 
             Configuration(onLogout)
         }

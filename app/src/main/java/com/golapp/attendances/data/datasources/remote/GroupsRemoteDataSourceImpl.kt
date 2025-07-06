@@ -1,7 +1,7 @@
 package com.golapp.attendances.data.datasources.remote
 
-import com.golapp.attendances.common.di.IoDispatcher
-import com.golapp.attendances.common.resultOf
+import com.golapp.attendances.data.di.IoDispatcher
+import com.golapp.attendances.data.util.resultOf
 import com.golapp.attendances.data.local.models.GroupWithClassPlayersEntity
 import com.golapp.attendances.data.local.models.StatisticsEntity
 import com.golapp.attendances.data.mappers.asEntity
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 class GroupsRemoteDataSourceImpl @Inject constructor(
     private val api: GolappAPI,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : GroupsRemoteDataSource {
     override suspend fun fetchGroups(): Flow<List<GroupWithClassPlayersEntity>> = flow {
         resultOf {

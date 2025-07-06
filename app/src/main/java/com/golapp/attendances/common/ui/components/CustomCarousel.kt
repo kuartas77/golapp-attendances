@@ -84,8 +84,8 @@ fun CustomCarousel(
 
 data class CarouselItem(
     val id: Int,
-    @DrawableRes val imageResId: Int,
-    @StringRes val contentDescriptionResId: Int
+    @param:DrawableRes val imageResId: Int,
+    @param:StringRes val contentDescriptionResId: Int
 )
 
 @Composable

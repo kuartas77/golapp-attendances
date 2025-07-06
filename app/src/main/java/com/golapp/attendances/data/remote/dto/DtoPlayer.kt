@@ -1,27 +1,27 @@
 package com.golapp.attendances.data.remote.dto
 
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class DtoPlayer(
-    @field:Json(name = "category")
+    @SerialName("category")
     val category: String,
-    @field:Json(name = "full_names")
+    @SerialName("full_names")
     val fullNames: String,
-    @field:Json(name = "id")
+    @SerialName("id")
     val id: Int,
-    @field:Json(name = "last_names")
+    @SerialName("last_names")
     val lastNames: String,
-    @field:Json(name = "names")
+    @SerialName("names")
     val names: String,
-    @field:Json(name = "photo_url")
+    @SerialName("photo_url")
     val photoUrl: String,
-    @field:Json(name = "unique_code")
+    @SerialName("unique_code")
     val uniqueCode: String,
-    @field:Json(name = "group_id")
+    @SerialName("group_id")
     val groupId: Int,
-    @field:Json(name = "inscription_id")
+    @SerialName("inscription_id")
     val inscriptionId: Int
 )

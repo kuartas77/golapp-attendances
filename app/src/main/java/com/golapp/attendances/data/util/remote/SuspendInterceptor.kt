@@ -1,4 +1,4 @@
-package com.golapp.attendances.common.remote
+package com.golapp.attendances.data.util.remote
 
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor

@@ -1,41 +1,30 @@
 package com.golapp.attendances.data.datasources.remote
 
-import com.golapp.attendances.common.di.IoDispatcher
-import com.golapp.attendances.common.resultOf
 import com.golapp.attendances.data.local.models.AttendanceEntity
 import com.golapp.attendances.data.mappers.asEntity
 import com.golapp.attendances.data.remote.GolappAPI
 import com.golapp.attendances.data.remote.datasources.AttendancesRemoteDataSource
 import com.golapp.attendances.data.remote.dto.RequestAttendance
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.onStart
+import com.golapp.attendances.domain.models.ClassDay
 import javax.inject.Inject
 
 class AttendancesRemoteDataSourceImpl @Inject constructor(
-    private val api: GolappAPI,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    private val api: GolappAPI
 ) : AttendancesRemoteDataSource {
-    override suspend fun fetchAttendances(
-        groupId: Int,
-        month: Int,
-        column: String,
-        schoolId: Int
-    ) = flow<List<AttendanceEntity>> {
-        resultOf {
-            val response = api.fetchAttendances(groupId, month, column, schoolId)
-            val body = response.body()
-            if (response.isSuccessful && body != null) {
-                emit(body.asEntity())
-            } else {
-                emit(emptyList<AttendanceEntity>())
-            }
-        }.onFailure {
-            emit(emptyList<AttendanceEntity>())
+    override suspend fun fetchAttendances(classDay: ClassDay): List<AttendanceEntity> {
+        val response = api.fetchAttendances(
+            classDay.groupId,
+            classDay.month,
+            classDay.column,
+            classDay.schoolId
+        )
+        val body = response.body()
+        return if (response.isSuccessful && body != null) {
+            body.asEntity()
+        } else {
+            emptyList()
         }
-
-    }.onStart { emptyList<AttendanceEntity>() }.flowOn(ioDispatcher)
+    }
 
     override suspend fun sendAttendance(requestAttendance: RequestAttendance) {
         api.sendAttendance(requestAttendance)
