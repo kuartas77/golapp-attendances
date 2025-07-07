@@ -55,8 +55,8 @@ class AttendanceRepositoryImpl @Inject constructor(
     override suspend fun getAttendances(classDay: ClassDay): Flow<List<AttendanceWithPlayer>> =
         attendanceLocalDataSource.getAttendances(classDay)
 
-    override suspend fun getAllAttendances(): List<AttendanceEntity> =
-        attendanceLocalDataSource.getAllAttendances()
+    override suspend fun getAllAttendances(): List<Attendance> =
+        attendanceLocalDataSource.getAllAttendances().asDomain()
 
 
     override suspend fun deleteAttendance(attendance: Attendance) {

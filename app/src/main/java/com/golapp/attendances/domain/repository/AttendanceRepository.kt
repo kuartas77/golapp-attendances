@@ -1,6 +1,5 @@
 package com.golapp.attendances.domain.repository
 
-import com.golapp.attendances.data.local.models.AttendanceEntity
 import com.golapp.attendances.data.remote.dto.RequestAttendance
 import com.golapp.attendances.domain.models.Attendance
 import com.golapp.attendances.domain.models.AttendanceSync
@@ -16,7 +15,7 @@ interface AttendanceRepository {
     suspend fun getAttendancesSync(): List<AttendanceSync>
     suspend fun getAttendancesWithPlayers(classDay: ClassDay): List<AttendanceWithPlayer>
     suspend fun getAttendances(classDay: ClassDay): Flow<List<AttendanceWithPlayer>>
-    suspend fun getAllAttendances(): List<AttendanceEntity>
+    suspend fun getAllAttendances(): List<Attendance>
     suspend fun deleteAttendance(attendance: Attendance)
     suspend fun deleteAllAttendances()
     suspend fun deleteAttendanceSync(attendanceSync: AttendanceSync)
