@@ -12,8 +12,6 @@ interface GroupRepository {
     suspend fun getGroupWithClassDaysById(groupId: Int): GroupWithClassDays
     suspend fun fetchAllGroups(): Flow<List<GroupWithClassPlayersEntity>>
     suspend fun fetchGroup(groupId: Int): Flow<GroupWithClassPlayersEntity>
-    suspend fun fetchGroupWithClassDaysList(): Flow<List<GroupWithClassDays>>
-    suspend fun fetchGroupWithPlayers(groupId: Int): Flow<GroupWithPlayers>
     suspend fun deleteGroups()
     suspend fun fetchStatistics(): Flow<List<Statistics>>
     suspend fun getGroupWhitPlayersById(groupId: Int): GroupWithPlayers

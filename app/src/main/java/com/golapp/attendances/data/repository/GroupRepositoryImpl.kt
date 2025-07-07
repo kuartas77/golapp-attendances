@@ -30,12 +30,6 @@ class GroupRepositoryImpl @Inject constructor(
     override suspend fun fetchAllGroups(): Flow<List<GroupWithClassPlayersEntity>> =
         groupsRemoteDataSource.fetchGroups()
 
-    override suspend fun fetchGroupWithClassDaysList(): Flow<List<GroupWithClassDays>> = flow {
-        resultOf {
-            emit(groupsLocalDataSource.getGroupsWithClassDays())
-        }.onFailure { emit(emptyList()) }
-    }.onStart { emptyList<GroupWithClassDays>() }.flowOn(ioDispatcher)
-
     override suspend fun getGroupsWithClassDaysOnMonth(month: Int): List<GroupWithClassDays> =
         groupsLocalDataSource.getGroupsWithClassDaysOnMonth(month)
 
@@ -44,16 +38,6 @@ class GroupRepositoryImpl @Inject constructor(
 
     override suspend fun getGroupWithClassDaysById(groupId: Int): GroupWithClassDays =
         groupsLocalDataSource.getGroupWithClassDaysById(groupId)
-
-    override suspend fun fetchGroupWithPlayers(groupId: Int): Flow<GroupWithPlayers> = flow {
-        groupsRemoteDataSource.fetchGroup(groupId)
-            .flowOn(ioDispatcher)
-            .collect {
-                insert(it)
-            }
-
-        emit(groupsLocalDataSource.getGroupWhitPlayersById(groupId))
-    }.flowOn(ioDispatcher)
 
     override suspend fun deleteGroups() {
         groupsLocalDataSource.deleteGroups()

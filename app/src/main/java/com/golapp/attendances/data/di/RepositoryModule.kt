@@ -39,13 +39,11 @@ object RepositoryModule {
     @Singleton
     fun provideAttendanceRepository(
         attendanceLocalDataSource: AttendancesLocalDataSource,
-        attendanceRemoteDataSource: AttendancesRemoteDataSource,
-        workManager: WorkManager
+        attendanceRemoteDataSource: AttendancesRemoteDataSource
     ): AttendanceRepository {
         return AttendanceRepositoryImpl(
             attendanceLocalDataSource = attendanceLocalDataSource,
-            attendanceRemoteDataSource = attendanceRemoteDataSource,
-            workManager = workManager
+            attendanceRemoteDataSource = attendanceRemoteDataSource
         )
     }
 

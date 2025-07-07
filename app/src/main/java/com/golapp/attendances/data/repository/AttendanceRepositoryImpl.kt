@@ -1,11 +1,8 @@
 package com.golapp.attendances.data.repository
 
 import androidx.annotation.WorkerThread
-import androidx.work.ExistingWorkPolicy
-import androidx.work.WorkManager
 import com.golapp.attendances.data.local.datasources.AttendancesLocalDataSource
-import com.golapp.attendances.data.local.datasources.ClassDayLocalDataSource
-import com.golapp.attendances.data.local.datasources.GroupsLocalDataSource
+import com.golapp.attendances.data.local.models.AttendanceEntity
 import com.golapp.attendances.data.mappers.asDomain
 import com.golapp.attendances.data.mappers.asEntity
 import com.golapp.attendances.data.remote.datasources.AttendancesRemoteDataSource
@@ -15,15 +12,13 @@ import com.golapp.attendances.domain.models.AttendanceSync
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.domain.repository.AttendanceRepository
-import com.golapp.attendances.domain.sync.AttendanceSyncWorker
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @WorkerThread
 class AttendanceRepositoryImpl @Inject constructor(
     private val attendanceLocalDataSource: AttendancesLocalDataSource,
-    private val attendanceRemoteDataSource: AttendancesRemoteDataSource,
-    private val workManager: WorkManager
+    private val attendanceRemoteDataSource: AttendancesRemoteDataSource
 ) : AttendanceRepository {
     override suspend fun insertAttendance(attendance: Attendance) {
         val attendanceEntity = attendance.asEntity()
@@ -60,6 +55,9 @@ class AttendanceRepositoryImpl @Inject constructor(
     override suspend fun getAttendances(classDay: ClassDay): Flow<List<AttendanceWithPlayer>> =
         attendanceLocalDataSource.getAttendances(classDay)
 
+    override suspend fun getAllAttendances(): List<AttendanceEntity> =
+        attendanceLocalDataSource.getAllAttendances()
+
 
     override suspend fun deleteAttendance(attendance: Attendance) {
         attendanceLocalDataSource.deleteAttendance(attendance.asEntity())
@@ -75,21 +73,6 @@ class AttendanceRepositoryImpl @Inject constructor(
 
     override suspend fun sendAttendance(requestAttendance: RequestAttendance) {
         attendanceRemoteDataSource.sendAttendance(requestAttendance)
-    }
-
-    override suspend fun syncAttendances() {
-        val attendanceSyncList = attendanceLocalDataSource.getAllAttendances()
-        attendanceSyncList.forEach { attendanceSync ->
-            if (attendanceSync.id != null) {
-                insertAttendanceSync(AttendanceSync(attendanceSync.id))
-            }
-        }
-
-        workManager.beginUniqueWork(
-            AttendanceSyncWorker.TAG,
-            ExistingWorkPolicy.REPLACE,
-            AttendanceSyncWorker.oneTimeWorkRequest()
-        ).enqueue()
     }
 
     override suspend fun fetchAttendances(classDay: ClassDay): List<Attendance> {

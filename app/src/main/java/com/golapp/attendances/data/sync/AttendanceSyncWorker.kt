@@ -1,4 +1,4 @@
-package com.golapp.attendances.domain.sync
+package com.golapp.attendances.data.sync
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker

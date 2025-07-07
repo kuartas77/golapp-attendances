@@ -1,5 +1,6 @@
 package com.golapp.attendances.ui.screens.attendances.di
 
+import androidx.work.WorkManager
 import com.golapp.attendances.data.util.remote.NetworkMonitor
 import com.golapp.attendances.domain.repository.AttendanceRepository
 import com.golapp.attendances.domain.repository.ClassDayRepository
@@ -26,14 +27,15 @@ object AttendancesModule {
         attendanceRepository: AttendanceRepository,
         groupRepository: GroupRepository,
         classDayRepository: ClassDayRepository,
-        networkMonitor: NetworkMonitor
+        networkMonitor: NetworkMonitor,
+        workManager: WorkManager
     ): AttendancesUseCases {
         return AttendancesUseCases(
             getClassDayById = GetClassDayByIdUseCaseImpl(classDayRepository),
             getAttendancesByClassDay = GetAttendancesByClassDayUseCaseImpl(attendanceRepository),
             takeAttendance = TakeAttendanceUseCaseImpl(attendanceRepository, networkMonitor),
             verifyAttendancesByClassId = VerifyAttendancesByClassIdUseCaseImpl(attendanceRepository, groupRepository),
-            syncAttendance = SyncAttendanceUseCaseImpl(attendanceRepository)
+            syncAttendance = SyncAttendanceUseCaseImpl(attendanceRepository, workManager)
         )
     }
 }
