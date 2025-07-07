@@ -20,7 +20,7 @@ android {
     defaultConfig {
         applicationId = "com.golapp.attendances"
         minSdk = 28
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 7
         versionName = "1.0.1"
 
