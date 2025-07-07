@@ -31,19 +31,7 @@ class TakeAttendanceUseCaseImpl @Inject constructor(
         attendanceRepository.insertAttendance(attendance)
 
         if (networkMonitor.isConnected()) {
-            attendanceRepository.sendAttendance(
-                RequestAttendance(
-                    inscriptionId = attendance.inscriptionId,
-                    groupId = attendance.trainingGroupId,
-                    year = attendance.year,
-                    month = attendance.month,
-                    column = attendance.column,
-                    value = attendance.value.toString(),
-                    attendanceId = attendance.attendanceId,
-                    attendanceDate = null,
-                    observations = null,
-                )
-            )
+            attendanceRepository.sendAttendance(attendance)
         } else {
             attendance.id?.let {
                 attendanceRepository.insertAttendanceSync(AttendanceSync(id = it))

@@ -10,7 +10,6 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import com.golapp.attendances.data.util.resultOf
-import com.golapp.attendances.data.mappers.asRequest
 import com.golapp.attendances.domain.models.AttendanceSync
 import com.golapp.attendances.domain.repository.AttendanceRepository
 import dagger.assisted.Assisted
@@ -46,7 +45,7 @@ class AttendanceSyncWorker @AssistedInject constructor(
     }
 
     private suspend fun sync(item: AttendanceSync) {
-        val attendance = attendanceRepository.getAttendanceById(item.id).asRequest()
+        val attendance = attendanceRepository.getAttendanceById(item.id)
         resultOf {
             attendanceRepository.sendAttendance(attendance)
         }.onSuccess {

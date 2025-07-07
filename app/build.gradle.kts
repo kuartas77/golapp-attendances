@@ -19,7 +19,7 @@ android {
 
     defaultConfig {
         applicationId = "com.golapp.attendances"
-        minSdk = 26
+        minSdk = 28
         targetSdk = 35
         versionCode = 7
         versionName = "1.0.1"
@@ -88,6 +88,8 @@ android {
 }
 
 dependencies {
+
+    implementation(project(":domain"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

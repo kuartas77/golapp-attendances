@@ -97,6 +97,12 @@ fun GroupWithClassPlayersEntity.asDomain(): GroupWithClassPlayers = GroupWithCla
     classDays = classDays.asDomain()
 )
 
+fun GroupWithClassPlayers.asEntity(): GroupWithClassPlayersEntity = GroupWithClassPlayersEntity(
+    group = group.asEntity(),
+    players = players.asEntity(),
+    classDays = classDays.asEntity()
+)
+
 fun GroupWithPlayersEntity.asDomain(): GroupWithPlayers = GroupWithPlayers(
     id = group.id,
     name = group.name,

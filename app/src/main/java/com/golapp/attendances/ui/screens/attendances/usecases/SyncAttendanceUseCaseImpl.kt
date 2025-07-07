@@ -15,7 +15,7 @@ class SyncAttendanceUseCaseImpl(
         val attendanceSyncList = attendanceRepository.getAllAttendances()
         attendanceSyncList.forEach { attendanceSync ->
             if (attendanceSync.id != null) {
-                attendanceRepository.insertAttendanceSync(AttendanceSync(attendanceSync.id))
+                attendanceRepository.insertAttendanceSync(AttendanceSync(attendanceSync.id!!))
             }
         }
 

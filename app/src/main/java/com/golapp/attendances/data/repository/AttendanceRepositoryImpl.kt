@@ -5,6 +5,7 @@ import com.golapp.attendances.data.local.datasources.AttendancesLocalDataSource
 import com.golapp.attendances.data.local.models.AttendanceEntity
 import com.golapp.attendances.data.mappers.asDomain
 import com.golapp.attendances.data.mappers.asEntity
+import com.golapp.attendances.data.mappers.asRequest
 import com.golapp.attendances.data.remote.datasources.AttendancesRemoteDataSource
 import com.golapp.attendances.data.remote.dto.RequestAttendance
 import com.golapp.attendances.domain.models.Attendance
@@ -55,8 +56,8 @@ class AttendanceRepositoryImpl @Inject constructor(
     override suspend fun getAttendances(classDay: ClassDay): Flow<List<AttendanceWithPlayer>> =
         attendanceLocalDataSource.getAttendances(classDay)
 
-    override suspend fun getAllAttendances(): List<AttendanceEntity> =
-        attendanceLocalDataSource.getAllAttendances()
+    override suspend fun getAllAttendances(): List<Attendance> =
+        attendanceLocalDataSource.getAllAttendances().asDomain()
 
 
     override suspend fun deleteAttendance(attendance: Attendance) {
@@ -71,8 +72,8 @@ class AttendanceRepositoryImpl @Inject constructor(
         attendanceLocalDataSource.deleteAttendanceSync(attendanceSync.asEntity())
     }
 
-    override suspend fun sendAttendance(requestAttendance: RequestAttendance) {
-        attendanceRemoteDataSource.sendAttendance(requestAttendance)
+    override suspend fun sendAttendance(attendance: Attendance) {
+        attendanceRemoteDataSource.sendAttendance(attendance.asRequest())
     }
 
     override suspend fun fetchAttendances(classDay: ClassDay): List<Attendance> {
