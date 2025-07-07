@@ -13,8 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.golapp.attendances.R
-import com.golapp.attendances.ui.theme.GolappAttendancesTheme
+import com.golapp.attendances.common.R
 
 @Composable
 fun AlertDialogSync(
@@ -57,7 +56,5 @@ fun AlertDialogSync(
 @Preview
 @Composable
 private fun AlertDialogSyncPreview() {
-    GolappAttendancesTheme {
-        AlertDialogSync(showDialog = true)
-    }
+    AlertDialogSync(showDialog = true)
 }

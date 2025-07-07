@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_bar_text">Buscar</string>
+    <string name="sync">Sincronizar</string>
+    <string name="sync_info">Toda la información de la toma de asistencias será enviada al servidor, permitiendo su acceso a través de la plataforma GOLAPP.</string>
+    <string name="confirm">Confirmar</string>
+    <string name="dismiss">Cancelar</string>
+</resources>

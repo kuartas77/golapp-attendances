@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "Golapp Attendances"
 include(":app")
 include(":domain")
+include(":common")

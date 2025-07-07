@@ -13,14 +13,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.golapp.attendances.common.Constants.SHAPE_SMALL
-import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 
 @Preview
 @Composable
 fun AserButtonPreview() {
-    GolappAttendancesTheme {
-        CustomButton(text = "Tester Button", onClick = {})
-    }
+    CustomButton(text = "Tester Button", onClick = {})
 }
 
 @Composable

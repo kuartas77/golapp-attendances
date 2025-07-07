@@ -50,31 +50,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.golapp.attendances.R
+import com.golapp.attendances.common.R
 import com.golapp.attendances.common.Constants.SPACER_LARGE
-import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 
 
 @Preview
 @Composable
 fun SearchFieldPreview() {
-    GolappAttendancesTheme {
-        SearchField(searchDisplay = "", onSearchDisplayChanged = {}, searchLabel = "")
-    }
+    SearchField(searchDisplay = "", onSearchDisplayChanged = {}, searchLabel = "")
+
 }
 
 @Preview()
 @Composable
 private fun Basic() {
-    GolappAttendancesTheme {
-        SearchBar(
-            hint = "grupos",
-            onSearchClicked = {},
-            onTextChange = {},
-            cornerShape = RoundedCornerShape(20.dp),
-            state = remember { mutableStateOf(TextFieldValue()) }
-        )
-    }
+    SearchBar(
+        hint = "grupos",
+        onSearchClicked = {},
+        onTextChange = {},
+        cornerShape = RoundedCornerShape(20.dp),
+        state = remember { mutableStateOf(TextFieldValue()) }
+    )
 }
 
 @Composable

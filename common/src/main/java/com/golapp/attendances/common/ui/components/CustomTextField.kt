@@ -36,9 +36,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SHAPE_SMALL
-import com.golapp.attendances.ui.theme.GolappAttendancesTheme
+import com.golapp.attendances.common.R
 
 object CustomTextField {
     @Composable
@@ -216,30 +215,26 @@ object CustomTextField {
 @Preview
 @Composable
 fun TextFieldPreview() {
-    GolappAttendancesTheme {
-        CustomTextField.Email(
-            value = "",
-            onValueChange = {},
-            leadingIcon = Icons.Outlined.MailOutline,
-            label = "Email",
-            placeholder = "Email",
-            contentDescription = ""
-        )
-    }
+    CustomTextField.Email(
+        value = "",
+        onValueChange = {},
+        leadingIcon = Icons.Outlined.MailOutline,
+        label = "Email",
+        placeholder = "Email",
+        contentDescription = ""
+    )
 }
 
 @Preview
 @Composable
 fun TextFieldErrorPreview() {
-    GolappAttendancesTheme {
-        CustomTextField.Password(
-            value = "",
-            onValueChange = {},
-            leadingIcon = Icons.Outlined.Lock,
-            label = "Password",
-            placeholder = "Password",
-            errorMessage = "Invalid Password",
-            contentDescription = ""
-        )
-    }
+    CustomTextField.Password(
+        value = "",
+        onValueChange = {},
+        leadingIcon = Icons.Outlined.Lock,
+        label = "Password",
+        placeholder = "Password",
+        errorMessage = "Invalid Password",
+        contentDescription = ""
+    )
 }
