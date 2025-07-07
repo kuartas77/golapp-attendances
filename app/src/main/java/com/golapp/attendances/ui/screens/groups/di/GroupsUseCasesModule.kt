@@ -11,6 +11,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
 
 @Module
@@ -21,10 +22,16 @@ object GroupsUseCasesModule {
     @Singleton
     fun provideGroupUseCases(groupRepository: GroupRepository): GroupUseCases {
         return GroupUseCases(
-            syncGroups = SyncGroupsUseCaseImpl(groupRepository),
-            getGroupListOnMonth = GetGroupListUseCaseImpl(groupRepository),
-            getGroupWithClassDaysById = GetGroupWithClassDaysByIdUseCaseImpl(groupRepository),
-            getGroupWithPlayersById = GetGroupWithPlayersByIdUseCaseImpl(groupRepository),
+            syncGroups = SyncGroupsUseCaseImpl(groupRepository, Dispatchers.IO),
+            getGroupListOnMonth = GetGroupListUseCaseImpl(groupRepository, Dispatchers.IO),
+            getGroupWithClassDaysById = GetGroupWithClassDaysByIdUseCaseImpl(
+                groupRepository,
+                Dispatchers.IO
+            ),
+            getGroupWithPlayersById = GetGroupWithPlayersByIdUseCaseImpl(
+                groupRepository,
+                Dispatchers.IO
+            ),
             getStatistics = GetStatisticsUseCaseImpl(groupRepository)
         )
     }

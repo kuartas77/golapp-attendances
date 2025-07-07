@@ -78,7 +78,7 @@ object CustomTextField {
                 },
                 enabled = isEnabled,
                 isError = errorMessage != null,
-                trailingIcon = if(isPassword == false) null else {
+                trailingIcon = if (isPassword == false) null else {
                     {
                         TextButton(
                             onClick = { hidePassword = !hidePassword },

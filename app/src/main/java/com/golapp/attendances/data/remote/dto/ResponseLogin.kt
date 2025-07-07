@@ -1,15 +1,15 @@
 package com.golapp.attendances.data.remote.dto
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class ResponseLogin(
-    @field:Json(name = "access_token") val token: String,
-    @field:Json(name = "refresh_token") val refreshToken: String,
-    @field:Json(name = "token_type") val type: String,
-    @field:Json(name = "expiration") val expires: Long,
-    @field:Json(name = "user") val userDto: UserDto?,
+    @SerialName("access_token") val token: String,
+    @SerialName("refresh_token") val refreshToken: String,
+    @SerialName("token_type") val type: String,
+    @SerialName("expiration") val expires: Long,
+    @SerialName("user") val userDto: UserDto?,
     val message: String? = null,
     val code: Int? = null
 )

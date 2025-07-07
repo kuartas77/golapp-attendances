@@ -4,6 +4,7 @@ import com.golapp.attendances.data.local.models.AttendanceEntity
 import com.golapp.attendances.data.local.models.AttendanceSyncEntity
 import com.golapp.attendances.domain.models.AttendanceSync
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
+import com.golapp.attendances.domain.models.ClassDay
 import kotlinx.coroutines.flow.Flow
 
 interface AttendancesLocalDataSource {
@@ -21,12 +22,7 @@ interface AttendancesLocalDataSource {
     suspend fun deleteAttendance(attendance: AttendanceEntity)
     suspend fun deleteAttendanceSync(attendanceSyncEntity: AttendanceSyncEntity)
     suspend fun deleteAttendances()
-    fun getAttendances(
-        groupId: Int,
-        month: Int,
-        column: String,
-        schoolId: Int
-    ): Flow<List<AttendanceWithPlayer>>
+    fun getAttendances(classDay: ClassDay): Flow<List<AttendanceWithPlayer>>
 
     suspend fun getAttendanceById(id: Long): AttendanceEntity
 

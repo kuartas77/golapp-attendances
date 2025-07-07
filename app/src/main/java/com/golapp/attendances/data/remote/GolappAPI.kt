@@ -6,7 +6,7 @@ import com.golapp.attendances.common.Constants.GROUPS
 import com.golapp.attendances.common.Constants.REFRESH
 import com.golapp.attendances.common.Constants.STATISTICS
 import com.golapp.attendances.common.Constants.UPDATE_ATTENDANCE
-import com.golapp.attendances.common.di.Authorized
+import com.golapp.attendances.data.di.Authorized
 import com.golapp.attendances.data.remote.dto.RequestAttendance
 import com.golapp.attendances.data.remote.dto.RequestAuth
 import com.golapp.attendances.data.remote.dto.ResponseAttendances

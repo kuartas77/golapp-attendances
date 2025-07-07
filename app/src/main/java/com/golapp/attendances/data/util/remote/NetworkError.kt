@@ -1,4 +1,4 @@
-package com.golapp.attendances.common.remote
+package com.golapp.attendances.data.util.remote
 
 sealed interface NetworkError {
     data object Connectivity : NetworkError

@@ -2,7 +2,7 @@ package com.golapp.attendances.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.golapp.attendances.common.di.IoDispatcher
+import com.golapp.attendances.data.di.IoDispatcher
 import com.golapp.attendances.domain.models.Statistics
 import com.golapp.attendances.domain.models.User
 import com.golapp.attendances.ui.screens.attendances.usecases.AttendancesUseCases
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val attendanceUseCases: AttendancesUseCases,
     private val groupUseCases: GroupUseCases,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private var currentDayJob: Job? = null
@@ -32,7 +32,7 @@ class HomeViewModel @Inject constructor(
     }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.WhileSubscribed(5000),
             initialValue = HomeUiState(isLoading = true)
         )
 

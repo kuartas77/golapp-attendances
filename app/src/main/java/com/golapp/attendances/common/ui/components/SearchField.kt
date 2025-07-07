@@ -2,6 +2,7 @@ package com.golapp.attendances.common.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +51,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.golapp.attendances.R
+import com.golapp.attendances.common.Constants.SPACER_LARGE
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 
 
@@ -69,6 +72,7 @@ private fun Basic() {
             onSearchClicked = {},
             onTextChange = {},
             cornerShape = RoundedCornerShape(20.dp),
+            state = remember { mutableStateOf(TextFieldValue()) }
         )
     }
 }
@@ -139,33 +143,35 @@ fun SearchField(
 @Composable
 fun SearchBar(
     hint: String = "",
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.padding(end = SPACER_LARGE),
     isEnabled: (Boolean) = true,
     height: Dp = 40.dp,
     elevation: Dp = 0.dp,
     cornerShape: Shape = MaterialTheme.shapes.medium,
     backgroundColor: Color = Color.White,
+    state: MutableState<TextFieldValue>,
     onSearchClicked: (String) -> Unit = {},
     onTextChange: (String) -> Unit = {},
+    onClearClick: () -> Unit = {}
 ) {
-    var text by remember { mutableStateOf(TextFieldValue()) }
     Row(
-        modifier = Modifier
+        modifier = modifier
             .height(height)
             .fillMaxWidth()
             .shadow(elevation = elevation, shape = cornerShape)
-            .background(color = backgroundColor, shape = cornerShape)
-            .clickable { onSearchClicked(text.text) },
+            .background(color = backgroundColor, shape = cornerShape),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+
         BasicTextField(
             modifier = modifier
                 .weight(5f)
                 .fillMaxWidth()
+                .focusable()
                 .padding(horizontal = 24.dp),
-            value = text,
+            value = state.value,
             onValueChange = {
-                text = it
+                state.value = it
                 onTextChange(it.text)
             },
             enabled = isEnabled,
@@ -175,7 +181,7 @@ fun SearchBar(
                 fontWeight = FontWeight.Bold
             ),
             decorationBox = { innerTextField ->
-                if (text.text.isEmpty()) {
+                if (state.value.text.isEmpty()) {
                     Text(
                         text = buildAnnotatedString {
                             append(stringResource(id = R.string.search_bar_text))
@@ -195,26 +201,27 @@ fun SearchBar(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Search
             ),
-            keyboardActions = KeyboardActions(onSearch = { onSearchClicked(text.text) }),
+            keyboardActions = KeyboardActions(onSearch = { onSearchClicked(state.value.text) }),
             singleLine = true
         )
+
         Box(
             modifier = modifier
                 .weight(1f)
                 .size(40.dp)
-                .background(color = Color.Transparent, shape = CircleShape)
-                .clickable {
-                    if (text.text.isNotEmpty()) {
-                        text = TextFieldValue(text = "")
-                        onTextChange("")
-                    }
-                },
+                .background(color = Color.Transparent, shape = CircleShape),
         ) {
-            if (text.text.isNotEmpty()) {
+            if (state.value.text.isNotEmpty()) {
                 Icon(
                     modifier = modifier
                         .fillMaxSize()
-                        .padding(10.dp),
+                        .padding(10.dp)
+                        .clickable {
+                            if (state.value.text.isNotEmpty()) {
+                                state.value = TextFieldValue(text = "")
+                                onClearClick()
+                            }
+                        },
                     painter = painterResource(id = R.drawable.ic_clear),
                     contentDescription = stringResource(id = R.string.search_bar_text),
                     tint = MaterialTheme.colorScheme.primary,
@@ -223,7 +230,10 @@ fun SearchBar(
                 Icon(
                     modifier = modifier
                         .fillMaxSize()
-                        .padding(10.dp),
+                        .padding(10.dp)
+                        .clickable(
+                            onClick = { onSearchClicked(state.value.text) }
+                        ),
                     imageVector = Icons.Filled.Search,
                     contentDescription = stringResource(id = R.string.search_bar_text),
                     tint = MaterialTheme.colorScheme.primary

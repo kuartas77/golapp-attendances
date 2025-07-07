@@ -4,15 +4,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +36,6 @@ import com.golapp.attendances.common.Constants.SHAPE_LARGE
 import com.golapp.attendances.common.Constants.SPACER_LARGE
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM
 import com.golapp.attendances.common.Constants.SPACER_SMALL
-import com.golapp.attendances.common.ui.components.HeaderContent
 import com.golapp.attendances.domain.models.Statistics
 
 @Composable
@@ -44,13 +43,11 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier.padding(horizontal = SPACER_MEDIUM),
+        modifier = modifier
+            .padding(horizontal = SPACER_MEDIUM)
+            .verticalScroll(rememberScrollState()),
     ) {
         Column {
-            HeaderContent()
-
-            Spacer(modifier = Modifier.height(SPACER_MEDIUM))
-
             SectionInfo()
         }
     }
@@ -62,7 +59,7 @@ private fun SectionInfo() {
     val viewModel: HomeViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listStatistics = uiState.listStatistics
-    val textListInfo = listOf<String>(
+    val textListInfo = listOf(
         stringResource(R.string.groups_info),
         stringResource(R.string.attendance_info),
         stringResource(R.string.sync_groups),
@@ -93,7 +90,9 @@ private fun SectionInfo() {
 
     LazyHorizontalGrid(
         rows = GridCells.Fixed(1),
-        modifier = Modifier.height(180.dp).padding(vertical = SPACER_MEDIUM),
+        modifier = Modifier
+            .height(180.dp)
+            .padding(vertical = SPACER_MEDIUM),
         verticalArrangement = Arrangement.spacedBy(SPACER_SMALL),
         horizontalArrangement = Arrangement.spacedBy(SPACER_SMALL)
     ) {
@@ -105,10 +104,8 @@ private fun SectionInfo() {
 
     Spacer(modifier = Modifier.height(SPACER_MEDIUM))
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(textListInfo.size) {
-            ItemsText(text = textListInfo[it])
-        }
+    textListInfo.forEach { item ->
+        ItemsText(text = item)
     }
 }
 

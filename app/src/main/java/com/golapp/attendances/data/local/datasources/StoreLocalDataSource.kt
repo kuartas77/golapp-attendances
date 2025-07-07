@@ -1,7 +1,5 @@
 package com.golapp.attendances.data.local.datasources
 
-import com.golapp.attendances.data.remote.dto.ResponseLogin
-
 interface StoreLocalDataSource {
     suspend fun saveToken(token: String)
     suspend fun saveRefreshToken(refreshToken: String)

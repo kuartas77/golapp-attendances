@@ -24,7 +24,7 @@ sealed class UiText {
     data object Empty : UiText()
 
     class StringResource(
-        @StringRes val resId: Int,
+        @param:StringRes val resId: Int,
         vararg val args: Any
     ) : UiText()
 

@@ -35,7 +35,7 @@ object GolappRadioButton {
             Text(
                 text = title,
                 modifier = Modifier
-                    .clickable(onClick = { onOptionSelected(value)  })
+                    .clickable(onClick = { onOptionSelected(value) })
                     .padding(start = 4.dp, end = 4.dp),
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.labelLarge,

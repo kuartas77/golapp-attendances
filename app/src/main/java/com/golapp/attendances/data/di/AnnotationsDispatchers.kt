@@ -1,4 +1,4 @@
-package com.golapp.attendances.common.di
+package com.golapp.attendances.data.di
 
 import javax.inject.Qualifier
 

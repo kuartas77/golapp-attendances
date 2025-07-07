@@ -19,5 +19,6 @@ class ClassDayLocalDataSourceImpl @Inject constructor(
         classDayDao.getClassDayById(classDayId).asDomain()
 
     override suspend fun deleteClassDays() = classDayDao.deleteClassDays()
-    override suspend fun deleteClassDaysByGroupId(groupId: Int) = classDayDao.deleteClassDaysByGroupId(groupId)
+    override suspend fun deleteClassDaysByGroupId(groupId: Int) =
+        classDayDao.deleteClassDaysByGroupId(groupId)
 }

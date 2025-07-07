@@ -1,26 +1,26 @@
 package com.golapp.attendances.data.remote.dto
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class DtoAttendance(
-    @field:Json(name = "column")
+    @SerialName("column")
     val column: String,
-    @field:Json(name = "id")
+    @SerialName("id")
     val attendanceId: Int,
-    @field:Json(name = "inscription_id")
+    @SerialName("inscription_id")
     val inscriptionId: Int,
-    @field:Json(name = "month")
+    @SerialName("month")
     val month: Int,
-    @field:Json(name = "player_id")
+    @SerialName("player_id")
     val playerId: Int,
-    @field:Json(name = "school_id")
+    @SerialName("school_id")
     val schoolId: Int,
-    @field:Json(name = "training_group_id")
+    @SerialName("training_group_id")
     val trainingGroupId: Int,
-    @field:Json(name = "value")
+    @SerialName("value")
     val value: String?,
-    @field:Json(name = "year")
+    @SerialName("year")
     val year: Int
 )

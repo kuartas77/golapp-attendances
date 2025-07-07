@@ -5,8 +5,9 @@ plugins {
 
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
-    alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.room)
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
@@ -14,28 +15,34 @@ plugins {
 
 android {
     namespace = "com.golapp.attendances"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.golapp.attendances"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.0"
+        versionCode = 7
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
         multiDexEnabled = true
-        ndk.debugSymbolLevel = "full"
     }
+
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
+
+    ndkVersion = "29.0.13599879 rc2"
 
     buildTypes {
         getByName("release") {
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = true
+            ndk {
+                debugSymbolLevel = "symbol_table"
+            }
             isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
@@ -44,11 +51,9 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
-            ndk {
-                debugSymbolLevel = "full"
-            }
         }
         getByName("debug") {
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = false
             isDebuggable = true
             isMinifyEnabled = false
             buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
@@ -61,6 +66,7 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
     buildFeatures {
         compose = true
         buildConfig = true
@@ -104,8 +110,7 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.okhttp)
-    implementation(libs.converter.moshi)
-    ksp(libs.moshi.kotlin.codegen)
+    implementation(libs.converter.kotlinx.serialization)
     implementation(libs.logging.interceptor)
 
     //Dagger hilt

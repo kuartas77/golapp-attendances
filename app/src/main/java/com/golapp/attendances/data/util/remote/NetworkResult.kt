@@ -1,4 +1,4 @@
-package com.golapp.attendances.common.remote
+package com.golapp.attendances.data.util.remote
 
 import retrofit2.HttpException
 import retrofit2.Response

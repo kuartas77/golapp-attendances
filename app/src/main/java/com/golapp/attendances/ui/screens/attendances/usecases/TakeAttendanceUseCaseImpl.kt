@@ -1,6 +1,6 @@
 package com.golapp.attendances.ui.screens.attendances.usecases
 
-import com.golapp.attendances.common.remote.NetworkMonitor
+import com.golapp.attendances.data.util.remote.NetworkMonitor
 import com.golapp.attendances.data.remote.dto.RequestAttendance
 import com.golapp.attendances.domain.models.Attendance
 import com.golapp.attendances.domain.models.AttendanceSync
@@ -30,7 +30,7 @@ class TakeAttendanceUseCaseImpl @Inject constructor(
 
         attendanceRepository.insertAttendance(attendance)
 
-        if (networkMonitor.isConnected()){
+        if (networkMonitor.isConnected()) {
             attendanceRepository.sendAttendance(
                 RequestAttendance(
                     inscriptionId = attendance.inscriptionId,
@@ -44,12 +44,11 @@ class TakeAttendanceUseCaseImpl @Inject constructor(
                     observations = null,
                 )
             )
-        }else {
+        } else {
             attendance.id?.let {
                 attendanceRepository.insertAttendanceSync(AttendanceSync(id = it))
             }
         }
-
 
 
     }

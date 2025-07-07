@@ -17,10 +17,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarDuration.Indefinite
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult.ActionPerformed
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
@@ -34,26 +37,27 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import com.golapp.attendances.common.remote.NetworkMonitor
-import com.golapp.attendances.common.ui.GolAppState
-import com.golapp.attendances.common.ui.rememberAppState
-import com.golapp.attendances.ui.navigation.Destinations
-import com.golapp.attendances.ui.navigation.attendanceGraph
-import com.golapp.attendances.ui.navigation.graphs.GuestGraph
-import com.golapp.attendances.ui.navigation.guestGraph
-import com.golapp.attendances.ui.navigation.homeGraph
+import com.golapp.attendances.data.util.remote.NetworkMonitor
+import com.golapp.attendances.ui.GolAppState
+import com.golapp.attendances.common.ui.components.HeaderContent
+import com.golapp.attendances.ui.rememberAppState
+import com.golapp.attendances.ui.navigation.GolappNavHost
+import com.golapp.attendances.ui.screens.SplashViewModel
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.reflect.KClass
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -63,8 +67,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
+
         splashScreen.setKeepOnScreenCondition { viewModel.isLoading.value }
         window.setFlags(
             WindowManager.LayoutParams.FLAG_SECURE,
@@ -80,11 +85,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(
+internal fun MainScreen(
     appState: GolAppState,
     modifier: Modifier = Modifier,
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo()
 ) {
+    val currentDestination = appState.currentDestination
+
     val snackbarHostState = remember { SnackbarHostState() }
 
     val isOffline by appState.isOffline.collectAsStateWithLifecycle()
@@ -95,15 +102,8 @@ fun MainScreen(
         NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(windowAdaptiveInfo)
     }
 
-    val screens = remember {
-        listOf(
-            Destinations.Home,
-            Destinations.Groups,
-            Destinations.Settings
-        )
-    }
-
     val notConnectedMessage = stringResource(R.string.not_connected)
+
     LaunchedEffect(isOffline) {
         if (isOffline) {
             snackbarHostState.showSnackbar(
@@ -113,17 +113,42 @@ fun MainScreen(
         }
     }
 
+    GolApp(layoutType, appState, currentDestination, snackbarHostState, modifier)
+}
+
+@Composable
+internal fun GolApp(
+    layoutType: NavigationSuiteType,
+    appState: GolAppState,
+    currentDestination: NavDestination?,
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier
+) {
     NavigationSuiteScaffold(
         layoutType = layoutType,
-        navigationSuiteItems = navigationSuiteItems(
-            currentDestination = appState.currentDestination,
-            navController = appState.navController,
-            screens = screens
-        )
+        navigationSuiteItems = { navigationItems(appState, currentDestination) }
+
     ) {
         Scaffold(
-            modifier = modifier.fillMaxSize(),
-            snackbarHost = { SnackbarHost(snackbarHostState) },
+            modifier = modifier
+                .fillMaxSize()
+                .semantics {
+                    testTagsAsResourceId = true
+                },
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            snackbarHost = {
+                SnackbarHost(
+                    snackbarHostState,
+                    modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing)
+                )
+            },
+            topBar = {
+                if (layoutType != NavigationSuiteType.None) {
+                    HeaderContent()
+                }
+            }
         ) { padding ->
             Box(
                 modifier = modifier
@@ -132,65 +157,55 @@ fun MainScreen(
                     .consumeWindowInsets(padding)
                     .windowInsetsPadding(
                         WindowInsets.safeDrawing.only(
-                            WindowInsetsSides.Horizontal,
-                        ),
+                            WindowInsetsSides.Horizontal
+                        )
                     )
             ) {
                 Surface(
                     modifier = modifier
                 ) {
-                    NavHost(
-                        navController = appState.navController,
-                        startDestination = GuestGraph.Guest
-                    ) {
-                        guestGraph(appState)
-                        homeGraph(appState)
-                        attendanceGraph(appState)
-                    }
+                    GolappNavHost(
+                        appState = appState,
+                        onShowSnackbar = { message, action ->
+                            snackbarHostState.showSnackbar(
+                                message = message,
+                                actionLabel = action,
+                                duration = SnackbarDuration.Short,
+                            ) == ActionPerformed
+                        }
+                    )
                 }
             }
         }
     }
 }
 
-@Composable
-private fun navigationSuiteItems(
-    currentDestination: NavDestination?,
-    navController: NavHostController,
-    screens: List<Destinations<out Any>>
-): NavigationSuiteScope.() -> Unit = {
-    screens.forEach { screen ->
+
+private fun NavigationSuiteScope.navigationItems(
+    appState: GolAppState,
+    currentDestination: NavDestination?
+) {
+    appState.topLevelDestinations.forEach { destination ->
         val isSelected =
-            currentDestination?.hierarchy?.any {
-                it.route?.contains(screen.route::class.simpleName.toString()) == true
-            } == true
+            currentDestination.isRouteInHierarchy(destination.baseRoute)
 
         item(
             selected = isSelected,
-            onClick = {
-                navController.navigate(screen.route) {
-                    popUpTo(Destinations.Home.route) {
-                        saveState = true
-                    }
-                    // Avoid multiple copies of the same destination when
-                    // re selecting the same item
-                    launchSingleTop = true
-                    // Restore state when re selecting a previously selected item
-                    restoreState = true
-                }
-            },
+            onClick = { appState.navigateToDestination(destination) },
             icon = {
                 Icon(
-                    painter = painterResource(screen.icon),
-                    contentDescription = stringResource(screen.label),
+                    painter = painterResource(destination.icon),
+                    contentDescription = stringResource(destination.label),
                     modifier = Modifier.height(24.dp)
                 )
             },
             label = {
-                Text(text = stringResource(screen.label))
+                Text(text = stringResource(destination.label))
             },
             alwaysShowLabel = true,
         )
     }
 }
 
+private fun NavDestination?.isRouteInHierarchy(route: KClass<*>) =
+    this?.hierarchy?.any { it.hasRoute(route) } == true

@@ -1,20 +1,17 @@
-package com.golapp.attendances.common.remote
+package com.golapp.attendances.data.util.remote
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.NetworkCapabilities
-import com.golapp.attendances.common.di.IoDispatcher
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
 class ConnectivityManagerNetworkMonitor @Inject constructor(
-    val context: Context,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    val context: Context
 ) : NetworkMonitor {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

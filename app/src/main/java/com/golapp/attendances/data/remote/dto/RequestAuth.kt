@@ -1,12 +1,12 @@
 package com.golapp.attendances.data.remote.dto
 
 import android.os.Build
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class RequestAuth(
-    @field:Json(name = "email") val email: String,
-    @field:Json(name = "password") val password: String,
-    @field:Json(name = "device_name") val deviceName: String = Build.MODEL.toString()
+    @SerialName("email") val email: String,
+    @SerialName("password") val password: String,
+    @SerialName("device_name") val deviceName: String = Build.MODEL.toString()
 )
