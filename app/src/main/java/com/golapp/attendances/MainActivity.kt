@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(
+internal fun MainScreen(
     appState: GolAppState,
     modifier: Modifier = Modifier,
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo()
@@ -113,15 +113,28 @@ fun MainScreen(
         }
     }
 
+    GolApp(layoutType, appState, currentDestination, snackbarHostState, modifier)
+}
+
+@Composable
+internal fun GolApp(
+    layoutType: NavigationSuiteType,
+    appState: GolAppState,
+    currentDestination: NavDestination?,
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier
+) {
     NavigationSuiteScaffold(
         layoutType = layoutType,
         navigationSuiteItems = { navigationItems(appState, currentDestination) }
 
     ) {
         Scaffold(
-            modifier = modifier.fillMaxSize().semantics {
-                testTagsAsResourceId = true
-            },
+            modifier = modifier
+                .fillMaxSize()
+                .semantics {
+                    testTagsAsResourceId = true
+                },
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.onBackground,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
