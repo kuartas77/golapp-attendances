@@ -9,7 +9,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
-import com.golapp.attendances.BuildConfig
+import com.golapp.attendances.data.BuildConfig
 import com.golapp.attendances.common.Constants.BD_NAME
 import com.golapp.attendances.common.Constants.PREFERENCES_NAME
 import com.golapp.attendances.data.datasources.local.AttendancesLocalDataSourceImpl

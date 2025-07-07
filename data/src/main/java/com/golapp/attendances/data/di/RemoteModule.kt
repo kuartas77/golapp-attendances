@@ -10,7 +10,7 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.CachePolicy
 import coil3.request.crossfade
 import coil3.util.DebugLogger
-import com.golapp.attendances.BuildConfig
+import com.golapp.attendances.data.BuildConfig
 import com.golapp.attendances.data.util.remote.ConnectivityManagerNetworkMonitor
 import com.golapp.attendances.data.util.remote.NetworkMonitor
 import com.golapp.attendances.data.datasources.remote.AttendancesRemoteDataSourceImpl
