@@ -1,4 +1,4 @@
-package com.golapp.attendances.common.ui
+package com.golapp.attendances.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable

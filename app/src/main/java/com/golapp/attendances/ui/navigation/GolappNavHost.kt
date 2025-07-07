@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
-import com.golapp.attendances.common.ui.GolAppState
+import com.golapp.attendances.ui.GolAppState
 import com.golapp.attendances.ui.navigation.graphs.Authentication
 import com.golapp.attendances.ui.navigation.graphs.Groups
 import com.golapp.attendances.ui.navigation.graphs.authenticationScreens
