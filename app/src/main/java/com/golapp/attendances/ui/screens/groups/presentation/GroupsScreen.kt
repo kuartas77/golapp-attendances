@@ -59,7 +59,7 @@ import com.golapp.attendances.common.ui.components.AlertDialogSync
 import com.golapp.attendances.common.ui.components.Loader
 import com.golapp.attendances.common.ui.components.ScheduleTimeContent
 import com.golapp.attendances.common.ui.components.SearchBar
-import com.golapp.attendances.common.ui.components.groupWithClassPreview
+import com.golapp.attendances.domain.preview.groupWithClassPreview
 import com.golapp.attendances.domain.models.GroupWithClassDays
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import kotlinx.coroutines.launch
@@ -150,7 +150,7 @@ private fun ListPanelGroups(
         modifier = modifier
             .padding(top = 8.dp, start = 8.dp, end = 8.dp)
     ) {
-        SearchBar(uiState = uiState, onEvent = onEvent)
+        SearchBarSection(uiState = uiState, onEvent = onEvent)
         Spacer(modifier = modifier.height(SPACER_SMALL))
 
         if (groups.isEmpty()) {
@@ -188,7 +188,7 @@ private fun ListPanelGroups(
 }
 
 @Composable
-fun SearchBar(
+fun SearchBarSection(
     modifier: Modifier = Modifier,
     uiState: GroupsUiState,
     onEvent: (GroupsUiEvent) -> Unit,

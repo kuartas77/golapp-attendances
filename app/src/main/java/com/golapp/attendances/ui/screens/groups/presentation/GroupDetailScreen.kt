@@ -48,7 +48,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SHAPE_MEDIUM
-import com.golapp.attendances.common.ui.components.groupWithClassPreview
+import com.golapp.attendances.domain.preview.groupWithClassPreview
 import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.domain.models.GroupWithClassDays
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme

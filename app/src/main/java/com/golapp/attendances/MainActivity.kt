@@ -50,7 +50,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.golapp.attendances.data.util.remote.NetworkMonitor
 import com.golapp.attendances.ui.GolAppState
-import com.golapp.attendances.common.ui.components.HeaderContent
+import com.golapp.attendances.ui.HeaderContent
 import com.golapp.attendances.ui.rememberAppState
 import com.golapp.attendances.ui.navigation.GolappNavHost
 import com.golapp.attendances.ui.screens.SplashViewModel

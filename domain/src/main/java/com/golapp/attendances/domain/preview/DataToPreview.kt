@@ -1,4 +1,4 @@
-package com.golapp.attendances.common.ui.components
+package com.golapp.attendances.domain.preview
 
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.domain.models.ClassDay

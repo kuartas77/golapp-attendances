@@ -50,7 +50,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.golapp.attendances.R
 import com.golapp.attendances.common.ui.components.GolappRadioButton
-import com.golapp.attendances.common.ui.components.attendanceWithPlayerPreview
+import com.golapp.attendances.domain.preview.attendanceWithPlayerPreview
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import kotlinx.coroutines.launch

@@ -6,8 +6,6 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.kotlin.parcelize)
-    alias(libs.plugins.room)
 
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
@@ -29,10 +27,6 @@ android {
             useSupportLibrary = true
         }
         multiDexEnabled = true
-    }
-
-    room {
-        schemaDirectory("$projectDir/schemas")
     }
 
     ndkVersion = "29.0.13599879 rc2"
@@ -90,6 +84,8 @@ android {
 dependencies {
 
     implementation(project(":domain"))
+    implementation(project(":common"))
+    implementation(project(":data"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -109,12 +105,6 @@ dependencies {
 
     implementation(libs.androidx.tracing)
 
-    // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.okhttp)
-    implementation(libs.converter.kotlinx.serialization)
-    implementation(libs.logging.interceptor)
-
     //Dagger hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
@@ -125,11 +115,6 @@ dependencies {
     implementation(libs.androidx.hilt.work)
     kspTest(libs.hilt.compiler)
     androidTestImplementation(libs.androidx.hilt.work)
-
-    // Room DB
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
 
     // Coil
     implementation(libs.coil.compose)
@@ -149,17 +134,8 @@ dependencies {
     implementation(libs.androidx.adaptive.layout)
     implementation(libs.androidx.adaptive.navigation)
 
-    implementation(libs.androidx.datastore.preferences)
-
     implementation(libs.timber)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
-
-
-//    implementation("")
-//    implementation("")
-//    implementation("")
-//    implementation("")
-
 }

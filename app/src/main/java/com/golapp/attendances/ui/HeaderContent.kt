@@ -1,4 +1,4 @@
-package com.golapp.attendances.common.ui.components
+package com.golapp.attendances.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
