@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -33,6 +34,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -48,6 +50,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
+import com.golapp.attendances.common.LocalTheme
+import com.golapp.attendances.common.darkThemeColors
+import com.golapp.attendances.common.lightThemeColors
 import com.golapp.attendances.data.util.remote.NetworkMonitor
 import com.golapp.attendances.ui.GolAppState
 import com.golapp.attendances.ui.HeaderContent
@@ -76,9 +81,15 @@ class MainActivity : ComponentActivity() {
             WindowManager.LayoutParams.FLAG_SECURE
         )
         setContent {
+
+            val themeColors = if (isSystemInDarkTheme()) darkThemeColors else lightThemeColors
+
             val appState = rememberAppState(networkMonitor = networkMonitor)
-            GolappAttendancesTheme {
-                MainScreen(appState = appState)
+
+            CompositionLocalProvider(LocalTheme provides themeColors) {
+                GolappAttendancesTheme {
+                    MainScreen(appState = appState)
+                }
             }
         }
     }

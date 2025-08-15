@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.golapp.attendances.common.Constants.SHAPE_SMALL
+import com.golapp.attendances.common.LocalTheme
 import com.golapp.attendances.common.R
 
 object CustomTextField {
@@ -56,6 +57,7 @@ object CustomTextField {
         keyboardActions: KeyboardActions = KeyboardActions(),
         backgroundColor: Color = MaterialTheme.colorScheme.background
     ) {
+        val theme = LocalTheme.current
         var hidePassword by remember {
             mutableStateOf(true)
         }
@@ -71,13 +73,13 @@ object CustomTextField {
                         Icon(
                             imageVector = leadingIcon,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = theme.buttonPrimary
                         )
                     }
                 },
                 enabled = isEnabled,
                 isError = errorMessage != null,
-                trailingIcon = if (isPassword == false) null else {
+                trailingIcon = if (!isPassword) null else {
                     {
                         TextButton(
                             onClick = { hidePassword = !hidePassword },
@@ -95,31 +97,32 @@ object CustomTextField {
                     Text(
                         text = label,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = theme.buttonPrimary
                     )
                 },
                 placeholder = {
                     Text(
                         text = placeholder,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = theme.buttonPrimary
                     )
                 },
                 singleLine = true,
                 shape = CutCornerShape(SHAPE_SMALL),
                 colors = OutlinedTextFieldDefaults.colors(
-                    cursorColor = MaterialTheme.colorScheme.primary,
-                    focusedTextColor = MaterialTheme.colorScheme.primary,
-                    unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                    cursorColor = theme.buttonPrimary,
+                    focusedTextColor = theme.buttonPrimary,
+                    unfocusedTextColor = theme.buttonPrimary,
                     focusedContainerColor = backgroundColor,
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-                    focusedLeadingIconColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primary,
-                    focusedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimary.copy(
+                    focusedBorderColor = theme.buttonPrimary,
+                    unfocusedBorderColor = theme.buttonPrimary,
+                    focusedLeadingIconColor = theme.buttonDisabled,
+                    unfocusedLeadingIconColor = theme.buttonPrimary,
+                    focusedLabelColor = theme.buttonDisabled,
+                    unfocusedPlaceholderColor = theme.buttonDisabled.copy(
                         alpha = 0.5f
                     ),
+                    errorBorderColor = theme.borderError
                 ),
                 visualTransformation = if (isPassword && hidePassword) PasswordVisualTransformation() else VisualTransformation.None,
                 keyboardOptions = keyboardOptions,
@@ -131,7 +134,7 @@ object CustomTextField {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = errorMessage,
-                    color = MaterialTheme.colorScheme.error,
+                    color = theme.borderError,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.labelLarge
                 )

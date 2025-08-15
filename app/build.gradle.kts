@@ -10,7 +10,9 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
-
+kotlin {
+    jvmToolchain(17)
+}
 android {
     namespace = "com.golapp.attendances"
     compileSdk = 36
@@ -44,21 +46,16 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
         }
         getByName("debug") {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = false
             isDebuggable = true
             isMinifyEnabled = false
-            buildConfigField("String", "API_URL", "\"https://app.golapp.com.co/api/\"")
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
     }
 
     buildFeatures {
