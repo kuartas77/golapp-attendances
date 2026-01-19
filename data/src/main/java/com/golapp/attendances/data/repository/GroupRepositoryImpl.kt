@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 
 class GroupRepositoryImpl @Inject constructor(
@@ -28,7 +29,12 @@ class GroupRepositoryImpl @Inject constructor(
 ) : GroupRepository {
 
     override suspend fun fetchAllGroups(): Flow<List<GroupWithClassPlayers>> =
-        groupsRemoteDataSource.fetchGroups().map { it.map { entity -> entity.asDomain() } }
+        groupsRemoteDataSource.fetchGroups().map {
+            it.map { entity ->
+                Timber.d("Fetching group: ${entity.group.name}")
+                entity.asDomain()
+            }
+        }
 
     override suspend fun getGroupsWithClassDaysOnMonth(month: Int): List<GroupWithClassDays> =
         groupsLocalDataSource.getGroupsWithClassDaysOnMonth(month)

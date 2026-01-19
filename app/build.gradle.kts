@@ -21,8 +21,8 @@ android {
         applicationId = "com.golapp.attendances"
         minSdk = 28
         targetSdk = 36
-        versionCode = 7
-        versionName = "1.0.1"
+        versionCode = 10
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -31,14 +31,19 @@ android {
         multiDexEnabled = true
     }
 
-    ndkVersion = "29.0.13599879 rc2"
+    packaging {
+        jniLibs {
+            // Asegura que los símbolos no se eliminen prematuramente
+            keepDebugSymbols.add("**/*.so")
+            useLegacyPackaging = true
+        }
+    }
+
+    ndkVersion = "26.1.10909125"
 
     buildTypes {
         getByName("release") {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = true
-            ndk {
-                debugSymbolLevel = "symbol_table"
-            }
             isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
@@ -46,6 +51,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk.debugSymbolLevel = "FULL"
+            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+                nativeSymbolUploadEnabled = true
+            }
         }
         getByName("debug") {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = false

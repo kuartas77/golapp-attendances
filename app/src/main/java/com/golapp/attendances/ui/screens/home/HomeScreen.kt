@@ -141,7 +141,7 @@ private fun ItemsText(
 fun StatisticsCard(modifier: Modifier = Modifier, statistic: Statistics) {
     OutlinedCard(
         Modifier
-            .size(180.dp)
+            .size(250.dp)
             .padding(SPACER_SMALL),
         shape = CutCornerShape(topEnd = SHAPE_LARGE, bottomStart = SHAPE_LARGE),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)

@@ -21,5 +21,7 @@ data class DtoClassDay(
     @SerialName("month_name")
     val monthName: String,
     @SerialName("school_id")
-    val schoolId: Int
+    val schoolId: Int,
+    @SerialName("year")
+    val year: Int? = null
 )

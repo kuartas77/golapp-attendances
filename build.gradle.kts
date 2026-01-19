@@ -14,3 +14,7 @@ plugins {
     id("com.google.firebase.crashlytics") version "3.0.4" apply false
     alias(libs.plugins.android.library) apply false
 }
+
+tasks.register("clean", Delete::class) {
+    delete(rootProject.layout.buildDirectory)
+}
