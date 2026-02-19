@@ -38,26 +38,23 @@ class GroupsViewModel @Inject constructor(
     private fun loadGroups(query: String = "") {
         viewModelScope.launch(ioDispatcher) {
             _uiState.update { it.copy(query = query, isLoading = true) }
-            groupUseCases.getGroupListOnMonth(month = currentMonth).collect { groups ->
-                if (groups.isEmpty()) {
-                    _uiState.update { it.copy(isLoading = false) }
-                    sendEvent(UiEvent.ShowSnackbar(UiText.StringResource(R.string.no_groups_found)))
-                } else if (query.isNotEmpty()) {
-                    val filteredGroups =
-                        groups.filter { it.fullGroup.contains(query, ignoreCase = true) }
-                    _uiState.update { it.copy(listGroups = filteredGroups, isLoading = false) }
-                } else {
-                    _uiState.update { it.copy(listGroups = groups, isLoading = false) }
-                }
+            val groups = groupUseCases.getGroupListOnMonth(month = currentMonth)
+            if (groups.isEmpty()) {
+                _uiState.update { it.copy(isLoading = false) }
+                sendEvent(UiEvent.ShowSnackbar(UiText.StringResource(R.string.no_groups_found)))
+            } else if (query.isNotEmpty()) {
+                val filteredGroups = groups.filter { it.fullGroup.contains(query, ignoreCase = true) }
+                _uiState.update { it.copy(listGroups = filteredGroups, isLoading = false) }
+            } else {
+                _uiState.update { it.copy(listGroups = groups, isLoading = false) }
             }
         }
     }
 
     private fun getSelectedGroup(id: Int) {
         viewModelScope.launch(ioDispatcher) {
-            groupUseCases.getGroupWithClassDaysById(id).collect { group ->
-                _uiState.update { it.copy(selectedGroup = group) }
-            }
+            val group = groupUseCases.getGroupWithClassDaysById(id)
+            _uiState.update { it.copy(selectedGroup = group) }
         }
     }
 

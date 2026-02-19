@@ -14,7 +14,7 @@ import com.golapp.attendances.domain.models.Statistics
 import com.golapp.attendances.domain.repository.GroupRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -43,15 +43,11 @@ class GroupRepositoryImpl @Inject constructor(
         groupsLocalDataSource.deleteGroups()
     }
 
-    override suspend fun fetchStatistics(): Flow<List<Statistics>> = flow {
+    override suspend fun fetchStatistics(): Flow<List<Statistics>> =
         groupsRemoteDataSource.fetchStatistics()
+            .filter { it.isNotEmpty() }
+            .map { statistics -> statistics.map { it.asDomain() } }
             .flowOn(ioDispatcher)
-            .collect {
-                if (it.isNotEmpty()) {
-                    emit(it.map { entity -> entity.asDomain() })
-                }
-            }
-    }.flowOn(ioDispatcher)
 
     override suspend fun getGroupWhitPlayersById(groupId: Int): GroupWithPlayers =
         groupsLocalDataSource.getGroupWhitPlayersById(groupId)
