@@ -1,18 +1,15 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.room)
+    alias(libs.plugins.daggerHilt)
     alias(libs.plugins.kotlinx.serialization)
-
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
-kotlin {
-    jvmToolchain(17)
-}
+
 android {
     namespace = "com.golapp.attendances"
     compileSdk = 36
@@ -22,7 +19,7 @@ android {
         minSdk = 28
         targetSdk = 36
         versionCode = 10
-        versionName = "1.0.2"
+        versionName = "1.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -31,27 +28,16 @@ android {
         multiDexEnabled = true
     }
 
-    packaging {
-        jniLibs {
-            // Asegura que los símbolos no se eliminen prematuramente
-            keepDebugSymbols.add("**/*.so")
-            useLegacyPackaging = true
-        }
-    }
-
-    ndkVersion = "26.1.10909125"
-
     buildTypes {
         getByName("release") {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = true
-            isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
+            ndk.debugSymbolLevel = "SYMBOL_TABLE" // or "FULL"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            ndk.debugSymbolLevel = "FULL"
             configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
                 nativeSymbolUploadEnabled = true
             }
@@ -71,27 +57,29 @@ android {
         compose = true
         buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.13"
-    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/gradle/incremental.annotation.processors"
         }
         dex {
             useLegacyPackaging = true
         }
         jniLibs {
+            // Asegura que los símbolos no se eliminen prematuramente
+            keepDebugSymbols.add("**/*.so")
             useLegacyPackaging = true
         }
+    }
+    ndkVersion = "29.0.14206865"
+
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 }
 
 dependencies {
 
-    implementation(project(":domain"))
-    implementation(project(":common"))
-    implementation(project(":data"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
