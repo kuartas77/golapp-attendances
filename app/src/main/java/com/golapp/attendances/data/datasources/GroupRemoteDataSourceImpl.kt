@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class GroupRemoteDataSourceImpl @Inject constructor(
     private val api: GolappAPI
-): GroupRemoteDataSource {
+) : GroupRemoteDataSource {
 
     override suspend fun fetchAllGroupsSnapshot(): List<GroupWithClassPlayers> {
         val res = api.getAllGroupsSnapshot()

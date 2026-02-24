@@ -12,12 +12,6 @@ import coil3.request.crossfade
 import coil3.util.DebugLogger
 import com.golapp.attendances.BuildConfig
 import com.golapp.attendances.common.NetworkMonitor
-import com.golapp.attendances.data.datasources.AttendanceRemoteDataSource
-import com.golapp.attendances.data.datasources.AttendanceRemoteDataSourceImpl
-import com.golapp.attendances.data.datasources.AuthRemoteDataSource
-import com.golapp.attendances.data.datasources.AuthRemoteDataSourceImpl
-import com.golapp.attendances.data.datasources.GroupRemoteDataSource
-import com.golapp.attendances.data.datasources.GroupRemoteDataSourceImpl
 import com.golapp.attendances.data.local.datastore.SessionManager
 import com.golapp.attendances.data.remote.GolappAPI
 import com.golapp.attendances.data.remote.interceptors.AuthCoilInterceptor
@@ -28,9 +22,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.serialization.json.Json
-import okhttp3.Call
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit

@@ -13,6 +13,7 @@ interface GroupRepository {
     fun observeClassDaysByGroup(groupId: Int): Flow<List<ClassDay>>
     suspend fun getGroupWhitPlayersById(groupId: Int): GroupWithPlayers
     fun observeGroupsWithClassDaysOnMonth(month: Int): Flow<List<GroupWithClassDays>>
+
     // Sync
     suspend fun fetchAllGroupsSnapshot(): List<GroupWithClassPlayers>
     suspend fun upsertGroupsWithClassPlayers(items: List<GroupWithClassPlayers>)

@@ -52,7 +52,7 @@ class AttendanceSyncWorker @AssistedInject constructor(
         }.onSuccess {
             attendanceRepository.deleteAttendanceSync(item)
         }.onFailure {
-            Timber.Forest.e(it, "syncAttendance ${item.id} failed (remote)")
+            Timber.e(it, "syncAttendance ${item.id} failed (remote)")
             throw it
         }
     }

@@ -10,4 +10,4 @@ data class User(
     val schoolName: String,
     val schoolSlug: String,
     val schoolLogo: String
-): Parcelable
+) : Parcelable

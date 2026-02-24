@@ -7,4 +7,4 @@ import kotlinx.parcelize.Parcelize
 data class GroupPlayer(
     val player: Player,
     val inscriptionId: Long
-): Parcelable
+) : Parcelable

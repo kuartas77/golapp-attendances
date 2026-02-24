@@ -6,4 +6,4 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class AttendanceSync(
     val id: Long
-): Parcelable
+) : Parcelable

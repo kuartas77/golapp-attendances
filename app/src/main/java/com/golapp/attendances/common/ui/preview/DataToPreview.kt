@@ -18,6 +18,7 @@ fun groupClassPreview(): Group {
         playerCount = 1,
     )
 }
+
 fun groupWithClassPreview(): GroupWithClassDays {
     return GroupWithClassDays(
         group = Group(

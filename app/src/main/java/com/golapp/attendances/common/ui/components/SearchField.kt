@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.golapp.attendances.R
-import com.golapp.attendances.common.Constants.SPACER_LARGE
 
 
 @Preview

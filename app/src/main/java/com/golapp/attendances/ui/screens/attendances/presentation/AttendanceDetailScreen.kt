@@ -71,7 +71,7 @@ fun DetailPanelAttendance(
         ) { attendance ->
             DetailScreen(
                 modifier = modifier,
-                attendance = selectedItem,
+                attendance = attendance,
                 backButton = {
                     AnimatedVisibility(
                         visible = navigator.canNavigateBack()
@@ -180,7 +180,7 @@ private fun DetailScreen(
                                         item.title,
                                         item.value,
                                         selectedOption.toString()
-                                    ) { it ->
+                                    ) {
                                         onTakeAttendance(attendance.copy(value = it))
                                         onOptionSelected(it)
                                     }

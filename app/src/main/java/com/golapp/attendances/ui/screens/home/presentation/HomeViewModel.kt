@@ -3,10 +3,10 @@ package com.golapp.attendances.ui.screens.home.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.golapp.attendances.di.IoDispatcher
-import com.golapp.attendances.domain.usecases.attendances.AttendancesUseCases
-import com.golapp.attendances.domain.usecases.groups.GroupsUseCases
 import com.golapp.attendances.domain.models.Statistics
 import com.golapp.attendances.domain.models.User
+import com.golapp.attendances.domain.usecases.attendances.AttendancesUseCases
+import com.golapp.attendances.domain.usecases.groups.GroupsUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job

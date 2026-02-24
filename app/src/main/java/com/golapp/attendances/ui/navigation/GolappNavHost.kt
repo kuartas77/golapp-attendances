@@ -7,7 +7,6 @@ import androidx.navigation.navOptions
 import com.golapp.attendances.ui.GolAppState
 import com.golapp.attendances.ui.navigation.graphs.Authentication
 import com.golapp.attendances.ui.navigation.graphs.Home
-import com.golapp.attendances.ui.navigation.graphs.Settings
 import com.golapp.attendances.ui.navigation.graphs.authenticationScreens
 import com.golapp.attendances.ui.navigation.graphs.groupsScreen
 import com.golapp.attendances.ui.navigation.graphs.homeScreen

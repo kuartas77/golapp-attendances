@@ -4,12 +4,9 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
-import com.golapp.attendances.data.local.database.entities.ClassDayEntity
 import com.golapp.attendances.data.local.database.entities.GroupEntity
 import com.golapp.attendances.data.local.database.entities.GroupWithClassDaysEntity
-import com.golapp.attendances.data.local.database.entities.GroupWithClassPlayersEntity
 import com.golapp.attendances.data.local.database.entities.GroupWithPlayersEntity
-import com.golapp.attendances.data.local.database.entities.PlayerEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -18,7 +15,8 @@ interface GroupDao {
     fun observeGroups(): Flow<List<GroupEntity>>
 
     @Transaction
-    @Query("""
+    @Query(
+        """
         SELECT * FROM `groups`
         WHERE id IN (
             SELECT DISTINCT group_id
@@ -26,11 +24,13 @@ interface GroupDao {
             WHERE month = :month
         )
         ORDER BY name ASC
-    """)
+    """
+    )
     fun observeGroupsWithClassDaysOnMonth(month: Int): Flow<List<GroupWithClassDaysEntity>>
 
     @Transaction
-    @Query("""
+    @Query(
+        """
         SELECT * FROM `groups`
         WHERE id IN (
             SELECT DISTINCT group_id
@@ -38,7 +38,8 @@ interface GroupDao {
             WHERE month = :month
         )
         ORDER BY name ASC
-    """)
+    """
+    )
     suspend fun getGroupsWithClassDaysOnMonth(month: Int): List<GroupWithClassDaysEntity>
 
     @Transaction

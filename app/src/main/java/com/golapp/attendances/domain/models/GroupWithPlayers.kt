@@ -7,4 +7,4 @@ import kotlinx.parcelize.Parcelize
 data class GroupWithPlayers(
     val group: Group,
     val players: List<Player>
-): Parcelable
+) : Parcelable

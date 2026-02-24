@@ -5,6 +5,6 @@ import javax.inject.Inject
 
 class ValidateTokenExpiryUseCase @Inject constructor(
     private val authRepository: AuthRepository
-){
+) {
     suspend operator fun invoke(): Boolean = authRepository.validateTokenExpiry()
 }

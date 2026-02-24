@@ -4,4 +4,4 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class PlayerInGroup(val playerId: Int, val inscriptionId: Int): Parcelable
+data class PlayerInGroup(val playerId: Int, val inscriptionId: Int) : Parcelable

@@ -50,12 +50,13 @@ fun HeaderContent(
     )
 
     Surface(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .windowInsetsPadding(
-            WindowInsets.safeDrawing.only(
-                WindowInsetsSides.Top
-            )
-        ),
+                WindowInsets.safeDrawing.only(
+                    WindowInsetsSides.Top
+                )
+            ),
     ) {
         Row(
             modifier = modifier

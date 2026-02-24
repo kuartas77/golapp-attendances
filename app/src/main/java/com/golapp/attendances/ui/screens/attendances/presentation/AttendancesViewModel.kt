@@ -83,10 +83,18 @@ class AttendancesViewModel @Inject constructor(
             .map { it.data }
             .flatMapLatest { classDay ->
                 attendancesUseCases.getAttendancesByClassDayUseCase(classDay)
-                    .map<List<AttendanceWithPlayer>, AttendancesResult> { AttendancesResult.Success(it) }
+                    .map<List<AttendanceWithPlayer>, AttendancesResult> {
+                        AttendancesResult.Success(
+                            it
+                        )
+                    }
                     .onStart {
                         // asegura la data 1 sola vez por classDay
-                        runCatching { attendancesUseCases.ensureAttendancesForClassDayUseCase(classDay) }
+                        runCatching {
+                            attendancesUseCases.ensureAttendancesForClassDayUseCase(
+                                classDay
+                            )
+                        }
                             .onFailure { e ->
                                 _effects.tryEmit(
                                     AttendancesUiEffect.ShowSnackbar(
@@ -256,7 +264,9 @@ data class AttendancesUiState(
 sealed interface AttendancesUiEvent {
     data class OnSearchAttendance(val query: String = "") : AttendancesUiEvent
     data object OnClearText : AttendancesUiEvent
-    data class OnSelectAttendance(val attendanceWithPlayer: AttendanceWithPlayer) : AttendancesUiEvent
+    data class OnSelectAttendance(val attendanceWithPlayer: AttendanceWithPlayer) :
+        AttendancesUiEvent
+
     data class OnTakeAttendance(val attendanceWithPlayer: AttendanceWithPlayer) : AttendancesUiEvent
     data object SyncAttendances : AttendancesUiEvent
     data object RetryLoad : AttendancesUiEvent

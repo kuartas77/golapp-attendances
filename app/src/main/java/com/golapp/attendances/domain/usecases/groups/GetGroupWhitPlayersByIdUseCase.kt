@@ -1,8 +1,8 @@
 package com.golapp.attendances.domain.usecases.groups
 
 import com.golapp.attendances.di.IoDispatcher
-import com.golapp.attendances.domain.repositories.GroupRepository
 import com.golapp.attendances.domain.models.GroupWithPlayers
+import com.golapp.attendances.domain.repositories.GroupRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

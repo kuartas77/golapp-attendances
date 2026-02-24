@@ -1,10 +1,10 @@
 package com.golapp.attendances.domain.usecases.attendances
 
+import com.golapp.attendances.domain.models.Attendance
+import com.golapp.attendances.domain.models.ClassDay
+import com.golapp.attendances.domain.repositories.AttendanceRepository
 import com.golapp.attendances.domain.repositories.GroupRepository
 import com.golapp.attendances.domain.time.YearProvider
-import com.golapp.attendances.domain.models.Attendance
-import com.golapp.attendances.domain.repositories.AttendanceRepository
-import com.golapp.attendances.domain.models.ClassDay
 import javax.inject.Inject
 
 class EnsureAttendancesForClassDayUseCase @Inject constructor(

@@ -55,7 +55,6 @@ object UseCasesModule {
     ): ValidateTokenExpiryUseCase = ValidateTokenExpiryUseCase(authRepository)
 
 
-
     @Provides
     @Singleton
     fun provideAuthUseCases(

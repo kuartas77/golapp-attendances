@@ -6,7 +6,6 @@ import com.golapp.attendances.common.Constants.GROUPS
 import com.golapp.attendances.common.Constants.REFRESH
 import com.golapp.attendances.common.Constants.STATISTICS
 import com.golapp.attendances.common.Constants.UPDATE_ATTENDANCE
-import com.golapp.attendances.di.Authorized
 import com.golapp.attendances.data.remote.models.dtos.AttendanceDto
 import com.golapp.attendances.data.remote.models.dtos.GroupDto
 import com.golapp.attendances.data.remote.models.requests.AttendanceRequest
@@ -15,6 +14,7 @@ import com.golapp.attendances.data.remote.models.responses.ApiData
 import com.golapp.attendances.data.remote.models.responses.GroupResponse
 import com.golapp.attendances.data.remote.models.responses.LoginResponse
 import com.golapp.attendances.data.remote.models.responses.StatisticsResponse
+import com.golapp.attendances.di.Authorized
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

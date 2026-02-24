@@ -10,7 +10,7 @@ class SyncAttendanceUseCase(
     private val attendanceRepository: AttendanceRepository,
     private val workManager: WorkManager
 ) {
-     suspend operator fun invoke() {
+    suspend operator fun invoke() {
         val attendanceSyncList = attendanceRepository.getAllAttendances()
 
         if (attendanceSyncList.isEmpty()) return

@@ -5,7 +5,7 @@ import com.golapp.attendances.data.remote.models.requests.AuthRequest
 import com.golapp.attendances.data.remote.models.responses.LoginResponse
 import javax.inject.Inject
 
-class AuthRemoteDataSourceImpl  @Inject constructor(
+class AuthRemoteDataSourceImpl @Inject constructor(
     private val api: GolappAPI
 ) : AuthRemoteDataSource {
     override suspend fun auth(email: String, password: String): LoginResponse {
