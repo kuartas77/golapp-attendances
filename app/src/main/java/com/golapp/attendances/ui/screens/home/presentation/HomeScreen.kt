@@ -200,7 +200,7 @@ fun StatisticsCard(modifier: Modifier = Modifier, statistic: Statistics) {
         ) {
             Column(modifier = modifier.weight(1f)) {
                 Text(
-                    stringResource(R.string.pendindg),
+                    stringResource(R.string.pending),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )

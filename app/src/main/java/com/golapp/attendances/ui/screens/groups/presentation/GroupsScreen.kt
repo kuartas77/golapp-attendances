@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,10 +31,13 @@ import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,21 +66,46 @@ import com.golapp.attendances.common.ui.components.SearchBar
 import com.golapp.attendances.common.ui.preview.groupWithClassPreview
 import com.golapp.attendances.domain.models.GroupWithClassDays
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun GroupsScreen(
-    onClickClassDay: (String) -> Unit = {}
+    onClickClassDay: (String) -> Unit = {},
+    onShowSnackbar: suspend (String, String?) -> Boolean
 ) {
     val viewModel: GroupsViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Evita capturar una lambda vieja si recomponen
+    val showSnackbarLatest = rememberUpdatedState(onShowSnackbar)
+
+    LaunchedEffect(Unit) {
+        viewModel.effects.collectLatest { effect ->
+            when (effect) {
+                is GroupsUiEffect.ShowSnackbar -> {
+                    val performed = showSnackbarLatest.value(
+                        effect.message,
+                        effect.actionLabel
+                    )
+
+                    // ✅ Si el usuario presionó la acción del snackbar
+                    if (performed) {
+                        when (effect.action) {
+                            GroupsUiAction.RetrySync -> viewModel.onEvent(GroupsUiEvent.Retry)
+                            null -> Unit
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     Surface(
         modifier = Modifier.padding(horizontal = SPACER_MEDIUM),
     ) {
         Column {
-
             Loader(show = uiState.isLoading)
 
             ListGroups(
@@ -158,8 +187,20 @@ private fun ListPanelGroups(
                 modifier = modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                content = { Text(text = stringResource(R.string.no_groups_found)) }
-            )
+            ) {
+                Text(
+                    text = uiState.blockingError ?: stringResource(R.string.no_groups_found)
+                )
+
+                if (uiState.blockingError != null) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = stringResource(R.string.retry),
+                        modifier = Modifier.clickable { onEvent(GroupsUiEvent.Retry) },
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         } else {
             LazyColumn(
                 state = listState,
@@ -188,12 +229,25 @@ private fun ListPanelGroups(
 }
 
 @Composable
-fun SearchBarSection(
+private fun SearchBarSection(
     modifier: Modifier = Modifier,
     uiState: GroupsUiState,
     onEvent: (GroupsUiEvent) -> Unit,
 ) {
     var showDialog by remember { mutableStateOf(false) }
+
+    // Estado del input (tu SearchBar lo requiere)
+    val searchState = rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(uiState.query))
+    }
+
+    // ✅ Mantiene el input sincronizado cuando el VM cambia query (ej: OnClearText)
+    LaunchedEffect(uiState.query) {
+        val current = searchState.value
+        if (current.text != uiState.query) {
+            searchState.value = current.copy(text = uiState.query)
+        }
+    }
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -201,21 +255,26 @@ fun SearchBarSection(
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
-            onClick = { showDialog = !showDialog },
-            content = {
+            enabled = !uiState.isSyncing,
+            onClick = { showDialog = !showDialog }
+        ) {
+            if (uiState.isSyncing) {
+                CircularProgressIndicator()
+            } else {
                 Icon(
                     painter = painterResource(R.drawable.ic_sync),
                     contentDescription = "Sync Groups"
                 )
             }
-        )
+        }
+
         SearchBar(
             hint = stringResource(id = R.string.groups),
+            state = searchState,
             onSearchClicked = { onEvent(GroupsUiEvent.OnSearchGroup(it)) },
             onTextChange = { onEvent(GroupsUiEvent.OnSearchGroup(it)) },
             onClearClick = { onEvent(GroupsUiEvent.OnClearText) },
             cornerShape = MaterialTheme.shapes.medium,
-            state = remember { mutableStateOf(TextFieldValue(uiState.query)) }
         )
     }
 

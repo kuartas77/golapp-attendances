@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -31,7 +30,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,7 +45,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.golapp.attendances.R
-import com.golapp.attendances.common.Constants.SHAPE_MEDIUM
 import com.golapp.attendances.common.ui.preview.groupWithClassPreview
 import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.domain.models.GroupWithClassDays
@@ -57,7 +54,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun ThreePaneScaffoldScope.DetailGroupPanel(
+fun DetailGroupPanel(
     navigator: ThreePaneScaffoldNavigator<GroupWithClassDays>,
     navigateToAttendances: (String) -> Unit
 ) {
@@ -218,7 +215,16 @@ private fun Header(modifier: Modifier, groupWithClassDays: GroupWithClassDays) {
             )
             Text(groupWithClassDays.group.days, style = MaterialTheme.typography.bodyMedium)
         }
+    }
 
+    HorizontalDivider(modifier = modifier.padding(start = 12.dp, end = 12.dp))
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
         Column(modifier = modifier.weight(1f)) {
             Text(
                 stringResource(R.string.schedules),
@@ -277,10 +283,9 @@ private fun ItemDay(
             .wrapContentSize()
             .padding(8.dp)
             .clickable { navigateToAttendances(item.classDayId) },
-        shape = CutCornerShape(SHAPE_MEDIUM),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-    ) {
+
+        ) {
         Column(
             modifier = modifier
                 .size(90.dp),

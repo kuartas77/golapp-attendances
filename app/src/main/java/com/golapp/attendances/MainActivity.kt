@@ -1,6 +1,7 @@
 package com.golapp.attendances
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -60,6 +61,8 @@ import com.golapp.attendances.ui.theme.LocalTheme
 import com.golapp.attendances.ui.theme.darkThemeColors
 import com.golapp.attendances.ui.theme.lightThemeColors
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.mapNotNull
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
@@ -70,8 +73,9 @@ class MainActivity : ComponentActivity() {
     private val viewModel: SplashViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+
         val splashScreen = installSplashScreen()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         splashScreen.setKeepOnScreenCondition { viewModel.isLoading.value }
@@ -115,8 +119,18 @@ internal fun MainScreen(
         if (isOffline) {
             snackbarHostState.showSnackbar(
                 message = notConnectedMessage,
-                duration = Indefinite
+                duration = SnackbarDuration.Long
             )
+        }
+    }
+
+    if (BuildConfig.DEBUG) {
+        LaunchedEffect(Unit) {
+            appState.navController.currentBackStackEntryFlow.collect { entry ->
+                val stack = appState.navController.currentBackStackEntryFlow
+                    .mapNotNull { it.destination.route }
+                Timber.tag("NAV").d("current=${entry.destination.route} stack=$stack")
+            }
         }
     }
 

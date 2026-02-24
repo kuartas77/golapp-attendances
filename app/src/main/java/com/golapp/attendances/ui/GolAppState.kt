@@ -91,23 +91,15 @@ class GolAppState(
 
     fun navigateToDestination(destinations: Destinations) {
         trace("Navigation: ${destinations.name}") {
+
             val topLevelNavOptions = navOptions {
-                // Pop up to the start destination of the graph to
-                // avoid building up a large stack of destinations
-                popUpTo(navController.graph.findStartDestination().id) {
-                    saveState = true
+                // Home SIEMPRE queda en la pila
+                popUpTo(Home) {
+                    inclusive = false
+                    saveState = false // ponlo true si quieres restaurar estado por tab
                 }
-                // Avoid multiple copies of the same destination when
-                // reselecting the same item
                 launchSingleTop = true
-                // Restore state when reselecting a previously selected item
-                restoreState = true
-                // Fixed the previous crash by using the correct 'Home' object instead of 'Destinations.HOME
-                if (destinations == Destinations.HOME) {
-                    popUpTo(Home) {
-                        inclusive = true
-                    }
-                }
+                restoreState = false // ponlo true si usas saveState=true
             }
 
             when (destinations) {

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
@@ -33,10 +32,13 @@ import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,12 +55,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.golapp.attendances.R
-import com.golapp.attendances.common.Constants.SHAPE_LARGE
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM
 import com.golapp.attendances.common.Constants.SPACER_SMALL
 import com.golapp.attendances.common.ui.components.AlertDialogSync
@@ -67,24 +68,45 @@ import com.golapp.attendances.common.ui.components.SearchBar
 import com.golapp.attendances.common.ui.preview.attendanceWithPlayerPreview
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
 fun AttendancesScreen(
+    onShowSnackbar: suspend (String, String?) -> Boolean,
     viewModel: AttendancesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val showSnackbarLatest = rememberUpdatedState(onShowSnackbar)
 
-    Surface(
-        modifier = Modifier.padding(horizontal = SPACER_MEDIUM),
-    ) {
+    LaunchedEffect(Unit) {
+        viewModel.effects.collectLatest { effect ->
+            when (effect) {
+                is AttendancesUiEffect.ShowSnackbar -> {
+                    val performed = showSnackbarLatest.value(effect.message, effect.actionLabel)
+                    if (performed) {
+                        when (val action = effect.action) {
+                            AttendancesUiAction.RetrySync -> viewModel.onEvent(AttendancesUiEvent.SyncAttendances)
+                            AttendancesUiAction.RetryLoad -> viewModel.onEvent(AttendancesUiEvent.RetryLoad)
+                            is AttendancesUiAction.RetryTake -> viewModel.onEvent(
+                                AttendancesUiEvent.OnTakeAttendance(action.attendance)
+                            )
+
+                            null -> Unit
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Surface(modifier = Modifier.padding(horizontal = SPACER_MEDIUM)) {
         Column {
-
             Loader(show = uiState.isLoading)
-
             ListAttendances(
                 uiState = uiState,
-                onEvent = viewModel::onEvent
+                onEvent = viewModel::onEvent,
+                onTakeAttendance = { viewModel.onEvent(AttendancesUiEvent.OnTakeAttendance(it)) }
             )
         }
     }
@@ -96,7 +118,8 @@ fun AttendancesScreen(
 fun ListAttendances(
     modifier: Modifier = Modifier,
     uiState: AttendancesUiState = AttendancesUiState(),
-    onEvent: (AttendancesUiEvent) -> Unit = {}
+    onEvent: (AttendancesUiEvent) -> Unit = {},
+    onTakeAttendance: (AttendanceWithPlayer) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
     val navigator = rememberListDetailPaneScaffoldNavigator<AttendanceWithPlayer>(
@@ -129,7 +152,11 @@ fun ListAttendances(
             }
         },
         detailPane = {
-            DetailPanelAttendance(navigator = navigator)
+            DetailPanelAttendance(
+                navigator = navigator,
+                uiState = uiState,
+                onTakeAttendance = onTakeAttendance
+            )
         }
     )
 }
@@ -144,7 +171,6 @@ private fun ListPanelAttendances(
 ) {
     val listState = rememberLazyListState()
     val attendances = uiState.listAttendances
-    var showDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     Column(
         modifier = modifier
@@ -156,27 +182,7 @@ private fun ListPanelAttendances(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = { showDialog = !showDialog },
-                content = {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_sync),
-                        contentDescription = "Sync Attendances"
-                    )
-                }
-            )
-            SearchBar(
-                hint = stringResource(
-                    id = R.string.title_attendances_p,
-                    uiState.classDaySelected?.monthName.toString(),
-                    uiState.classDaySelected?.date.toString(),
-                    uiState.classDaySelected?.day.toString()
-                ),
-                onSearchClicked = { onEvent(AttendancesUiEvent.OnSearchAttendance(it)) },
-                onTextChange = { onEvent(AttendancesUiEvent.OnSearchAttendance(it)) },
-                cornerShape = MaterialTheme.shapes.medium,
-                state = remember { mutableStateOf(TextFieldValue(uiState.query)) }
-            )
+            SearchBarSection(uiState = uiState, onEvent = onEvent)
         }
         Spacer(modifier = modifier.height(SPACER_SMALL))
         if (attendances.isEmpty()) {
@@ -184,30 +190,88 @@ private fun ListPanelAttendances(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                content = { Text(text = stringResource(R.string.no_attendances_found)) }
+                content = {
+                    Text(
+                        uiState.blockingError ?: stringResource(R.string.no_attendances_found)
+                    )
+                }
             )
-        }
-        LazyColumn(
-            state = listState,
-            modifier = modifier.fillMaxSize()
-        ) {
-            items(
-                count = attendances.count(),
-                key = { it }
+        } else {
+            LazyColumn(
+                state = listState,
+                modifier = modifier.fillMaxSize()
             ) {
-                val attendance = attendances[it]
-                AttendanceItem(attendance = attendance) {
-                    onEvent(AttendancesUiEvent.OnSelectAttendance(attendance))
-                    scope.launch {
-                        navigator.navigateTo(
-                            ListDetailPaneScaffoldRole.Detail,
-                            attendance
-                        )
+                items(
+                    count = attendances.count(),
+                    key = { it }
+                ) {
+                    val attendance = attendances[it]
+                    AttendanceItem(attendance = attendance) {
+                        onEvent(AttendancesUiEvent.OnSelectAttendance(attendance))
+                        scope.launch {
+                            navigator.navigateTo(
+                                ListDetailPaneScaffoldRole.Detail,
+                                attendance
+                            )
+                        }
                     }
                 }
             }
         }
 
+    }
+
+
+}
+
+@Composable
+private fun SearchBarSection(
+    modifier: Modifier = Modifier,
+    uiState: AttendancesUiState = AttendancesUiState(),
+    onEvent: (AttendancesUiEvent) -> Unit,
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    // Estado del input (tu SearchBar lo requiere)
+    val searchState = rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(uiState.query))
+    }
+
+    // ✅ Mantiene el input sincronizado cuando el VM cambia query (ej: OnClearText)
+    LaunchedEffect(uiState.query) {
+        val current = searchState.value
+        if (current.text != uiState.query) {
+            searchState.value = current.copy(text = uiState.query)
+        }
+    }
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = { showDialog = !showDialog },
+            content = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_sync),
+                    contentDescription = "Sync Attendances"
+                )
+            }
+        )
+        SearchBar(
+            hint = stringResource(
+                id = R.string.title_attendances_p,
+                uiState.classDaySelected?.monthName.toString(),
+                uiState.classDaySelected?.date.toString(),
+                uiState.classDaySelected?.day.toString()
+            ),
+            state = searchState,
+            onSearchClicked = { onEvent(AttendancesUiEvent.OnSearchAttendance(it)) },
+            onTextChange = { onEvent(AttendancesUiEvent.OnSearchAttendance(it)) },
+            onClearClick = { onEvent(AttendancesUiEvent.OnClearText) },
+            cornerShape = MaterialTheme.shapes.medium,
+        )
     }
 
     AnimatedVisibility(visible = showDialog) {
@@ -221,7 +285,6 @@ private fun ListPanelAttendances(
         )
     }
 }
-
 
 @Composable
 private fun AttendanceItem(
@@ -249,7 +312,6 @@ private fun AttendanceItem(
             .height(120.dp)
             .padding(top = 8.dp)
             .clickable { onClickItem() },
-        shape = CutCornerShape(topEnd = SHAPE_LARGE, bottomStart = SHAPE_LARGE),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {

@@ -6,8 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.golapp.attendances.ui.GolAppState
 import com.golapp.attendances.ui.navigation.graphs.Authentication
-import com.golapp.attendances.ui.navigation.graphs.Groups
 import com.golapp.attendances.ui.navigation.graphs.Home
+import com.golapp.attendances.ui.navigation.graphs.Settings
 import com.golapp.attendances.ui.navigation.graphs.authenticationScreens
 import com.golapp.attendances.ui.navigation.graphs.groupsScreen
 import com.golapp.attendances.ui.navigation.graphs.homeScreen
@@ -32,11 +32,12 @@ fun GolappNavHost(
 
         authenticationScreens(
             onDetectLogin = {
-                navController.navigateToHome(navOptions {
-                    popUpTo(Home) {
-                        inclusive = true
+                navController.navigateToHome(
+                    navOptions {
+                        popUpTo(Authentication) { inclusive = true } // elimina Auth del stack
+                        launchSingleTop = true
                     }
-                })
+                )
             }
         )
 
@@ -44,21 +45,19 @@ fun GolappNavHost(
 
         settingScreen(onLogout = {
             mainViewModel.logout()
-            navController.navigateToAuthentication(navOptions {
-                popUpTo(Authentication) {
-                    inclusive = true
+            navController.navigateToAuthentication(
+                navOptions {
+                    popUpTo(Home) { inclusive = true } // borra Home y el resto
+                    launchSingleTop = true
                 }
-            })
+            )
         })
 
         groupsScreen(
             onClickClassDay = {
-                navController.navigateToGroups(it, navOptions {
-                    popUpTo(Groups) {
-                        inclusive = false
-                    }
-                })
-            }
+                navController.navigateToGroups(it)
+            },
+            onShowSnackbar = onShowSnackbar
         )
     }
 

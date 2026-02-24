@@ -64,7 +64,6 @@ fun GolappAttendancesTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        shapes = shapes,
         typography = Typography,
         content = content
     )

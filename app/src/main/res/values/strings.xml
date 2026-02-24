@@ -62,5 +62,6 @@
     <string name="info_group">Información Del Grupo</string>
     <string name="general">General</string>
     <string name="taken">Tomadas</string>
-    <string name="pendindg">Pendientes</string>
+    <string name="pending">Pendientes</string>
+    <string name="retry">Reintentar</string>
 </resources>

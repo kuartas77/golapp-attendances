@@ -30,7 +30,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -44,8 +43,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.golapp.attendances.R
@@ -61,9 +58,10 @@ import kotlinx.coroutines.launch
 fun DetailPanelAttendance(
     modifier: Modifier = Modifier,
     navigator: ThreePaneScaffoldNavigator<AttendanceWithPlayer>,
-    viewModel: AttendancesViewModel = hiltViewModel()
+    uiState: AttendancesUiState,
+    onTakeAttendance: (AttendanceWithPlayer) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val scope = rememberCoroutineScope()
 
     navigator.currentDestination?.contentKey?.let { selectedItem ->
@@ -90,9 +88,7 @@ fun DetailPanelAttendance(
                         )
                     }
                 },
-                onTakeAttendance = {
-                    viewModel.onEvent(AttendancesUiEvent.OnTakeAttendance(it))
-                },
+                onTakeAttendance = onTakeAttendance,
                 uiState = uiState
 
             )

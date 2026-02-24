@@ -9,7 +9,6 @@ import com.golapp.attendances.ui.screens.attendances.presentation.AttendancesScr
 import com.golapp.attendances.ui.screens.groups.presentation.GroupsScreen
 import kotlinx.serialization.Serializable
 
-
 @Serializable
 object GroupAttendances
 
@@ -19,7 +18,8 @@ object Groups
 @Serializable
 data class Attendances(val classDayId: String)
 
-fun NavController.navigateToGroups(navOptions: NavOptions) = navigate(Groups, navOptions)
+fun NavController.navigateToGroups(navOptions: NavOptions) =
+    navigate(Groups, navOptions)
 
 fun NavController.navigateToGroups(
     classDayId: String,
@@ -27,15 +27,23 @@ fun NavController.navigateToGroups(
 ) = navigate(Attendances(classDayId), navOptions)
 
 fun NavGraphBuilder.groupsScreen(
-    onClickClassDay: (String) -> Unit = {}
+    onClickClassDay: (String) -> Unit = {},
+    onShowSnackbar: suspend (String, String?) -> Boolean
 ) {
     navigation<GroupAttendances>(startDestination = Groups) {
+
         composable<Groups> {
-            GroupsScreen(onClickClassDay = onClickClassDay)
+            GroupsScreen(
+                onClickClassDay = onClickClassDay,
+                onShowSnackbar = onShowSnackbar
+            )
         }
+
         composable<Attendances> {
-            AttendancesScreen()
+            // Si luego Attendances necesita UiEffect/snackbar, ya lo tienes listo:
+            AttendancesScreen(
+                onShowSnackbar = onShowSnackbar
+            )
         }
     }
-
 }
