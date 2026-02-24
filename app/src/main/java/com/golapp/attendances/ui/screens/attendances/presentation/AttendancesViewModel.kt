@@ -4,16 +4,17 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.golapp.attendances.data.di.IoDispatcher
+import com.golapp.attendances.di.IoDispatcher
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.domain.models.ClassDay
+import com.golapp.attendances.domain.usecases.attendances.AttendancesUseCases
 import com.golapp.attendances.ui.navigation.graphs.Attendances
-import com.golapp.attendances.ui.screens.attendances.usecases.AttendancesUseCases
-import com.golapp.attendances.ui.screens.groups.usecases.GroupUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -31,7 +32,7 @@ class AttendancesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AttendancesUiState())
     val uiState = _uiState.onSubscription { loadAttendances() }.stateIn(
         scope = viewModelScope,
-        started = kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
+        started = WhileSubscribed(5000),
         initialValue = AttendancesUiState(isLoading = true)
     )
 
@@ -39,17 +40,19 @@ class AttendancesViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val classDay = attendancesUseCases.getClassDayById(attendanceRoute.classDayId)
+            val classDay = attendancesUseCases.getClassDayByIdUseCase(attendanceRoute.classDayId)
             _uiState.update { it.copy(classDaySelected = classDay) }
 
-            async {
-                attendancesUseCases.verifyAttendancesByClassId(classDay)
-                attendancesUseCases.getAttendancesByClassDay(classDay).collect { attendances ->
+            attendancesUseCases.ensureAttendancesForClassDayUseCase(classDay)
+            attendancesUseCases.getAttendancesByClassDayUseCase(classDay)
+                .onStart { _uiState.update { it.copy(isLoading = true) } }
+                .catch { e ->
+                    _uiState.update { it.copy(isLoading = false, error = e.message ?: "Error") }
+                }.collect { attendances ->
                     _uiState.update {
                         it.copy(listAttendances = attendances, isLoading = false)
                     }
                 }
-            }.await()
         }
     }
 
@@ -58,45 +61,52 @@ class AttendancesViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             val classDay = _uiState.value.classDaySelected
             if (classDay != null) {
-                attendancesUseCases.getAttendancesByClassDay(classDay).collect { attendances ->
-                    if (query.isBlank() || query.isEmpty()) {
-                        _uiState.update {
-                            it.copy(listAttendances = attendances, isLoading = false)
-                        }
-                    } else {
-                        val filteredCode = attendances.filter {
-                            it.player.uniqueCode.contains(
-                                query,
-                                ignoreCase = true
-                            )
-                        }
-                        val filteredName = attendances.filter {
-                            it.player.fullNames.contains(
-                                query,
-                                ignoreCase = true
-                            )
+
+                attendancesUseCases.getAttendancesByClassDayUseCase(classDay)
+                    .collect { attendances ->
+                        if (query.isBlank() || query.isEmpty()) {
+                            _uiState.update {
+                                it.copy(listAttendances = attendances, isLoading = false)
+                            }
+                        } else {
+                            val filteredCode = attendances.filter {
+                                it.player.uniqueCode.contains(
+                                    query,
+                                    ignoreCase = true
+                                )
+                            }
+                            val filteredName = attendances.filter {
+                                it.player.fullNames.contains(
+                                    query,
+                                    ignoreCase = true
+                                )
+                            }
+
+                            val filtered = filteredCode.plus(filteredName)
+
+                            _uiState.update {
+                                it.copy(
+                                    listAttendances = filtered,
+                                    isLoading = false
+                                )
+                            }
                         }
 
-                        val filtered = filteredCode.plus(filteredName)
-
-                        _uiState.update { it.copy(listAttendances = filtered, isLoading = false) }
                     }
-
-                }
             }
         }
     }
 
     private fun takeAttendance(attendanceWithPlayer: AttendanceWithPlayer) {
         viewModelScope.launch {
-            attendancesUseCases.takeAttendance(attendanceWithPlayer)
+            //attendancesUseCases.takeAttendance(attendanceWithPlayer)
         }
     }
 
     private fun syncAttendances() {
         viewModelScope.launch(ioDispatcher) {
             _uiState.update { it.copy(isLoading = true) }
-            attendancesUseCases.syncAttendance()
+            attendancesUseCases.syncAttendanceUseCase()
             _uiState.update { it.copy(isLoading = false) }
         }
     }

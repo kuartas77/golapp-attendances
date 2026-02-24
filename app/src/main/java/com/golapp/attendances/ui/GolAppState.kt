@@ -6,7 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -16,9 +16,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.get
 import androidx.navigation.navOptions
 import androidx.tracing.trace
-import com.golapp.attendances.data.util.remote.NetworkMonitor
+import com.golapp.attendances.common.NetworkMonitor
 import com.golapp.attendances.ui.navigation.Destinations
 import com.golapp.attendances.ui.navigation.graphs.Authentication
+import com.golapp.attendances.ui.navigation.graphs.Home
 import com.golapp.attendances.ui.navigation.graphs.navigateToGroups
 import com.golapp.attendances.ui.navigation.graphs.navigateToHome
 import com.golapp.attendances.ui.navigation.graphs.navigateToSettings
@@ -80,7 +81,7 @@ class GolAppState(
     val isGuestDestination: Boolean
         @Composable get() = currentDestination?.hierarchy?.any { it.route == navController.graph[Authentication].route } == true
 
-    val isOffline = networkMonitor.isOnline
+    val isOffline = networkMonitor.isConnected
         .map(Boolean::not)
         .stateIn(
             scope = coroutineScope,
@@ -91,11 +92,22 @@ class GolAppState(
     fun navigateToDestination(destinations: Destinations) {
         trace("Navigation: ${destinations.name}") {
             val topLevelNavOptions = navOptions {
+                // Pop up to the start destination of the graph to
+                // avoid building up a large stack of destinations
                 popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true
                 }
+                // Avoid multiple copies of the same destination when
+                // reselecting the same item
                 launchSingleTop = true
+                // Restore state when reselecting a previously selected item
                 restoreState = true
+                // Fixed the previous crash by using the correct 'Home' object instead of 'Destinations.HOME
+                if (destinations == Destinations.HOME) {
+                    popUpTo(Home) {
+                        inclusive = true
+                    }
+                }
             }
 
             when (destinations) {

@@ -48,7 +48,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SHAPE_MEDIUM
-import com.golapp.attendances.domain.preview.groupWithClassPreview
+import com.golapp.attendances.common.ui.preview.groupWithClassPreview
 import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.domain.models.GroupWithClassDays
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
@@ -186,7 +186,7 @@ private fun DetailScreen(
 }
 
 @Composable
-private fun Header(modifier: Modifier, group: GroupWithClassDays) {
+private fun Header(modifier: Modifier, groupWithClassDays: GroupWithClassDays) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -198,7 +198,7 @@ private fun Header(modifier: Modifier, group: GroupWithClassDays) {
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            Text(group.fullGroup, style = MaterialTheme.typography.bodyMedium)
+            Text(groupWithClassDays.group.fullGroup, style = MaterialTheme.typography.bodyMedium)
         }
     }
 
@@ -216,7 +216,7 @@ private fun Header(modifier: Modifier, group: GroupWithClassDays) {
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            Text(group.days, style = MaterialTheme.typography.bodyMedium)
+            Text(groupWithClassDays.group.days, style = MaterialTheme.typography.bodyMedium)
         }
 
         Column(modifier = modifier.weight(1f)) {
@@ -225,7 +225,10 @@ private fun Header(modifier: Modifier, group: GroupWithClassDays) {
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            Text(group.explodeSchedules, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                groupWithClassDays.group.explodeSchedules,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 
@@ -244,7 +247,7 @@ private fun Header(modifier: Modifier, group: GroupWithClassDays) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                group.classDays.size.toString(),
+                groupWithClassDays.classDays.size.toString(),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -256,7 +259,7 @@ private fun Header(modifier: Modifier, group: GroupWithClassDays) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                group.playerCount.toString(),
+                groupWithClassDays.group.playerCount.toString(),
                 style = MaterialTheme.typography.bodyMedium
             )
         }

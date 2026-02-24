@@ -1,4 +1,4 @@
-package com.golapp.attendances.data.mappers
+package com.golapp.attendances.data.mapper
 
 import com.golapp.attendances.data.local.models.StatisticsEntity
 import com.golapp.attendances.data.remote.dto.DtoStatistics

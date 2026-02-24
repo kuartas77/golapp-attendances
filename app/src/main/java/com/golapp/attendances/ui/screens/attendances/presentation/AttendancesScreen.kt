@@ -64,7 +64,7 @@ import com.golapp.attendances.common.Constants.SPACER_SMALL
 import com.golapp.attendances.common.ui.components.AlertDialogSync
 import com.golapp.attendances.common.ui.components.Loader
 import com.golapp.attendances.common.ui.components.SearchBar
-import com.golapp.attendances.domain.preview.attendanceWithPlayerPreview
+import com.golapp.attendances.common.ui.preview.attendanceWithPlayerPreview
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import kotlinx.coroutines.launch

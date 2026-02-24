@@ -2,8 +2,8 @@ package com.golapp.attendances.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.golapp.attendances.domain.repository.AuthRepository
-import com.golapp.attendances.ui.screens.home.HomeUiState
+import com.golapp.attendances.domain.repositories.AuthRepository
+import com.golapp.attendances.ui.screens.home.presentation.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,9 +28,9 @@ class MainViewModel @Inject constructor(
 
     fun getUserData() {
         viewModelScope.launch {
-            authRepository.getUserData().collect { user ->
-                _uiState.value = HomeUiState(user = user, isLoading = false, isLoggedIn = true)
-            }
+            val user = authRepository.getUserData()
+            _uiState.value = HomeUiState(user = user, isLoading = false, isLoggedIn = true)
+
         }
     }
 

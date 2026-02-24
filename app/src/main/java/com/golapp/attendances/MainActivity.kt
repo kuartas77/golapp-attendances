@@ -1,7 +1,6 @@
 package com.golapp.attendances
 
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -50,16 +49,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.golapp.attendances.common.LocalTheme
-import com.golapp.attendances.common.darkThemeColors
-import com.golapp.attendances.common.lightThemeColors
-import com.golapp.attendances.data.util.remote.NetworkMonitor
+import com.golapp.attendances.common.NetworkMonitor
 import com.golapp.attendances.ui.GolAppState
 import com.golapp.attendances.ui.HeaderContent
-import com.golapp.attendances.ui.rememberAppState
 import com.golapp.attendances.ui.navigation.GolappNavHost
+import com.golapp.attendances.ui.rememberAppState
 import com.golapp.attendances.ui.screens.SplashViewModel
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
+import com.golapp.attendances.ui.theme.LocalTheme
+import com.golapp.attendances.ui.theme.darkThemeColors
+import com.golapp.attendances.ui.theme.lightThemeColors
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -71,15 +70,12 @@ class MainActivity : ComponentActivity() {
     private val viewModel: SplashViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
         enableEdgeToEdge()
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
         splashScreen.setKeepOnScreenCondition { viewModel.isLoading.value }
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE
-        )
+
         setContent {
 
             val themeColors = if (isSystemInDarkTheme()) darkThemeColors else lightThemeColors

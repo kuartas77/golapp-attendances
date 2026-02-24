@@ -1,0 +1,10 @@
+package com.golapp.attendances.data.local.database.entities
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "attendance_sync")
+data class AttendanceSyncEntity(
+    @PrimaryKey(autoGenerate = false)
+    val id: Long
+)

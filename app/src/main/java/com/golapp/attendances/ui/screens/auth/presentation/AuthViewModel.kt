@@ -4,9 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.golapp.attendances.BuildConfig
 import com.golapp.attendances.R
-import com.golapp.attendances.data.di.IoDispatcher
-import com.golapp.attendances.common.ui.events.UiText
-import com.golapp.attendances.ui.screens.auth.usecases.AuthenticationUseCases
+import com.golapp.attendances.common.events.UiText
+import com.golapp.attendances.di.IoDispatcher
+import com.golapp.attendances.domain.ui.LoginState
+import com.golapp.attendances.domain.usecases.auth.AuthUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,9 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authenticationUseCases: AuthenticationUseCases,
+    private val authUseCases: AuthUseCases,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
-
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthUiState(isLoading = true))
     val uiState = _uiState.asStateFlow()
@@ -28,16 +28,41 @@ class AuthViewModel @Inject constructor(
         checkTokenExpiry()
     }
 
+    fun onEvent(event: AuthUiEvent) {
+        when (event) {
+            is AuthUiEvent.EmailChanged -> _uiState.update {
+                it.copy(
+                    email = event.email,
+                    errorEmail = null,
+                    error = null
+                )
+            }
+
+            is AuthUiEvent.PasswordChanged -> _uiState.update {
+                it.copy(
+                    password = event.password,
+                    errorPassword = null,
+                    error = null
+                )
+            }
+
+            AuthUiEvent.LoginClicked -> validateAndLogin()
+        }
+    }
+
     private fun checkTokenExpiry() {
         viewModelScope.launch(ioDispatcher) {
-            _uiState.update { it.copy(isLoading = true) }
-            if (authenticationUseCases.validateTokenExpiry()) {
-                _uiState.update { it.copy(isLoggedIn = true) }
+            setLoading(true)
+
+            val valid = authUseCases.validateTokenExpiryUseCase()
+
+            if (valid) {
+                _uiState.update { it.copy(isLoggedIn = true, isLoading = false) }
             } else {
                 _uiState.update {
                     it.copy(
-                        isLoading = false,
                         isLoggedIn = false,
+                        isLoading = false,
                         errorEmail = UiText.StringResource(resId = R.string.session_expired)
                     )
                 }
@@ -45,54 +70,73 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: AuthUiEvent) {
-        when (event) {
-            is AuthUiEvent.EmailChanged -> _uiState.update { it.copy(email = event.email) }
-            AuthUiEvent.LoginClicked -> auth()
-            is AuthUiEvent.PasswordChanged -> _uiState.update { it.copy(password = event.password) }
-        }
-    }
+    private fun validateAndLogin() {
+        // limpiar errores previos
+        _uiState.update { it.copy(errorEmail = null, errorPassword = null, error = null) }
 
-    private fun auth() {
-        _uiState.update { it.copy(errorEmail = null, errorPassword = null) }
+        val email = uiState.value.email
+        val password = uiState.value.password
 
-        if (authenticationUseCases.validateEmail(uiState.value.email).not()) {
+        var hasError = false
+
+        if (!authUseCases.validateEmail(email)) {
+            hasError = true
             _uiState.update { it.copy(errorEmail = UiText.StringResource(resId = R.string.invalid_email)) }
         }
-        if (authenticationUseCases.validatePassword(uiState.value.password).not()) {
+        if (!authUseCases.validatePassword(password)) {
+            hasError = true
             _uiState.update { it.copy(errorPassword = UiText.StringResource(resId = R.string.invalid_password)) }
         }
 
-        if (_uiState.value.errorEmail === null && _uiState.value.errorPassword === null) {
-            processLogin()
+        if (!hasError) {
+            processLogin(email, password)
         }
     }
 
-    private fun processLogin() {
-        _uiState.update { it.copy(isLoading = true) }
+    private fun processLogin(email: String, password: String) {
         viewModelScope.launch(ioDispatcher) {
-            authenticationUseCases.loginWithEmail(
-                email = uiState.value.email,
-                password = uiState.value.password
-            ).collect { resultLogin ->
-                when (resultLogin.code) {
-                    200 -> {
-                        _uiState.update { it.copy(isLoggedIn = resultLogin.idle) }
-                    }
+            setLoading(true)
 
+            val result = authUseCases.loginWithEmail(email, password)
+
+            applyLoginResult(result)
+
+            setLoading(false)
+        }
+    }
+
+    private fun applyLoginResult(result: LoginState) {
+        when (result) {
+            LoginState.Success -> {
+                _uiState.update { it.copy(isLoggedIn = true) }
+            }
+
+            is LoginState.Error -> {
+                when (result.code) {
                     422 -> {
                         _uiState.update {
-                            it.copy(errorEmail = UiText.StringResource(R.string.error_credential_is_not_valid))
+                            it.copy(
+                                isLoggedIn = false,
+                                errorEmail = UiText.StringResource(R.string.error_credential_is_not_valid)
+                            )
                         }
                     }
 
                     else -> {
-                        _uiState.update { it.copy(error = resultLogin.message) }
+                        _uiState.update {
+                            it.copy(
+                                isLoggedIn = false,
+                                error = result.message ?: "Error de autenticación"
+                            )
+                        }
                     }
                 }
-                _uiState.update { it.copy(isLoggedIn = resultLogin.idle, isLoading = false) }
             }
         }
+    }
+
+    private fun setLoading(value: Boolean) {
+        _uiState.update { it.copy(isLoading = value) }
     }
 }
 

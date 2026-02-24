@@ -47,7 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SHAPE_LARGE
@@ -59,7 +59,7 @@ import com.golapp.attendances.common.ui.components.AlertDialogSync
 import com.golapp.attendances.common.ui.components.Loader
 import com.golapp.attendances.common.ui.components.ScheduleTimeContent
 import com.golapp.attendances.common.ui.components.SearchBar
-import com.golapp.attendances.domain.preview.groupWithClassPreview
+import com.golapp.attendances.common.ui.preview.groupWithClassPreview
 import com.golapp.attendances.domain.models.GroupWithClassDays
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import kotlinx.coroutines.launch
@@ -144,7 +144,7 @@ private fun ListPanelGroups(
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-    val groups = uiState.listGroups
+    val groupWithClassDays = uiState.listGroups
 
     Column(
         modifier = modifier
@@ -153,7 +153,7 @@ private fun ListPanelGroups(
         SearchBarSection(uiState = uiState, onEvent = onEvent)
         Spacer(modifier = modifier.height(SPACER_SMALL))
 
-        if (groups.isEmpty()) {
+        if (groupWithClassDays.isEmpty()) {
             Column(
                 modifier = modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -166,11 +166,11 @@ private fun ListPanelGroups(
                 modifier = modifier.fillMaxSize()
             ) {
                 items(
-                    count = groups.count(),
+                    count = groupWithClassDays.count(),
                     key = { it }
                 ) {
-                    val group = groups[it]
-                    GroupItem(group = group) {
+                    val group = groupWithClassDays[it]
+                    GroupItem(item = group) {
                         onEvent(GroupsUiEvent.OnSelectGroup(group))
                         scope.launch {
                             navigator.navigateTo(
@@ -235,7 +235,7 @@ fun SearchBarSection(
 @Composable
 private fun GroupItem(
     modifier: Modifier = Modifier,
-    group: GroupWithClassDays,
+    item: GroupWithClassDays,
     onClickItem: (GroupWithClassDays) -> Unit = {}
 ) {
     Card(
@@ -244,7 +244,7 @@ private fun GroupItem(
             .wrapContentHeight(align = Alignment.Top)
             .height(120.dp)
             .padding(top = SPACER_LARGE)
-            .clickable { onClickItem(group) },
+            .clickable { onClickItem(item) },
         shape = CutCornerShape(topEnd = SHAPE_LARGE, bottomStart = SHAPE_LARGE),
         elevation = CardDefaults.cardElevation(defaultElevation = SPACER_MEDIUM_LARGE),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
@@ -265,7 +265,7 @@ private fun GroupItem(
                 Text(
                     text = buildAnnotatedString {
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(group.fullGroup)
+                            append(item.group.fullGroup)
                         }
                     },
                     maxLines = 2,
@@ -278,7 +278,7 @@ private fun GroupItem(
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
                             append(stringResource(R.string.members))
                             append(" ")
-                            append(group.playerCount.toString())
+                            append(item.group.playerCount.toString())
                         }
                     },
                     maxLines = 1,
@@ -286,8 +286,8 @@ private fun GroupItem(
                 )
                 Spacer(modifier = modifier.height(SPACER_LARGE))
                 ScheduleTimeContent(
-                    date = group.days,
-                    time = group.explodeSchedules
+                    date = item.group.days,
+                    time = item.group.explodeSchedules
                 )
             }
         }
@@ -298,6 +298,6 @@ private fun GroupItem(
 @Composable
 private fun GroupsScreenPreview() {
     GolappAttendancesTheme {
-        GroupItem(group = groupWithClassPreview())
+        GroupItem(item = groupWithClassPreview())
     }
 }

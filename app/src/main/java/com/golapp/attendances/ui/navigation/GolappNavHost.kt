@@ -7,6 +7,7 @@ import androidx.navigation.navOptions
 import com.golapp.attendances.ui.GolAppState
 import com.golapp.attendances.ui.navigation.graphs.Authentication
 import com.golapp.attendances.ui.navigation.graphs.Groups
+import com.golapp.attendances.ui.navigation.graphs.Home
 import com.golapp.attendances.ui.navigation.graphs.authenticationScreens
 import com.golapp.attendances.ui.navigation.graphs.groupsScreen
 import com.golapp.attendances.ui.navigation.graphs.homeScreen
@@ -32,7 +33,7 @@ fun GolappNavHost(
         authenticationScreens(
             onDetectLogin = {
                 navController.navigateToHome(navOptions {
-                    popUpTo(navController.graph.id) {
+                    popUpTo(Home) {
                         inclusive = true
                     }
                 })
@@ -44,7 +45,7 @@ fun GolappNavHost(
         settingScreen(onLogout = {
             mainViewModel.logout()
             navController.navigateToAuthentication(navOptions {
-                popUpTo(navController.graph.id) {
+                popUpTo(Authentication) {
                     inclusive = true
                 }
             })
