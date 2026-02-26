@@ -4,8 +4,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.golapp.attendances.ui.screens.home.presentation.HomeScreen
-import com.golapp.attendances.ui.screens.settings.presentation.SettingsScreen
+import com.golapp.attendances.ui.screens.home.HomeScreen
+import com.golapp.attendances.ui.screens.settings.SettingsScreen
 import kotlinx.serialization.Serializable
 
 

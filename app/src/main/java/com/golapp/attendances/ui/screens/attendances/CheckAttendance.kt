@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.attendances.presentation
+package com.golapp.attendances.ui.screens.attendances
 
 data class CheckAttendance(
     val title: String,

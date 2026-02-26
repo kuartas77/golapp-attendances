@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.groups.presentation
+package com.golapp.attendances.ui.screens.groups
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background

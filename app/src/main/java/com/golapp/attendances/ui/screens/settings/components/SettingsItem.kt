@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.settings.presentation.components
+package com.golapp.attendances.ui.screens.settings.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

@@ -13,6 +13,8 @@ import com.golapp.attendances.domain.usecases.attendances.SyncAttendanceUseCase
 import com.golapp.attendances.domain.usecases.attendances.UpdateAttendanceValueUseCase
 import com.golapp.attendances.domain.usecases.auth.AuthUseCases
 import com.golapp.attendances.domain.usecases.auth.AuthenticateWithEmailUseCase
+import com.golapp.attendances.domain.usecases.auth.GetUserDataUseCase
+import com.golapp.attendances.domain.usecases.auth.LogoutUseCase
 import com.golapp.attendances.domain.usecases.auth.ValidateEmailUseCase
 import com.golapp.attendances.domain.usecases.auth.ValidatePasswordUseCase
 import com.golapp.attendances.domain.usecases.auth.ValidateTokenExpiryUseCase
@@ -54,6 +56,18 @@ object UseCasesModule {
         authRepository: AuthRepository
     ): ValidateTokenExpiryUseCase = ValidateTokenExpiryUseCase(authRepository)
 
+    @Provides
+    @Singleton
+    fun provideLogoutUseCase(
+        authRepository: AuthRepository,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ): LogoutUseCase = LogoutUseCase(authRepository, ioDispatcher)
+
+    @Provides
+    @Singleton
+    fun provideGetUserDataUseCase(authRepository: AuthRepository) =
+        GetUserDataUseCase(authRepository)
+
 
     @Provides
     @Singleton
@@ -61,12 +75,16 @@ object UseCasesModule {
         validateEmail: ValidateEmailUseCase,
         validatePassword: ValidatePasswordUseCase,
         loginWithEmail: AuthenticateWithEmailUseCase,
-        validateTokenExpiryUseCase: ValidateTokenExpiryUseCase
+        validateTokenExpiryUseCase: ValidateTokenExpiryUseCase,
+        getUserDataUseCase: GetUserDataUseCase,
+        logoutUseCase: LogoutUseCase
     ): AuthUseCases = AuthUseCases(
         validateEmail,
         validatePassword,
         loginWithEmail,
-        validateTokenExpiryUseCase
+        validateTokenExpiryUseCase,
+        getUserDataUseCase,
+        logoutUseCase
     )
 
     @Provides

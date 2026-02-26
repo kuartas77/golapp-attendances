@@ -1,6 +1,7 @@
-package com.golapp.attendances.ui.screens.auth.presentation
+package com.golapp.attendances.ui.screens.auth
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SHAPE_SMALL
@@ -40,7 +41,7 @@ import com.golapp.attendances.common.ui.components.CustomTextField
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 
 @Composable
-fun AuthenticationScreen(
+fun LoginScreen(
     onDetectLogin: () -> Unit = {}
 ) {
     val viewModel: AuthViewModel = hiltViewModel()
@@ -57,12 +58,14 @@ fun AuthenticationScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.soccer_field),
-                contentDescription = "background",
+                contentDescription = "Soccer Field",
+                modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
+                alpha = 0.1f
             )
 
             Column(

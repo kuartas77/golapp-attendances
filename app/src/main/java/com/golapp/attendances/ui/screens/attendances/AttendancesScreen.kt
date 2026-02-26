@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.groups.presentation
+package com.golapp.attendances.ui.screens.attendances
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -11,13 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +42,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -51,49 +54,44 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import com.golapp.attendances.R
-import com.golapp.attendances.common.Constants.SHAPE_LARGE
-import com.golapp.attendances.common.Constants.SPACER_LARGE
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM
-import com.golapp.attendances.common.Constants.SPACER_MEDIUM_LARGE
 import com.golapp.attendances.common.Constants.SPACER_SMALL
 import com.golapp.attendances.common.ui.components.AlertDialogSync
 import com.golapp.attendances.common.ui.components.Loader
-import com.golapp.attendances.common.ui.components.ScheduleTimeContent
 import com.golapp.attendances.common.ui.components.SearchBar
-import com.golapp.attendances.common.ui.preview.groupWithClassPreview
-import com.golapp.attendances.domain.models.GroupWithClassDays
+import com.golapp.attendances.common.ui.preview.attendanceWithPlayerPreview
+import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-
 @Composable
-fun GroupsScreen(
-    onClickClassDay: (String) -> Unit = {},
-    onShowSnackbar: suspend (String, String?) -> Boolean
+fun AttendancesScreen(
+    onShowSnackbar: suspend (String, String?) -> Boolean,
+    viewModel: AttendancesViewModel = hiltViewModel()
 ) {
-    val viewModel: GroupsViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    // Evita capturar una lambda vieja si recomponen
     val showSnackbarLatest = rememberUpdatedState(onShowSnackbar)
 
     LaunchedEffect(Unit) {
         viewModel.effects.collectLatest { effect ->
             when (effect) {
-                is GroupsUiEffect.ShowSnackbar -> {
-                    val performed = showSnackbarLatest.value(
-                        effect.message,
-                        effect.actionLabel
-                    )
-
-                    // ✅ Si el usuario presionó la acción del snackbar
+                is AttendancesUiEffect.ShowSnackbar -> {
+                    val performed = showSnackbarLatest.value(effect.message, effect.actionLabel)
                     if (performed) {
-                        when (effect.action) {
-                            GroupsUiAction.RetrySync -> viewModel.onEvent(GroupsUiEvent.Retry)
+                        when (val action = effect.action) {
+                            AttendancesUiAction.RetrySync -> viewModel.onEvent(AttendancesUiEvent.SyncAttendances)
+                            AttendancesUiAction.RetryLoad -> viewModel.onEvent(AttendancesUiEvent.RetryLoad)
+                            is AttendancesUiAction.RetryTake -> viewModel.onEvent(
+                                AttendancesUiEvent.OnTakeAttendance(action.attendance)
+                            )
+
                             null -> Unit
                         }
                     }
@@ -102,16 +100,13 @@ fun GroupsScreen(
         }
     }
 
-    Surface(
-        modifier = Modifier.padding(horizontal = SPACER_MEDIUM),
-    ) {
+    Surface(modifier = Modifier.padding(horizontal = SPACER_MEDIUM)) {
         Column {
             Loader(show = uiState.isLoading)
-
-            ListGroups(
+            ListAttendances(
                 uiState = uiState,
                 onEvent = viewModel::onEvent,
-                onClickClassDay = onClickClassDay
+                onTakeAttendance = { viewModel.onEvent(AttendancesUiEvent.OnTakeAttendance(it)) }
             )
         }
     }
@@ -120,14 +115,17 @@ fun GroupsScreen(
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun ListGroups(
+fun ListAttendances(
     modifier: Modifier = Modifier,
-    uiState: GroupsUiState = GroupsUiState(),
-    onEvent: (GroupsUiEvent) -> Unit = {},
-    onClickClassDay: (String) -> Unit = {}
+    uiState: AttendancesUiState = AttendancesUiState(),
+    onEvent: (AttendancesUiEvent) -> Unit = {},
+    onTakeAttendance: (AttendanceWithPlayer) -> Unit = {}
 ) {
-    val navigator = rememberListDetailPaneScaffoldNavigator<GroupWithClassDays>()
     val scope = rememberCoroutineScope()
+    val navigator = rememberListDetailPaneScaffoldNavigator<AttendanceWithPlayer>(
+        isDestinationHistoryAware = false
+    )
+
     val backBehavior = if (navigator.canNavigateBack()) {
         BackNavigationBehavior.PopUntilContentChange
     } else {
@@ -146,7 +144,7 @@ fun ListGroups(
         value = navigator.scaffoldValue,
         listPane = {
             AnimatedPane {
-                ListPanelGroups(
+                ListPanelAttendances(
                     uiState = uiState,
                     onEvent = onEvent,
                     navigator = navigator
@@ -154,75 +152,73 @@ fun ListGroups(
             }
         },
         detailPane = {
-            AnimatedPane {
-                DetailGroupPanel(navigator = navigator) {
-                    onClickClassDay(it)
-                }
-            }
+            DetailPanelAttendance(
+                navigator = navigator,
+                uiState = uiState,
+                onTakeAttendance = onTakeAttendance
+            )
         }
     )
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-private fun ListPanelGroups(
+private fun ListPanelAttendances(
     modifier: Modifier = Modifier,
-    uiState: GroupsUiState,
-    onEvent: (GroupsUiEvent) -> Unit,
-    navigator: ThreePaneScaffoldNavigator<GroupWithClassDays>
+    uiState: AttendancesUiState = AttendancesUiState(),
+    onEvent: (AttendancesUiEvent) -> Unit,
+    navigator: ThreePaneScaffoldNavigator<AttendanceWithPlayer>
 ) {
     val listState = rememberLazyListState()
+    val attendances = uiState.listAttendances
     val scope = rememberCoroutineScope()
-    val groupWithClassDays = uiState.listGroups
-
     Column(
         modifier = modifier
-            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+            .fillMaxSize()
+            .padding(8.dp)
     ) {
-        SearchBarSection(uiState = uiState, onEvent = onEvent)
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SearchBarSection(uiState = uiState, onEvent = onEvent)
+        }
         Spacer(modifier = modifier.height(SPACER_SMALL))
-
-        if (groupWithClassDays.isEmpty()) {
+        if (attendances.isEmpty()) {
             Column(
-                modifier = modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-            ) {
-                Text(
-                    text = uiState.blockingError ?: stringResource(R.string.no_groups_found)
-                )
-
-                if (uiState.blockingError != null) {
-                    Spacer(modifier = Modifier.height(12.dp))
+                content = {
                     Text(
-                        text = stringResource(R.string.retry),
-                        modifier = Modifier.clickable { onEvent(GroupsUiEvent.Retry) },
-                        fontWeight = FontWeight.Bold
+                        uiState.blockingError ?: stringResource(R.string.no_attendances_found)
                     )
                 }
-            }
+            )
         } else {
             LazyColumn(
                 state = listState,
                 modifier = modifier.fillMaxSize()
             ) {
                 items(
-                    count = groupWithClassDays.count(),
+                    count = attendances.count(),
                     key = { it }
                 ) {
-                    val group = groupWithClassDays[it]
-                    GroupItem(item = group) {
-                        onEvent(GroupsUiEvent.OnSelectGroup(group))
+                    val attendance = attendances[it]
+                    AttendanceItem(attendance = attendance) {
+                        onEvent(AttendancesUiEvent.OnSelectAttendance(attendance))
                         scope.launch {
                             navigator.navigateTo(
                                 ListDetailPaneScaffoldRole.Detail,
-                                group
+                                attendance
                             )
                         }
                     }
                 }
             }
         }
+
     }
 
 
@@ -231,8 +227,8 @@ private fun ListPanelGroups(
 @Composable
 private fun SearchBarSection(
     modifier: Modifier = Modifier,
-    uiState: GroupsUiState,
-    onEvent: (GroupsUiEvent) -> Unit,
+    uiState: AttendancesUiState = AttendancesUiState(),
+    onEvent: (AttendancesUiEvent) -> Unit,
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
@@ -255,25 +251,25 @@ private fun SearchBarSection(
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
-            enabled = !uiState.isSyncing,
-            onClick = { showDialog = !showDialog }
-        ) {
-            if (uiState.isSyncing) {
-                CircularProgressIndicator()
-            } else {
+            onClick = { showDialog = !showDialog },
+            content = {
                 Icon(
                     painter = painterResource(R.drawable.ic_sync),
-                    contentDescription = "Sync Groups"
+                    contentDescription = "Sync Attendances"
                 )
             }
-        }
-
+        )
         SearchBar(
-            hint = stringResource(id = R.string.groups),
+            hint = stringResource(
+                id = R.string.title_attendances_p,
+                uiState.classDaySelected?.monthName.toString(),
+                uiState.classDaySelected?.date.toString(),
+                uiState.classDaySelected?.day.toString()
+            ),
             state = searchState,
-            onSearchClicked = { onEvent(GroupsUiEvent.OnSearchGroup(it)) },
-            onTextChange = { onEvent(GroupsUiEvent.OnSearchGroup(it)) },
-            onClearClick = { onEvent(GroupsUiEvent.OnClearText) },
+            onSearchClicked = { onEvent(AttendancesUiEvent.OnSearchAttendance(it)) },
+            onTextChange = { onEvent(AttendancesUiEvent.OnSearchAttendance(it)) },
+            onClearClick = { onEvent(AttendancesUiEvent.OnClearText) },
             cornerShape = MaterialTheme.shapes.medium,
         )
     }
@@ -283,80 +279,157 @@ private fun SearchBarSection(
             showDialog = showDialog,
             onConfirm = {
                 showDialog = false
-                onEvent(GroupsUiEvent.SyncGroups)
+                onEvent(AttendancesUiEvent.SyncAttendances)
             },
-            textBody = R.string.sync_info_groups,
             onDismissRequest = { showDialog = false }
         )
     }
 }
 
 @Composable
-private fun GroupItem(
+private fun AttendanceItem(
     modifier: Modifier = Modifier,
-    item: GroupWithClassDays,
-    onClickItem: (GroupWithClassDays) -> Unit = {}
+    attendance: AttendanceWithPlayer,
+    onClickItem: () -> Unit = {}
 ) {
+    val attendancesList = remember { getListOfAttendance() }
+    var attendanceValue = ""
+
+    val attendanceFind = attendancesList.find { it.value == attendance.value }
+    attendanceFind?.let {
+        attendanceValue = it.title
+    } ?: run {
+        attendanceValue = stringResource(R.string.take_attendance)
+    }
+
+    val imageRequest = ImageRequest.Builder(LocalContext.current).data(attendance.player.photoUrl)
+        .build()
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top)
             .height(120.dp)
-            .padding(top = SPACER_LARGE)
-            .clickable { onClickItem(item) },
-        shape = CutCornerShape(topEnd = SHAPE_LARGE, bottomStart = SHAPE_LARGE),
-        elevation = CardDefaults.cardElevation(defaultElevation = SPACER_MEDIUM_LARGE),
+            .padding(top = 8.dp)
+            .clickable { onClickItem() },
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .height(120.dp)
+                .padding(8.dp),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(2f),
-                verticalArrangement = Arrangement.Center,
-
-                ) {
+                verticalArrangement = Arrangement.Center
+            ) {
                 Text(
                     text = buildAnnotatedString {
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(item.group.fullGroup)
+                            append(stringResource(R.string.unique_code))
                         }
+                        append(" ")
+                        append(attendance.player.uniqueCode)
                     },
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodySmall
                 )
-                Spacer(modifier = modifier.height(SPACER_SMALL))
                 Text(
                     text = buildAnnotatedString {
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(stringResource(R.string.members))
-                            append(" ")
-                            append(item.group.playerCount.toString())
+                            append(stringResource(R.string.category))
                         }
+                        append(" ")
+                        append(attendance.player.category)
                     },
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 12.sp,
                     style = MaterialTheme.typography.bodySmall
                 )
-                Spacer(modifier = modifier.height(SPACER_LARGE))
-                ScheduleTimeContent(
-                    date = item.group.days,
-                    time = item.group.explodeSchedules
+                Spacer(modifier = modifier.height(SPACER_MEDIUM))
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(stringResource(R.string.names))
+                        }
+                        append(" ")
+                        append(attendance.player.names)
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(stringResource(R.string.lastNames))
+                        }
+                        append(" ")
+                        append(attendance.player.lastNames)
+                    },
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.bodySmall
+                )
+
+                AssistChip(
+                    modifier = modifier.wrapContentHeight(),
+                    onClick = { onClickItem() },
+                    enabled = true,
+                    label = {
+                        Text(
+                            text = attendanceValue,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 12.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.id_calendar),
+                            contentDescription = "calendar",
+                            modifier = Modifier.size(12.dp),
+                        )
+                    },
+                    shape = MaterialTheme.shapes.small
+                )
+            }
+
+            Surface(
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier.size(width = 100.dp, height = 140.dp)
+            ) {
+
+                AsyncImage(
+                    model = imageRequest,
+                    contentDescription = stringResource(R.string.player_photo),
+                    placeholder = painterResource(R.drawable.user),
+                    error = painterResource(R.drawable.user),
+                    contentScale = ContentScale.Crop,
+                    modifier = modifier
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview()
 @Composable
-private fun GroupsScreenPreview() {
+private fun AttendanceItemPreview() {
     GolappAttendancesTheme {
-        GroupItem(item = groupWithClassPreview())
+        AttendanceItem(attendance = attendanceWithPlayerPreview())
     }
 }

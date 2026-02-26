@@ -3,7 +3,8 @@ package com.golapp.attendances.ui.screens
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.golapp.attendances.domain.repositories.AuthRepository
-import com.golapp.attendances.ui.screens.home.presentation.HomeUiState
+import com.golapp.attendances.domain.usecases.auth.AuthUseCases
+import com.golapp.attendances.ui.screens.home.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authUseCases: AuthUseCases
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -28,15 +29,14 @@ class MainViewModel @Inject constructor(
 
     fun getUserData() {
         viewModelScope.launch {
-            val user = authRepository.getUserData()
+            val user = authUseCases.getUserDataUseCase()
             _uiState.value = HomeUiState(user = user, isLoading = false, isLoggedIn = true)
-
         }
     }
 
     fun logout() {
         viewModelScope.launch {
-            authRepository.logout()
+            authUseCases.logoutUseCase()
             _uiState.value = HomeUiState(isLoading = false, isLoggedIn = false)
         }
     }

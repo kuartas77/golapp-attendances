@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "b25efd8e76ba942a2c73bbb5220eb92a",
+    "identityHash": "bb386d86622039d0693f6405161dcc82",
     "entities": [
       {
         "tableName": "groups",
@@ -128,18 +128,19 @@
         },
         "indices": [
           {
-            "name": "index_attendances_school_id_group_id_inscription_id_player_id_month_column",
+            "name": "index_attendances_school_id_group_id_inscription_id_player_id_year_month_column",
             "unique": true,
             "columnNames": [
               "school_id",
               "group_id",
               "inscription_id",
               "player_id",
+              "year",
               "month",
               "column"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_attendances_school_id_group_id_inscription_id_player_id_month_column` ON `${TABLE_NAME}` (`school_id`, `group_id`, `inscription_id`, `player_id`, `month`, `column`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_attendances_school_id_group_id_inscription_id_player_id_year_month_column` ON `${TABLE_NAME}` (`school_id`, `group_id`, `inscription_id`, `player_id`, `year`, `month`, `column`)"
           },
           {
             "name": "index_attendances_group_id",
@@ -380,7 +381,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b25efd8e76ba942a2c73bbb5220eb92a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bb386d86622039d0693f6405161dcc82')"
     ]
   }
 }

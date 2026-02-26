@@ -2,8 +2,6 @@ package com.golapp.attendances.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -11,6 +9,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.get
 import androidx.navigation.navOptions
@@ -35,7 +34,7 @@ fun rememberAppState(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     mainViewModel: MainViewModel = hiltViewModel()
 ): GolAppState {
-    return remember(navController, coroutineScope) {
+    return remember(navController, coroutineScope, networkMonitor, mainViewModel) {
         GolAppState(
             navController = navController,
             mainViewModel = mainViewModel,
@@ -54,31 +53,14 @@ class GolAppState(
 ) {
     val topLevelDestinations: List<Destinations> = Destinations.entries
 
-    private val previousDestination = mutableStateOf<NavDestination?>(null)
-
     val currentDestination: NavDestination?
-        @Composable get() {
-            // Collect the currentBackStackEntryFlow as a state
-            val currentEntry = navController.currentBackStackEntryFlow
-                .collectAsState(initial = null)
-
-            // Fallback to previousDestination if currentEntry is null
-            return currentEntry.value?.destination.also { destination ->
-                if (destination != null) {
-                    previousDestination.value = destination
-                }
-            } ?: previousDestination.value
-        }
-
-    val currentTopLevelDestination: Destinations?
-        @Composable get() {
-            return Destinations.entries.firstOrNull { topLevelDestination ->
-                currentDestination?.hasRoute(route = topLevelDestination.route) == true
-            }
-        }
+        @Composable get() = navController
+            .currentBackStackEntryAsState().value?.destination
 
     val isGuestDestination: Boolean
-        @Composable get() = currentDestination?.hierarchy?.any { it.route == navController.graph[Authentication].route } == true
+        @Composable get() = currentDestination?.hierarchy?.any { 
+            it.route == navController.graph[Authentication].route 
+        } == true
 
     val isOffline = networkMonitor.isConnected
         .map(Boolean::not)
@@ -90,15 +72,13 @@ class GolAppState(
 
     fun navigateToDestination(destinations: Destinations) {
         trace("Navigation: ${destinations.name}") {
-
             val topLevelNavOptions = navOptions {
-                // Home SIEMPRE queda en la pila
                 popUpTo(Home) {
                     inclusive = false
-                    saveState = false // ponlo true si quieres restaurar estado por tab
+                    saveState = false
                 }
                 launchSingleTop = true
-                restoreState = false // ponlo true si usas saveState=true
+                restoreState = false
             }
 
             when (destinations) {

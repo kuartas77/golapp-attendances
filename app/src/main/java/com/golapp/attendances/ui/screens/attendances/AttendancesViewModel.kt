@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.attendances.presentation
+package com.golapp.attendances.ui.screens.attendances
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -84,16 +84,12 @@ class AttendancesViewModel @Inject constructor(
             .flatMapLatest { classDay ->
                 attendancesUseCases.getAttendancesByClassDayUseCase(classDay)
                     .map<List<AttendanceWithPlayer>, AttendancesResult> {
-                        AttendancesResult.Success(
-                            it
-                        )
+                        AttendancesResult.Success(it )
                     }
                     .onStart {
                         // asegura la data 1 sola vez por classDay
                         runCatching {
-                            attendancesUseCases.ensureAttendancesForClassDayUseCase(
-                                classDay
-                            )
+                            attendancesUseCases.ensureAttendancesForClassDayUseCase(classDay)
                         }
                             .onFailure { e ->
                                 _effects.tryEmit(

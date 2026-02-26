@@ -5,8 +5,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.golapp.attendances.ui.screens.attendances.presentation.AttendancesScreen
-import com.golapp.attendances.ui.screens.groups.presentation.GroupsScreen
+import com.golapp.attendances.ui.screens.attendances.AttendancesScreen
+import com.golapp.attendances.ui.screens.groups.GroupsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable

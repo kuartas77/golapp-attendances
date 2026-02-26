@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.attendances.presentation
+package com.golapp.attendances.ui.screens.attendances
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade

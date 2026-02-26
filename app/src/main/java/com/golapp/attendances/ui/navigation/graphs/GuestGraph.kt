@@ -4,7 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.golapp.attendances.ui.screens.auth.presentation.AuthenticationScreen
+import com.golapp.attendances.ui.screens.auth.LoginScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -15,6 +15,6 @@ fun NavController.navigateToAuthentication(navOptions: NavOptions? = null) =
 
 fun NavGraphBuilder.authenticationScreens(onDetectLogin: () -> Unit = {}) {
     composable<Authentication> {
-        AuthenticationScreen(onDetectLogin = onDetectLogin)
+        LoginScreen(onDetectLogin = onDetectLogin)
     }
 }
