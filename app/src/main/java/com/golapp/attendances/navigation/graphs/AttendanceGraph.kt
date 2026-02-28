@@ -1,12 +1,12 @@
-package com.golapp.attendances.ui.navigation.graphs
+package com.golapp.attendances.navigation.graphs
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.golapp.attendances.ui.screens.attendances.AttendancesScreen
-import com.golapp.attendances.ui.screens.groups.GroupsScreen
+import com.golapp.attendances.feature.attendances.AttendancesScreen
+import com.golapp.attendances.feature.groups.GroupsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable

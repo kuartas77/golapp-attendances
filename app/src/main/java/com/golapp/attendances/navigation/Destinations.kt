@@ -1,12 +1,12 @@
-package com.golapp.attendances.ui.navigation
+package com.golapp.attendances.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.golapp.attendances.R
-import com.golapp.attendances.ui.navigation.graphs.GroupAttendances
-import com.golapp.attendances.ui.navigation.graphs.Groups
-import com.golapp.attendances.ui.navigation.graphs.Home
-import com.golapp.attendances.ui.navigation.graphs.Settings
+import com.golapp.attendances.navigation.graphs.GroupAttendances
+import com.golapp.attendances.navigation.graphs.Groups
+import com.golapp.attendances.navigation.graphs.Home
+import com.golapp.attendances.navigation.graphs.Settings
 import kotlin.reflect.KClass
 
 

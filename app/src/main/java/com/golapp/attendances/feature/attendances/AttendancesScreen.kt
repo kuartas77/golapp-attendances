@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.attendances
+package com.golapp.attendances.feature.attendances
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility

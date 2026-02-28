@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.settings
+package com.golapp.attendances.feature.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM_LARGE
-import com.golapp.attendances.ui.screens.settings.components.SettingsItem
+import com.golapp.attendances.feature.settings.components.SettingsItem
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 
 @Composable

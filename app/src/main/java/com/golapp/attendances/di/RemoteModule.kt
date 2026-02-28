@@ -56,8 +56,7 @@ object RemoteModule {
     @Singleton
     @ApiOkHttp
     fun provideOkHttpClient(
-        authHeaderInterceptor: AuthHeaderInterceptor,
-        networkMonitorInterceptor: NetworkMonitorInterceptor
+        authHeaderInterceptor: AuthHeaderInterceptor
     ): OkHttpClient = trace("GolappOkHttpClient") {
         OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().apply {
@@ -65,7 +64,6 @@ object RemoteModule {
                 else HttpLoggingInterceptor.Level.NONE
             })
             .addInterceptor(authHeaderInterceptor)
-            .addInterceptor(networkMonitorInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
@@ -111,7 +109,6 @@ object RemoteModule {
         @ApplicationContext context: Context,
         @CoilOkHttp coilOkHttpClient: OkHttpClient
     ): ImageLoader = trace("GolappImageLoader") {
-        ImageLoader.Builder(context)
         ImageLoader.Builder(context)
             .memoryCachePolicy(CachePolicy.ENABLED)
             .memoryCache {

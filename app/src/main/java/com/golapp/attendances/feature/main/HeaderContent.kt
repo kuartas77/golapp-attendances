@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui
+package com.golapp.attendances.feature.main
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -27,11 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.LocalPlatformContext
-import coil3.compose.rememberAsyncImagePainter
-import coil3.request.ImageRequest
+import coil3.compose.AsyncImage
 import com.golapp.attendances.R
-import com.golapp.attendances.ui.screens.MainViewModel
 
 
 @Composable
@@ -41,13 +38,8 @@ fun HeaderContent(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val userName = uiState.user?.name ?: ""
-    val schoolLogoUrl = uiState.user?.schoolLogo ?: ""
-    val schoolName = uiState.user?.schoolName ?: ""
-    val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalPlatformContext.current)
-            .data(schoolLogoUrl)
-            .build(),
-    )
+    val schoolLogoUrl = uiState.user?.schoolLogo ?: "https://app.golapp.com.co/img/ballon.png"
+    val schoolName = uiState.user?.schoolName ?: "GOLAPP"
 
     Surface(
         modifier = modifier
@@ -66,8 +58,8 @@ fun HeaderContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Image(
-                painter = painter,
+            AsyncImage(
+                model = schoolLogoUrl,
                 contentDescription = schoolName,
                 contentScale = ContentScale.Fit,
                 modifier = modifier.size(48.dp, 36.dp)

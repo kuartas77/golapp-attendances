@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.home
+package com.golapp.attendances.feature.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

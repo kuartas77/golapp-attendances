@@ -1,10 +1,9 @@
-package com.golapp.attendances.ui.screens
+package com.golapp.attendances.feature.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.golapp.attendances.domain.repositories.AuthRepository
 import com.golapp.attendances.domain.usecases.auth.AuthUseCases
-import com.golapp.attendances.ui.screens.home.HomeUiState
+import com.golapp.attendances.feature.home.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

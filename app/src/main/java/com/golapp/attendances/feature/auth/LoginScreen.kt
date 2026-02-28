@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.auth
+package com.golapp.attendances.feature.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

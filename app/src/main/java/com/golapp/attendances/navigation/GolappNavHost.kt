@@ -1,19 +1,19 @@
-package com.golapp.attendances.ui.navigation
+package com.golapp.attendances.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
-import com.golapp.attendances.ui.GolAppState
-import com.golapp.attendances.ui.navigation.graphs.Authentication
-import com.golapp.attendances.ui.navigation.graphs.Home
-import com.golapp.attendances.ui.navigation.graphs.authenticationScreens
-import com.golapp.attendances.ui.navigation.graphs.groupsScreen
-import com.golapp.attendances.ui.navigation.graphs.homeScreen
-import com.golapp.attendances.ui.navigation.graphs.navigateToAuthentication
-import com.golapp.attendances.ui.navigation.graphs.navigateToGroups
-import com.golapp.attendances.ui.navigation.graphs.navigateToHome
-import com.golapp.attendances.ui.navigation.graphs.settingScreen
+import com.golapp.attendances.feature.main.GolAppState
+import com.golapp.attendances.navigation.graphs.Authentication
+import com.golapp.attendances.navigation.graphs.Home
+import com.golapp.attendances.navigation.graphs.authenticationScreens
+import com.golapp.attendances.navigation.graphs.groupsScreen
+import com.golapp.attendances.navigation.graphs.homeScreen
+import com.golapp.attendances.navigation.graphs.navigateToAuthentication
+import com.golapp.attendances.navigation.graphs.navigateToGroups
+import com.golapp.attendances.navigation.graphs.navigateToHome
+import com.golapp.attendances.navigation.graphs.settingScreen
 
 @Composable
 fun GolappNavHost(

@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui
+package com.golapp.attendances.feature.main
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -6,7 +6,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -15,13 +14,12 @@ import androidx.navigation.get
 import androidx.navigation.navOptions
 import androidx.tracing.trace
 import com.golapp.attendances.common.NetworkMonitor
-import com.golapp.attendances.ui.navigation.Destinations
-import com.golapp.attendances.ui.navigation.graphs.Authentication
-import com.golapp.attendances.ui.navigation.graphs.Home
-import com.golapp.attendances.ui.navigation.graphs.navigateToGroups
-import com.golapp.attendances.ui.navigation.graphs.navigateToHome
-import com.golapp.attendances.ui.navigation.graphs.navigateToSettings
-import com.golapp.attendances.ui.screens.MainViewModel
+import com.golapp.attendances.navigation.Destinations
+import com.golapp.attendances.navigation.graphs.Authentication
+import com.golapp.attendances.navigation.graphs.Home
+import com.golapp.attendances.navigation.graphs.navigateToGroups
+import com.golapp.attendances.navigation.graphs.navigateToHome
+import com.golapp.attendances.navigation.graphs.navigateToSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map

@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.auth
+package com.golapp.attendances.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

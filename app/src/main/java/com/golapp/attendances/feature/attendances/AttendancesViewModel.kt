@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens.attendances
+package com.golapp.attendances.feature.attendances
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -8,7 +8,7 @@ import com.golapp.attendances.di.IoDispatcher
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.domain.usecases.attendances.AttendancesUseCases
-import com.golapp.attendances.ui.navigation.graphs.Attendances
+import com.golapp.attendances.navigation.graphs.Attendances
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi

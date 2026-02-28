@@ -1,4 +1,4 @@
-package com.golapp.attendances.ui.screens
+package com.golapp.attendances.feature.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

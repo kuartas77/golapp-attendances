@@ -1,10 +1,10 @@
-package com.golapp.attendances.ui.navigation.graphs
+package com.golapp.attendances.navigation.graphs
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.golapp.attendances.ui.screens.auth.LoginScreen
+import com.golapp.attendances.feature.auth.LoginScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
