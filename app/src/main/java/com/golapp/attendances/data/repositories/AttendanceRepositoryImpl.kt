@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 class AttendanceRepositoryImpl @Inject constructor(
@@ -55,9 +56,14 @@ class AttendanceRepositoryImpl @Inject constructor(
         classDay: ClassDay,
         year: Int
     ): List<Attendance> = withContext(ioDispatcher) {
-        // el remoto puede traer year o no; forzamos el year del contexto si hace falta
-        remote.fetchAttendances(classDay).map { a ->
-            if (a.year == year) a else a.copy(year = year)
+        try {
+            // el remoto puede traer year o no; forzamos el year del contexto si hace falta
+            remote.fetchAttendances(classDay).map { a ->
+                if (a.year == year) a else a.copy(year = year)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "fetchAttendances failed: ${e.message}")
+            emptyList()
         }
     }
 
@@ -99,6 +105,13 @@ class AttendanceRepositoryImpl @Inject constructor(
     override suspend fun updateAttendanceValue(localAttendanceId: Long, value: String?) =
         withContext(ioDispatcher) {
             attendanceDao.updateValueById(localAttendanceId, value)
+            try {
+                val attendance = attendanceDao.getAttendanceById(localAttendanceId).toDomain()
+                remote.syncAttendance(attendance)
+            } catch (e: Exception) {
+                Timber.e(e, "syncAssignedGroups failed: ${e.message}")
+                return@withContext
+            }
         }
 
     override suspend fun getAllAttendances(): List<Attendance> = withContext(ioDispatcher) {

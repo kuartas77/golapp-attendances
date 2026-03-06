@@ -38,7 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.golapp.attendances.R
 import com.golapp.attendances.common.Constants.SHAPE_SMALL
-import com.golapp.attendances.ui.theme.LocalTheme
 
 
 object CustomTextField {
@@ -58,7 +57,7 @@ object CustomTextField {
         keyboardActions: KeyboardActions = KeyboardActions(),
         backgroundColor: Color = MaterialTheme.colorScheme.background
     ) {
-        val theme = LocalTheme.current
+
         var hidePassword by remember {
             mutableStateOf(true)
         }
@@ -74,7 +73,7 @@ object CustomTextField {
                         Icon(
                             imageVector = leadingIcon,
                             contentDescription = null,
-                            tint = theme.buttonPrimary
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
@@ -98,32 +97,32 @@ object CustomTextField {
                     Text(
                         text = label,
                         style = MaterialTheme.typography.labelSmall,
-                        color = theme.buttonPrimary
+                        color = MaterialTheme.colorScheme.primary
                     )
                 },
                 placeholder = {
                     Text(
                         text = placeholder,
                         style = MaterialTheme.typography.labelSmall,
-                        color = theme.buttonPrimary
+                        color = MaterialTheme.colorScheme.primary
                     )
                 },
                 singleLine = true,
                 shape = CutCornerShape(SHAPE_SMALL),
                 colors = OutlinedTextFieldDefaults.colors(
-                    cursorColor = theme.buttonPrimary,
-                    focusedTextColor = theme.buttonPrimary,
-                    unfocusedTextColor = theme.buttonPrimary,
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    focusedTextColor = MaterialTheme.colorScheme.primary,
+                    unfocusedTextColor = MaterialTheme.colorScheme.primary,
                     focusedContainerColor = backgroundColor,
-                    focusedBorderColor = theme.buttonPrimary,
-                    unfocusedBorderColor = theme.buttonPrimary,
-                    focusedLeadingIconColor = theme.buttonDisabled,
-                    unfocusedLeadingIconColor = theme.buttonPrimary,
-                    focusedLabelColor = theme.buttonDisabled,
-                    unfocusedPlaceholderColor = theme.buttonDisabled.copy(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.surface,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = MaterialTheme.colorScheme.surface,
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.surface.copy(
                         alpha = 0.5f
                     ),
-                    errorBorderColor = theme.borderError
+                    errorBorderColor = MaterialTheme.colorScheme.error
                 ),
                 visualTransformation = if (isPassword && hidePassword) PasswordVisualTransformation() else VisualTransformation.None,
                 keyboardOptions = keyboardOptions,
@@ -135,7 +134,7 @@ object CustomTextField {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = errorMessage,
-                    color = theme.borderError,
+                    color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.labelLarge
                 )

@@ -10,6 +10,7 @@ import com.golapp.attendances.domain.usecases.attendances.AttendancesUseCases
 import com.golapp.attendances.domain.usecases.attendances.EnsureAttendancesForClassDayUseCase
 import com.golapp.attendances.domain.usecases.attendances.GetAttendancesByClassDayUseCase
 import com.golapp.attendances.domain.usecases.attendances.SyncAttendanceUseCase
+import com.golapp.attendances.domain.usecases.attendances.TakeAttendanceUseCase
 import com.golapp.attendances.domain.usecases.attendances.UpdateAttendanceValueUseCase
 import com.golapp.attendances.domain.usecases.auth.AuthUseCases
 import com.golapp.attendances.domain.usecases.auth.AuthenticateWithEmailUseCase
@@ -133,6 +134,13 @@ object UseCasesModule {
         ioDispatcher
     )
 
+    @Provides
+    @Singleton
+    fun provideTakeAttendanceUseCase(
+        attendanceRepository: AttendanceRepository
+    ): TakeAttendanceUseCase = TakeAttendanceUseCase(attendanceRepository)
+
+
 
     @Provides
     @Singleton
@@ -141,13 +149,15 @@ object UseCasesModule {
         ensureAttendancesForClassDayUseCase: EnsureAttendancesForClassDayUseCase,
         updateAttendanceValueUseCase: UpdateAttendanceValueUseCase,
         getClassDayByIdUseCase: GetClassDayByIdUseCase,
-        getAttendancesByClassDayUseCase: GetAttendancesByClassDayUseCase
+        getAttendancesByClassDayUseCase: GetAttendancesByClassDayUseCase,
+        takeAttendanceUseCase: TakeAttendanceUseCase
     ): AttendancesUseCases = AttendancesUseCases(
         ensureAttendancesForClassDayUseCase,
         updateAttendanceValueUseCase,
         syncAttendanceUseCase,
         getClassDayByIdUseCase,
-        getAttendancesByClassDayUseCase
+        getAttendancesByClassDayUseCase,
+        takeAttendanceUseCase
     )
 
     // Groups

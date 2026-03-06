@@ -11,10 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -54,17 +55,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.golapp.attendances.R
-import com.golapp.attendances.common.Constants.SHAPE_LARGE
 import com.golapp.attendances.common.Constants.SPACER_LARGE
 import com.golapp.attendances.common.Constants.SPACER_MEDIUM
-import com.golapp.attendances.common.Constants.SPACER_MEDIUM_LARGE
 import com.golapp.attendances.common.Constants.SPACER_SMALL
+import com.golapp.attendances.common.scheduleInline
 import com.golapp.attendances.common.ui.components.AlertDialogSync
 import com.golapp.attendances.common.ui.components.Loader
-import com.golapp.attendances.common.ui.components.ScheduleTimeContent
 import com.golapp.attendances.common.ui.components.SearchBar
 import com.golapp.attendances.common.ui.preview.groupWithClassPreview
 import com.golapp.attendances.domain.models.GroupWithClassDays
+import com.golapp.attendances.ui.theme.BrandDefaults
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -204,7 +204,8 @@ private fun ListPanelGroups(
         } else {
             LazyColumn(
                 state = listState,
-                modifier = modifier.fillMaxSize()
+                modifier = modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(
                     count = groupWithClassDays.count(),
@@ -298,56 +299,84 @@ private fun GroupItem(
     onClickItem: (GroupWithClassDays) -> Unit = {}
 ) {
     Card(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top)
-            .height(120.dp)
-            .padding(top = SPACER_LARGE)
             .clickable { onClickItem(item) },
-        shape = CutCornerShape(topEnd = SHAPE_LARGE, bottomStart = SHAPE_LARGE),
-        elevation = CardDefaults.cardElevation(defaultElevation = SPACER_MEDIUM_LARGE),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = BrandDefaults.cardColors()
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-        ) {
-            Column(
+        Column(modifier = Modifier.padding(14.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .weight(2f),
-                verticalArrangement = Arrangement.Center,
+                    .fillMaxWidth(),
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center,
 
-                ) {
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(item.group.fullGroup)
-                        }
-                    },
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Spacer(modifier = modifier.height(SPACER_SMALL))
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(stringResource(R.string.members))
-                            append(" ")
-                            append(item.group.playerCount.toString())
-                        }
-                    },
-                    maxLines = 1,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Spacer(modifier = modifier.height(SPACER_LARGE))
-                ScheduleTimeContent(
-                    date = item.group.days,
-                    time = item.group.explodeSchedules
-                )
+                    ) {
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append(item.group.fullGroup)
+                            }
+                        },
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(modifier = modifier.height(SPACER_SMALL))
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append(stringResource(R.string.members))
+                                append(" ")
+                                append(item.group.playerCount.toString())
+                            }
+                        },
+                        maxLines = 1,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(modifier = modifier.height(SPACER_LARGE))
+
+                    Row(
+                        modifier = modifier,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.id_calendar),
+                            contentDescription = "Icon Date",
+                            modifier = Modifier.size(16.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(
+                            text = item.group.days.scheduleInline(),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+
+                    Row(
+                        modifier = modifier,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_stopwatch),
+                            contentDescription = "Icon Date",
+                            modifier = Modifier.size(16.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(
+                            text = item.group.explodeSchedules.scheduleInline(),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
             }
         }
     }

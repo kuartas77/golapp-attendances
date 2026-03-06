@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -27,17 +25,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItemColors
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -51,13 +48,11 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import com.golapp.attendances.common.NetworkMonitor
 import com.golapp.attendances.feature.main.GolAppState
 import com.golapp.attendances.feature.main.HeaderContent
-import com.golapp.attendances.navigation.GolappNavHost
-import com.golapp.attendances.feature.main.rememberAppState
 import com.golapp.attendances.feature.main.SplashViewModel
+import com.golapp.attendances.feature.main.rememberAppState
+import com.golapp.attendances.navigation.GolappNavHost
+import com.golapp.attendances.ui.theme.BrandDefaults
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
-import com.golapp.attendances.ui.theme.LocalTheme
-import com.golapp.attendances.ui.theme.darkThemeColors
-import com.golapp.attendances.ui.theme.lightThemeColors
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.mapNotNull
 import timber.log.Timber
@@ -80,15 +75,15 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
-            val themeColors = if (isSystemInDarkTheme()) darkThemeColors else lightThemeColors
+//            val themeColors = if (isSystemInDarkTheme()) darkThemeColors else lightThemeColors
 
             val appState = rememberAppState(networkMonitor = networkMonitor)
 
-            CompositionLocalProvider(LocalTheme provides themeColors) {
-                GolappAttendancesTheme {
-                    MainScreen(appState = appState)
-                }
+//            CompositionLocalProvider(LocalTheme provides themeColors) {
+            GolappAttendancesTheme {
+                MainScreen(appState = appState)
             }
+//            }
         }
     }
 }
@@ -143,11 +138,15 @@ internal fun GolApp(
     snackbarHostState: SnackbarHostState,
     modifier: Modifier
 ) {
+    val suiteColors = BrandDefaults.navigationSuiteColors()
+    val suiteItemColors = BrandDefaults.navigationSuiteItemColors()
+
     NavigationSuiteScaffold(
         layoutType = layoutType,
+        navigationSuiteColors = suiteColors,
         navigationSuiteItems = {
             if (layoutType != NavigationSuiteType.None) {
-                navigationItems(appState, currentDestination)
+                navigationItems(appState, currentDestination, suiteItemColors)
             }
         }
 
@@ -158,8 +157,8 @@ internal fun GolApp(
                 .semantics {
                     testTagsAsResourceId = true
                 },
-            containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.onBackground,
+//            containerColor = Color.Transparent,
+//            contentColor = MaterialTheme.colorScheme.onBackground,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             snackbarHost = {
                 SnackbarHost(
@@ -206,7 +205,8 @@ internal fun GolApp(
 
 private fun NavigationSuiteScope.navigationItems(
     appState: GolAppState,
-    currentDestination: NavDestination?
+    currentDestination: NavDestination?,
+    suiteItemColors: NavigationSuiteItemColors
 ) {
     appState.topLevelDestinations.forEach { destination ->
         val isSelected =
@@ -226,6 +226,7 @@ private fun NavigationSuiteScope.navigationItems(
                 Text(text = stringResource(destination.label))
             },
             alwaysShowLabel = true,
+            colors = suiteItemColors
         )
     }
 }

@@ -56,7 +56,8 @@ object RemoteModule {
     @Singleton
     @ApiOkHttp
     fun provideOkHttpClient(
-        authHeaderInterceptor: AuthHeaderInterceptor
+        authHeaderInterceptor: AuthHeaderInterceptor,
+        networkMonitorInterceptor: NetworkMonitorInterceptor
     ): OkHttpClient = trace("GolappOkHttpClient") {
         OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().apply {
@@ -64,6 +65,7 @@ object RemoteModule {
                 else HttpLoggingInterceptor.Level.NONE
             })
             .addInterceptor(authHeaderInterceptor)
+            .addInterceptor(networkMonitorInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)

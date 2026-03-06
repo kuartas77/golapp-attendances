@@ -8,3 +8,9 @@ fun String.toAbsoluteUrl(): String {
     if (raw.startsWith("http://") || raw.startsWith("https://")) return raw
     return BuildConfig.API_URL.trimEnd('/') + "/" + raw.trimStart('/')
 }
+
+fun String.scheduleInline(): String =
+    split(",")
+        .map { it.trim() }
+        .filter { it.isNotBlank() }
+        .joinToString("  |  ")

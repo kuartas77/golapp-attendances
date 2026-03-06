@@ -1,16 +1,14 @@
 package com.golapp.attendances.ui.theme
 
-import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
-import com.golapp.attendances.common.Constants.SHAPE_LARGE
-import com.golapp.attendances.common.Constants.SHAPE_MEDIUM
-import com.golapp.attendances.common.Constants.SHAPE_SMALL
-import com.golapp.attendances.common.Constants.SHAPE_XLARGE
+import androidx.compose.ui.unit.dp
 
 
-val shapes = Shapes(
-    small = CutCornerShape(SHAPE_SMALL),
-    medium = CutCornerShape(SHAPE_MEDIUM),
-    large = CutCornerShape(SHAPE_LARGE),
-    extraLarge = CutCornerShape(SHAPE_XLARGE)
+val AppShapes = Shapes(
+    extraSmall = RoundedCornerShape(8.dp),
+    small = RoundedCornerShape(12.dp),
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(20.dp),
+    extraLarge = RoundedCornerShape(28.dp)
 )

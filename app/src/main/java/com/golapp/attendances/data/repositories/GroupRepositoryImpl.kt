@@ -37,8 +37,8 @@ class GroupRepositoryImpl @Inject constructor(
         val remoteSnapshot = try {
             remote.fetchAllGroupsSnapshot()
         } catch (e: Exception) {
-            Timber.e(e, "syncAssignedGroups failed")
-            emptyList()
+            Timber.e(e, "syncAssignedGroups failed: ${e.message}")
+            return@withContext
         }
 
         // Si el backend retorna vacío porque no tiene grupos
@@ -121,7 +121,7 @@ class GroupRepositoryImpl @Inject constructor(
                 remote.fetchAllGroupsSnapshot()
             } catch (e: Exception) {
                 Timber.e(e, "syncGroupsIfEmpty failed (remote)")
-                emptyList()
+                return@withContext
             }
 
             if (remoteSnapshot.isEmpty()) return@withContext

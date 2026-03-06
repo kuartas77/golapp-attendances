@@ -199,8 +199,7 @@ class AttendancesViewModel @Inject constructor(
     private fun takeAttendance(attendanceWithPlayer: AttendanceWithPlayer) {
         viewModelScope.launch(ioDispatcher) {
             runCatching {
-                // Si tienes el use case:
-                // attendancesUseCases.takeAttendanceUseCase(attendanceWithPlayer)
+                 attendancesUseCases.takeAttendanceUseCase(attendanceWithPlayer)
             }.onFailure { e ->
                 _effects.emit(
                     AttendancesUiEffect.ShowSnackbar(

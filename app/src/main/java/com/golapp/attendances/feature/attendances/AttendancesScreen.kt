@@ -17,11 +17,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -199,7 +199,8 @@ private fun ListPanelAttendances(
         } else {
             LazyColumn(
                 state = listState,
-                modifier = modifier.fillMaxSize()
+                modifier = modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(
                     count = attendances.count(),
@@ -237,7 +238,7 @@ private fun SearchBarSection(
         mutableStateOf(TextFieldValue(uiState.query))
     }
 
-    // ✅ Mantiene el input sincronizado cuando el VM cambia query (ej: OnClearText)
+    // Mantiene el input sincronizado cuando el VM cambia query
     LaunchedEffect(uiState.query) {
         val current = searchState.value
         if (current.text != uiState.query) {
@@ -305,12 +306,10 @@ private fun AttendanceItem(
     val imageRequest = ImageRequest.Builder(LocalContext.current).data(attendance.player.photoUrl)
         .build()
 
-    Card(
+    OutlinedCard(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top)
-            .height(120.dp)
-            .padding(top = 8.dp)
             .clickable { onClickItem() },
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
@@ -323,9 +322,7 @@ private fun AttendanceItem(
                 .padding(8.dp),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(2f),
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
@@ -426,7 +423,7 @@ private fun AttendanceItem(
     }
 }
 
-@Preview()
+@Preview
 @Composable
 private fun AttendanceItemPreview() {
     GolappAttendancesTheme {

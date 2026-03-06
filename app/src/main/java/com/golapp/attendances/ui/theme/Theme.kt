@@ -13,36 +13,40 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF101E42),
-    secondary = Color(0xFFFFCC05),
-    background = Color(0xFFF6F6F6),
-    surface = Color(0xFFF6F6F6),
-    onPrimary = Color.Black,
-    onSecondary = Color.White,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    surfaceContainer = Color(0xE6F8F9FA),
+    primary = Navy,
+    onPrimary = Color.White,          // contraste: texto/iconos sobre primary
+    secondary = Gold,
+    onSecondary = Navy,        // contraste: texto/iconos sobre secondary
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    background = Color(0xFFF7F8FC),
+    onBackground = Navy,
+
+    surface = Color.White,
+    onSurface = Navy,
+
+    surfaceVariant = Color(0xFFEEF1F9),
+    onSurfaceVariant = Navy,
+
+    outline = Color(0xFFCBD2E6)
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFFFFCC05),
-    secondary = Color(0xFF101E42),
-    background = Color.Black,
-    surface = Color.Black,
-    onPrimary = Color.Black,
-    onSecondary = Color.White,
-    onBackground = Color.White,
-    onSurface = Color.White,
+    primary = GoldMuted,
+    onPrimary = DarkBg,
+
+    secondary = NavyMuted,
+    onSecondary = DarkText,
+
+    background = DarkBg,
+    onBackground = DarkText,
+
+    surface = DarkSurface,
+    onSurface = DarkText,
+
+    surfaceVariant = DarkSurface2,
+    onSurfaceVariant = DarkTextMuted,
+
+    outline = Color(0xFF3A4775)
 )
 
 @Composable
@@ -65,6 +69,7 @@ fun GolappAttendancesTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = AppShapes,
         content = content
     )
 }

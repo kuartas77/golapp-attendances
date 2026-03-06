@@ -45,6 +45,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.golapp.attendances.R
+import com.golapp.attendances.common.scheduleInline
 import com.golapp.attendances.common.ui.preview.groupWithClassPreview
 import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.domain.models.GroupWithClassDays
@@ -213,7 +214,7 @@ private fun Header(modifier: Modifier, groupWithClassDays: GroupWithClassDays) {
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            Text(groupWithClassDays.group.days, style = MaterialTheme.typography.bodyMedium)
+            Text(groupWithClassDays.group.days.scheduleInline(), style = MaterialTheme.typography.bodyMedium)
         }
     }
 
@@ -232,7 +233,7 @@ private fun Header(modifier: Modifier, groupWithClassDays: GroupWithClassDays) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                groupWithClassDays.group.explodeSchedules,
+                groupWithClassDays.group.explodeSchedules.scheduleInline(),
                 style = MaterialTheme.typography.bodyMedium
             )
         }

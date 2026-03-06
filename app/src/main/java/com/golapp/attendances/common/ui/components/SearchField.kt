@@ -1,6 +1,7 @@
 package com.golapp.attendances.common.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
@@ -147,7 +148,7 @@ fun SearchBar(
     isEnabled: (Boolean) = true,
     height: Dp = 40.dp,
     elevation: Dp = 0.dp,
-    cornerShape: Shape = MaterialTheme.shapes.medium,
+    cornerShape: Shape = MaterialTheme.shapes.small,
     backgroundColor: Color = Color.White,
     state: MutableState<TextFieldValue>,
     onSearchClicked: (String) -> Unit = {},
@@ -159,7 +160,8 @@ fun SearchBar(
             .height(height)
             .fillMaxWidth()
             .shadow(elevation = elevation, shape = cornerShape)
-            .background(color = backgroundColor, shape = cornerShape),
+            .background(color = backgroundColor, shape = cornerShape)
+            .border(2.dp, MaterialTheme.colorScheme.primary, cornerShape),
         verticalAlignment = Alignment.CenterVertically,
     ) {
 

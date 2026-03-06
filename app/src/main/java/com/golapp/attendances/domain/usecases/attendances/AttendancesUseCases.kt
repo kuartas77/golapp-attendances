@@ -7,5 +7,6 @@ data class AttendancesUseCases(
     val updateAttendanceValueUseCase: UpdateAttendanceValueUseCase,
     val syncAttendanceUseCase: SyncAttendanceUseCase,
     val getClassDayByIdUseCase: GetClassDayByIdUseCase,
-    val getAttendancesByClassDayUseCase: GetAttendancesByClassDayUseCase
+    val getAttendancesByClassDayUseCase: GetAttendancesByClassDayUseCase,
+    val takeAttendanceUseCase: TakeAttendanceUseCase
 )

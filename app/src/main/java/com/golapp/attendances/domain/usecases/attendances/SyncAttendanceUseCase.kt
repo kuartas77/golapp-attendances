@@ -5,8 +5,9 @@ import androidx.work.WorkManager
 import com.golapp.attendances.data.sync.AttendanceSyncWorker
 import com.golapp.attendances.domain.models.AttendanceSync
 import com.golapp.attendances.domain.repositories.AttendanceRepository
+import javax.inject.Inject
 
-class SyncAttendanceUseCase(
+class SyncAttendanceUseCase @Inject constructor(
     private val attendanceRepository: AttendanceRepository,
     private val workManager: WorkManager
 ) {

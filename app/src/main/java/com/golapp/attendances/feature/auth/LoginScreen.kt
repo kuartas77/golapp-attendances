@@ -58,7 +58,7 @@ fun LoginScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
         ) {
             Image(
                 painter = painterResource(id = R.drawable.soccer_field),
