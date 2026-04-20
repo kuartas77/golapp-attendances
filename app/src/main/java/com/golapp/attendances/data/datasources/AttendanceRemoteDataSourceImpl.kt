@@ -12,8 +12,6 @@ class AttendanceRemoteDataSourceImpl @Inject constructor(
 ) : AttendanceRemoteDataSource {
 
     override suspend fun fetchAttendances(classDay: ClassDay): List<Attendance> {
-        // Deja que Retrofit lance HttpException / IOException;
-        // tu repository ya lo está atrapando (try/catch) 👍
         val res = api.getAttendances(
             schoolId = classDay.schoolId,
             groupId = classDay.groupId,

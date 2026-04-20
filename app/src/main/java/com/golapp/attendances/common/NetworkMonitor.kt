@@ -18,59 +18,50 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@Suppress
+@Singleton
 class NetworkMonitor @Inject constructor(
     context: Context
 ) {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    // Scope interno liviano
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
-    // Exponemos un StateFlow (siempre tiene último valor)
-    private val _isConnected = MutableStateFlow(readInitialConnection())
+    private val _isConnected = MutableStateFlow(readCurrentConnection())
     val isConnected: StateFlow<Boolean> = _isConnected.asStateFlow()
 
-    init {
-        scope.launch {
-            observeConnectivity()
-                .distinctUntilChanged()
-                .collect { _isConnected.value = it }
+    private val callback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            // No decidir aquí “true” directo.
+            // Android recomienda esperar capacidades para evitar race conditions.
+            _isConnected.value = readCurrentConnection()
+        }
+
+        override fun onLost(network: Network) {
+            // Recalcular el estado real actual.
+            _isConnected.value = readCurrentConnection()
+        }
+
+        override fun onCapabilitiesChanged(
+            network: Network,
+            networkCapabilities: NetworkCapabilities
+        ) {
+            _isConnected.value = networkCapabilities.hasCapability(
+                NetworkCapabilities.NET_CAPABILITY_VALIDATED
+            )
         }
     }
 
-    /** Snapshot inmediato para interceptor */
+    init {
+        connectivityManager.registerDefaultNetworkCallback(callback)
+    }
+
     fun isConnectedNow(): Boolean = isConnected.value
 
-    private fun observeConnectivity(): Flow<Boolean> = callbackFlow {
-        val callback = object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                trySend(true)
-            }
+    private fun readCurrentConnection(): Boolean {
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val caps = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
 
-            override fun onLost(network: Network) {
-                trySend(false)
-            }
-
-            override fun onCapabilitiesChanged(network: Network, caps: NetworkCapabilities) {
-                val hasInternet = caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-                trySend(hasInternet)
-            }
-        }
-
-        val request = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
-
-        connectivityManager.registerNetworkCallback(request, callback)
-        awaitClose { connectivityManager.unregisterNetworkCallback(callback) }
-    }.conflate()
-
-    private fun readInitialConnection(): Boolean {
-        val active = connectivityManager.activeNetwork ?: return false
-        val caps = connectivityManager.getNetworkCapabilities(active) ?: return false
         return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 }

@@ -5,7 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.work.WorkManager
 import com.golapp.attendances.data.local.datastore.SessionManager
-import com.golapp.attendances.data.remote.GolappAPI
+import com.golapp.attendances.data.remote.RefreshApi
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -25,13 +25,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideGson(): Gson = GsonBuilder().create()
-
-    @Provides
-    @Singleton
     fun provideAppDataStore(
         preferenceDataStore: DataStore<Preferences>,
-        api: dagger.Lazy<GolappAPI>,
+        api: dagger.Lazy<RefreshApi>,
         gson: Gson
     ): SessionManager = SessionManager(preferenceDataStore, api, gson)
 

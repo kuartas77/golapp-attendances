@@ -17,9 +17,9 @@ object Settings
 
 fun NavController.navigateToHome(navOptions: NavOptions? = null) = navigate(Home, navOptions)
 
-fun NavGraphBuilder.homeScreen() {
+fun NavGraphBuilder.homeScreen(onLogout: () -> Unit = {}) {
     composable<Home> {
-        HomeScreen()
+        HomeScreen(onLogout = onLogout)
     }
 }
 

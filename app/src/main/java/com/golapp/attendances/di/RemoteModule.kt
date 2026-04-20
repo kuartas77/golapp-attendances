@@ -14,9 +14,13 @@ import com.golapp.attendances.BuildConfig
 import com.golapp.attendances.common.NetworkMonitor
 import com.golapp.attendances.data.local.datastore.SessionManager
 import com.golapp.attendances.data.remote.GolappAPI
+import com.golapp.attendances.data.remote.RefreshApi
+import com.golapp.attendances.data.remote.auth.TokenAuthenticator
 import com.golapp.attendances.data.remote.interceptors.AuthCoilInterceptor
 import com.golapp.attendances.data.remote.interceptors.AuthHeaderInterceptor
 import com.golapp.attendances.data.remote.interceptors.NetworkMonitorInterceptor
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,6 +36,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object RemoteModule {
+
+    @Provides
+    @Singleton
+    fun provideGson(): Gson = GsonBuilder().create()
+
     @Provides
     @Singleton
     fun provideNetworkMonitor(@ApplicationContext context: Context): NetworkMonitor =
@@ -39,32 +48,67 @@ object RemoteModule {
 
     @Provides
     @Singleton
-    fun providesHeadersInterceptor(sessionManager: SessionManager): AuthHeaderInterceptor =
-        AuthHeaderInterceptor(sessionManager)
+    fun provideAuthHeaderInterceptor(
+        sessionManager: SessionManager
+    ): AuthHeaderInterceptor = AuthHeaderInterceptor(sessionManager)
 
     @Provides
     @Singleton
-    fun providesHeaderCoilInterceptor(sessionManager: SessionManager): AuthCoilInterceptor =
-        AuthCoilInterceptor(sessionManager)
+    fun provideTokenAuthenticator(
+        sessionManager: SessionManager
+    ): TokenAuthenticator = TokenAuthenticator(sessionManager)
 
     @Provides
     @Singleton
-    fun providesNetworkMonitorInterceptor(networkMonitor: NetworkMonitor): NetworkMonitorInterceptor =
-        NetworkMonitorInterceptor(networkMonitor)
+    fun provideHeaderCoilInterceptor(
+        sessionManager: SessionManager
+    ): AuthCoilInterceptor = AuthCoilInterceptor(sessionManager)
+
+    @Provides
+    @Singleton
+    fun provideNetworkMonitorInterceptor(
+        networkMonitor: NetworkMonitor
+    ): NetworkMonitorInterceptor = NetworkMonitorInterceptor(networkMonitor)
 
     @Provides
     @Singleton
     @ApiOkHttp
     fun provideOkHttpClient(
         authHeaderInterceptor: AuthHeaderInterceptor,
-        networkMonitorInterceptor: NetworkMonitorInterceptor
+        networkMonitorInterceptor: NetworkMonitorInterceptor,
+        tokenAuthenticator: TokenAuthenticator
     ): OkHttpClient = trace("GolappOkHttpClient") {
         OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().apply {
-                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
-                else HttpLoggingInterceptor.Level.NONE
+                level = if (BuildConfig.DEBUG) {
+                    HttpLoggingInterceptor.Level.BODY
+                } else {
+                    HttpLoggingInterceptor.Level.NONE
+                }
             })
             .addInterceptor(authHeaderInterceptor)
+            .addInterceptor(networkMonitorInterceptor)
+            .authenticator(tokenAuthenticator)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @RefreshOkHttp
+    fun provideRefreshOkHttpClient(
+        networkMonitorInterceptor: NetworkMonitorInterceptor
+    ): OkHttpClient = trace("GolappRefreshOkHttpClient") {
+        OkHttpClient.Builder()
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = if (BuildConfig.DEBUG) {
+                    HttpLoggingInterceptor.Level.BODY
+                } else {
+                    HttpLoggingInterceptor.Level.NONE
+                }
+            })
             .addInterceptor(networkMonitorInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -75,15 +119,32 @@ object RemoteModule {
     @Provides
     @Singleton
     fun provideGolappAPI(
-        @ApiOkHttp okHttpClient: OkHttpClient
+        @ApiOkHttp okHttpClient: OkHttpClient,
+        gson: Gson
     ): GolappAPI {
         return trace("GolappNetwork") {
             Retrofit.Builder()
                 .baseUrl(BuildConfig.API_URL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(okHttpClient)
                 .build()
                 .create(GolappAPI::class.java)
+        }
+    }
+
+    @Provides
+    @Singleton
+    fun provideRefreshApi(
+        @RefreshOkHttp okHttpClient: OkHttpClient,
+        gson: Gson
+    ): RefreshApi {
+        return trace("GolappRefreshNetwork") {
+            Retrofit.Builder()
+                .baseUrl(BuildConfig.API_URL)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(okHttpClient)
+                .build()
+                .create(RefreshApi::class.java)
         }
     }
 
@@ -95,9 +156,7 @@ object RemoteModule {
         networkMonitorInterceptor: NetworkMonitorInterceptor
     ): OkHttpClient = trace("GolappCoilOkHttpClient") {
         OkHttpClient.Builder()
-            // Si tus imágenes requieren token:
             .addInterceptor(headerCoilInterceptor)
-            // Si quieres forzar caché offline (solo útil si configuras cache de OkHttp):
             .addInterceptor(networkMonitorInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -133,7 +192,9 @@ object RemoteModule {
                     )
                 )
             }
-            .apply { if (BuildConfig.DEBUG) logger(DebugLogger()) }
+            .apply {
+                if (BuildConfig.DEBUG) logger(DebugLogger())
+            }
             .crossfade(true)
             .build()
     }

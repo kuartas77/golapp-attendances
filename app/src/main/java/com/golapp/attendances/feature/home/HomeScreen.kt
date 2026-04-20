@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +40,8 @@ import com.golapp.attendances.domain.models.Statistics
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLogout: () -> Unit = {}
 ) {
     Surface(
         modifier = modifier
@@ -47,17 +49,24 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState()),
     ) {
         Column {
-            SectionInfo()
+            SectionInfo(onLogout)
         }
     }
 }
 
 @Composable
-private fun SectionInfo() {
+private fun SectionInfo(onLogout: () -> Unit) {
 
     val viewModel: HomeViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listStatistics = uiState.listStatistics
+
+    LaunchedEffect(uiState.isLoggedIn) {
+        if (!uiState.isLoggedIn) {
+            onLogout()
+        }
+    }
+
     val textListInfo = listOf(
         stringResource(R.string.groups_info),
         stringResource(R.string.attendance_info),

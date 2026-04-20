@@ -6,6 +6,7 @@ import com.golapp.attendances.data.local.database.AttendancesDB
 import com.golapp.attendances.data.local.database.daos.AttendanceDao
 import com.golapp.attendances.data.mappers.toDomain
 import com.golapp.attendances.data.mappers.toEntity
+import com.golapp.attendances.data.remote.models.dtos.StatisticsDto
 import com.golapp.attendances.di.IoDispatcher
 import com.golapp.attendances.domain.models.Attendance
 import com.golapp.attendances.domain.models.AttendanceSync
@@ -106,8 +107,10 @@ class AttendanceRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             attendanceDao.updateValueById(localAttendanceId, value)
             try {
-                val attendance = attendanceDao.getAttendanceById(localAttendanceId).toDomain()
-                remote.syncAttendance(attendance)
+                val attendance = attendanceDao.getAttendanceById(localAttendanceId)?.toDomain()
+                if (attendance != null) {
+                    remote.syncAttendance(attendance)
+                }
             } catch (e: Exception) {
                 Timber.e(e, "syncAssignedGroups failed: ${e.message}")
                 return@withContext
@@ -130,12 +133,16 @@ class AttendanceRepositoryImpl @Inject constructor(
         attendanceDao.deleteAttendanceSync(item.toEntity())
     }
 
-    override suspend fun getAttendanceById(id: Long): Attendance = withContext(ioDispatcher) {
-        attendanceDao.getAttendanceById(id).toDomain()
+    override suspend fun getAttendanceById(id: Long): Attendance? = withContext(ioDispatcher) {
+        attendanceDao.getAttendanceById(id)?.toDomain()
     }
 
     override suspend fun syncAttendance(attendance: Attendance) {
         remote.syncAttendance(attendance)
+    }
+
+    override suspend fun getAttendanceStatistics(): List<StatisticsDto> {
+        TODO("Not yet implemented")
     }
 
 }

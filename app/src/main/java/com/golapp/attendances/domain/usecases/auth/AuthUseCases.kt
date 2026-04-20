@@ -6,5 +6,6 @@ data class AuthUseCases(
     val loginWithEmail: AuthenticateWithEmailUseCase,
     val validateTokenExpiryUseCase: ValidateTokenExpiryUseCase,
     val getUserDataUseCase: GetUserDataUseCase,
+    val checkLoginUseCase: CheckLoginUseCase,
     val logoutUseCase: LogoutUseCase
 )

@@ -7,73 +7,46 @@ import okhttp3.Request
 import okhttp3.Response
 import retrofit2.Invocation
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class AuthHeaderInterceptor @Inject constructor(
     private val sessionManager: SessionManager
 ) : SuspendInterceptor() {
+
     override suspend fun interceptSuspend(chain: Interceptor.Chain): Response {
-        var request = chain.request()
+        val originalRequest = chain.request()
 
-        val invocation =
-            chain.request().tag(Invocation::class.java) ?: return chain.proceed(chain.request())
-        containedOnInvocation(invocation).forEach { annotation ->
-            request = handleAnnotation(annotation, request)
+        val invocation = originalRequest.tag(Invocation::class.java)
+        val hasAuthorizedAnnotation = invocation
+            ?.method()
+            ?.annotations
+            ?.any { it is Authorized } == true
+
+        val request = if (hasAuthorizedAnnotation) {
+            addAuthHeaders(originalRequest)
+        } else {
+            addDefaultHeaders(originalRequest)
         }
 
-        val response = chain.proceed(request)
-
-        if (response.code == 401) {
-
-            sessionManager.refreshToken()
-
-            val type = sessionManager.getType()
-            val token = sessionManager.getToken()
-
-            response.close()
-            val request = request.newBuilder()
-                .addHeader("Authorization", "$type $token")
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Accept", "application/json")
-                .build()
-
-            return chain.proceed(request)  // re-request
-
-        }
-
-        return response
+        return chain.proceed(request)
     }
 
-    private fun containedOnInvocation(invocation: Invocation): Set<Annotation> {
-        return invocation.method().annotations.toSet()
-    }
-
-    private suspend fun handleAnnotation(
-        annotation: Annotation,
-        request: Request,
-    ): Request {
-
-        return when (annotation) {
-            is Authorized -> addHeaders(request)
-            else -> addContentTypeHeader(request)
-        }
-    }
-
-    private suspend fun addHeaders(request: Request): Request {
-
+    private suspend fun addAuthHeaders(request: Request): Request {
         val type = sessionManager.getType()
         val token = sessionManager.getToken()
+
         return request.newBuilder()
-            .addHeader("Authorization", "$type $token")
-            .addHeader("Content-Type", "application/json")
-            .addHeader("Accept", "application/json")
+            .header("Authorization", "$type $token")
+            .header("Content-Type", "application/json")
+            .header("Accept", "application/json")
             .build()
     }
 
-    private fun addContentTypeHeader(request: Request): Request {
+    private fun addDefaultHeaders(request: Request): Request {
         return request.newBuilder()
-            .addHeader("Content-Type", "application/json")
-            .addHeader("Accept", "application/json")
+            .header("Content-Type", "application/json")
+            .header("Accept", "application/json")
             .build()
     }
-
 }

@@ -29,3 +29,11 @@ annotation class ApiOkHttp
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class CoilOkHttp
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class RefreshOkHttp
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class RefreshRetrofit

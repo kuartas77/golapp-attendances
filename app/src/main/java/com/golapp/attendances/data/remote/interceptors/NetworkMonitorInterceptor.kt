@@ -5,7 +5,9 @@ import okhttp3.CacheControl
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class NetworkMonitorInterceptor @Inject constructor(
     private val networkMonitor: NetworkMonitor
 ) : Interceptor {

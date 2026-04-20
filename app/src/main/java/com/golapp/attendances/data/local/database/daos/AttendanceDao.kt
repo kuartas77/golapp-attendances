@@ -59,7 +59,7 @@ interface AttendanceDao {
         WHERE id = :id
     """
     )
-    suspend fun getAttendanceById(id: Long): AttendanceEntity
+    suspend fun getAttendanceById(id: Long): AttendanceEntity?
 
 
     @Query("SELECT * FROM attendances")

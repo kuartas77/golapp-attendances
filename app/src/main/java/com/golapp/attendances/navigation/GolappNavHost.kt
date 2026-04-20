@@ -6,7 +6,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.golapp.attendances.feature.main.GolAppState
 import com.golapp.attendances.navigation.graphs.Authentication
-import com.golapp.attendances.navigation.graphs.Home
 import com.golapp.attendances.navigation.graphs.authenticationScreens
 import com.golapp.attendances.navigation.graphs.groupsScreen
 import com.golapp.attendances.navigation.graphs.homeScreen
@@ -40,16 +39,14 @@ fun GolappNavHost(
             }
         )
 
-        homeScreen()
+        homeScreen(onLogout = {
+            mainViewModel.logout()
+            navController.navigateToAuthentication()
+        })
 
         settingScreen(onLogout = {
             mainViewModel.logout()
-            navController.navigateToAuthentication(
-                navOptions {
-                    popUpTo(Home) { inclusive = true } // borra Home y el resto
-                    launchSingleTop = true
-                }
-            )
+            navController.navigateToAuthentication()
         })
 
         groupsScreen(

@@ -11,6 +11,7 @@ import com.golapp.attendances.domain.models.User
 import com.golapp.attendances.domain.repositories.AuthRepository
 import com.golapp.attendances.domain.ui.LoginState
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -66,4 +67,6 @@ class AuthRepositoryImpl @Inject constructor(
             sessionManager.clearSession()
         }
     }
+
+    override fun isLoggedIn(): Flow<Boolean> = sessionManager.isUserLoggedIn
 }

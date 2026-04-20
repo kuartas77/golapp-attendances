@@ -6,6 +6,7 @@ import com.golapp.attendances.di.IoDispatcher
 import com.golapp.attendances.domain.models.Statistics
 import com.golapp.attendances.domain.models.User
 import com.golapp.attendances.domain.usecases.attendances.AttendancesUseCases
+import com.golapp.attendances.domain.usecases.auth.AuthUseCases
 import com.golapp.attendances.domain.usecases.groups.GroupsUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,11 +15,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val authUseCases: AuthUseCases,
     private val attendanceUseCases: AttendancesUseCases,
     private val groupsUseCases: GroupsUseCases,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
@@ -27,6 +30,7 @@ class HomeViewModel @Inject constructor(
     private var currentDayJob: Job? = null
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.onSubscription {
+        checkLogin()
         syncAttendances()
         fetchStatistics()
     }
@@ -44,6 +48,23 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun checkLogin() {
+        viewModelScope.launch {
+            authUseCases.checkLoginUseCase().collect { isLoggedIn ->
+                if (!isLoggedIn) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = true,
+                            isLoggedIn = false,
+                            error = null
+                        )
+                    }
+                    authUseCases.logoutUseCase()
+                }
+            }
+        }
+    }
+
     fun fetchStatistics() {
         viewModelScope.launch(ioDispatcher) {
 //            groupsUseCases.getStatistics().collect {
@@ -56,7 +77,7 @@ class HomeViewModel @Inject constructor(
 data class HomeUiState(
     val user: User? = null,
     val isLoading: Boolean = false,
-    val isLoggedIn: Boolean = false,
+    val isLoggedIn: Boolean = true,
     val error: String? = null,
     val listStatistics: List<Statistics> = emptyList()
 )

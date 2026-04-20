@@ -47,6 +47,11 @@ class AttendanceSyncWorker @AssistedInject constructor(
 
     private suspend fun synchronize(item: AttendanceSync) {
         val attendance = attendanceRepository.getAttendanceById(item.id)
+        if (attendance == null) {
+            attendanceRepository.deleteAttendanceSync(item)
+            return
+        }
+
         resultOf {
             attendanceRepository.syncAttendance(attendance)
         }.onSuccess {

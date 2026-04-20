@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.golapp.attendances.data.remote.GolappAPI
+import com.golapp.attendances.data.remote.RefreshApi
 import com.golapp.attendances.data.remote.models.dtos.toDomain
 import com.golapp.attendances.domain.models.User
 import com.google.gson.Gson
@@ -18,7 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class SessionManager @Inject constructor(
     private val preferenceDatasource: DataStore<Preferences>,
-    private val api: dagger.Lazy<GolappAPI>,
+    private val refreshApi: dagger.Lazy<RefreshApi>,
     private val gson: Gson
 ) {
     companion object {
@@ -47,14 +47,21 @@ class SessionManager @Inject constructor(
                 this[REFRESH_TOKEN_KEY] = refreshToken
                 this[TOKEN_TYPE] = type
                 this[EXPIRATION_TOKEN_KEY] = expiration
-                if (user != null) this[USER_KEY] = gson.toJson(user) else remove(USER_KEY)
+
+                if (user != null) {
+                    this[USER_KEY] = gson.toJson(user)
+                } else {
+                    remove(USER_KEY)
+                }
             }
         }
     }
 
     suspend fun saveUser(user: User) {
         preferenceDatasource.updateData { prefs ->
-            prefs.toMutablePreferences().apply { this[USER_KEY] = gson.toJson(user) }
+            prefs.toMutablePreferences().apply {
+                this[USER_KEY] = gson.toJson(user)
+            }
         }
     }
 
@@ -70,7 +77,7 @@ class SessionManager @Inject constructor(
         preferenceDatasource.data.first()[REFRESH_TOKEN_KEY] ?: ""
 
     suspend fun getType(): String =
-        preferenceDatasource.data.first()[TOKEN_TYPE] ?: ""
+        preferenceDatasource.data.first()[TOKEN_TYPE] ?: "Bearer"
 
     suspend fun getExpiration(): Long =
         preferenceDatasource.data.first()[EXPIRATION_TOKEN_KEY] ?: 0L
@@ -81,23 +88,28 @@ class SessionManager @Inject constructor(
         }
     }
 
-    suspend fun refreshToken() {
-        val refreshToken = getRefreshToken()
+    suspend fun refreshTokenSafely(): Boolean {
+        return try {
+            val refreshToken = getRefreshToken()
+            if (refreshToken.isBlank()) return false
 
-        val type: String = getType()
+            val response = refreshApi.get().refreshToken("Bearer $refreshToken")
+            val body = response.body()
 
-        val response = api.get().refreshToken("$type $refreshToken")
-
-        val responseLogin = response.body()
-
-        if (response.isSuccessful && responseLogin != null) {
-            saveSession(
-                token = responseLogin.token,
-                refreshToken = responseLogin.refreshToken,
-                type = responseLogin.type,
-                expiration = responseLogin.expires,
-                user = responseLogin.userDto?.toDomain()
-            )
+            if (response.isSuccessful && body != null) {
+                saveSession(
+                    token = body.token,
+                    refreshToken = body.refreshToken,
+                    type = body.type,
+                    expiration = body.expires,
+                    user = body.userDto?.toDomain()
+                )
+                true
+            } else {
+                false
+            }
+        } catch (_: Exception) {
+            false
         }
     }
 }

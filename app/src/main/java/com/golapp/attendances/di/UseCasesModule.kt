@@ -8,12 +8,14 @@ import com.golapp.attendances.domain.repositories.GroupRepository
 import com.golapp.attendances.domain.time.YearProvider
 import com.golapp.attendances.domain.usecases.attendances.AttendancesUseCases
 import com.golapp.attendances.domain.usecases.attendances.EnsureAttendancesForClassDayUseCase
+import com.golapp.attendances.domain.usecases.attendances.GetAttendanceStatisticsUseCase
 import com.golapp.attendances.domain.usecases.attendances.GetAttendancesByClassDayUseCase
 import com.golapp.attendances.domain.usecases.attendances.SyncAttendanceUseCase
 import com.golapp.attendances.domain.usecases.attendances.TakeAttendanceUseCase
 import com.golapp.attendances.domain.usecases.attendances.UpdateAttendanceValueUseCase
 import com.golapp.attendances.domain.usecases.auth.AuthUseCases
 import com.golapp.attendances.domain.usecases.auth.AuthenticateWithEmailUseCase
+import com.golapp.attendances.domain.usecases.auth.CheckLoginUseCase
 import com.golapp.attendances.domain.usecases.auth.GetUserDataUseCase
 import com.golapp.attendances.domain.usecases.auth.LogoutUseCase
 import com.golapp.attendances.domain.usecases.auth.ValidateEmailUseCase
@@ -69,6 +71,9 @@ object UseCasesModule {
     fun provideGetUserDataUseCase(authRepository: AuthRepository) =
         GetUserDataUseCase(authRepository)
 
+    @Provides
+    @Singleton
+    fun provideCheckLoginUseCase(authRepository: AuthRepository) = CheckLoginUseCase(authRepository)
 
     @Provides
     @Singleton
@@ -78,6 +83,7 @@ object UseCasesModule {
         loginWithEmail: AuthenticateWithEmailUseCase,
         validateTokenExpiryUseCase: ValidateTokenExpiryUseCase,
         getUserDataUseCase: GetUserDataUseCase,
+        checkLoginUseCase: CheckLoginUseCase,
         logoutUseCase: LogoutUseCase
     ): AuthUseCases = AuthUseCases(
         validateEmail,
@@ -85,6 +91,7 @@ object UseCasesModule {
         loginWithEmail,
         validateTokenExpiryUseCase,
         getUserDataUseCase,
+        checkLoginUseCase,
         logoutUseCase
     )
 
@@ -140,6 +147,11 @@ object UseCasesModule {
         attendanceRepository: AttendanceRepository
     ): TakeAttendanceUseCase = TakeAttendanceUseCase(attendanceRepository)
 
+    @Provides
+    @Singleton
+    fun provideGetAttendanceStatisticsUseCase(
+        attendanceRepository: AttendanceRepository
+    ): GetAttendanceStatisticsUseCase = GetAttendanceStatisticsUseCase(attendanceRepository)
 
 
     @Provides
@@ -150,14 +162,16 @@ object UseCasesModule {
         updateAttendanceValueUseCase: UpdateAttendanceValueUseCase,
         getClassDayByIdUseCase: GetClassDayByIdUseCase,
         getAttendancesByClassDayUseCase: GetAttendancesByClassDayUseCase,
-        takeAttendanceUseCase: TakeAttendanceUseCase
+        takeAttendanceUseCase: TakeAttendanceUseCase,
+        getAttendanceStatisticsUseCase: GetAttendanceStatisticsUseCase
     ): AttendancesUseCases = AttendancesUseCases(
         ensureAttendancesForClassDayUseCase,
         updateAttendanceValueUseCase,
         syncAttendanceUseCase,
         getClassDayByIdUseCase,
         getAttendancesByClassDayUseCase,
-        takeAttendanceUseCase
+        takeAttendanceUseCase,
+        getAttendanceStatisticsUseCase
     )
 
     // Groups
@@ -213,6 +227,4 @@ object UseCasesModule {
         observeClassDaysByGroupUseCase,
         getGroupWhitPlayersByIdUseCase
     )
-
-
 }
