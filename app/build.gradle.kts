@@ -13,7 +13,7 @@ plugins {
 
 android {
     namespace = "com.golapp.attendances"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.golapp.attendances"
@@ -34,7 +34,6 @@ android {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = true
             isMinifyEnabled = true
             isShrinkResources = true
-            ndk.debugSymbolLevel = "SYMBOL_TABLE" // or "FULL"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -64,14 +63,6 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "META-INF/gradle/incremental.annotation.processors"
-        }
-        dex {
-            useLegacyPackaging = true
-        }
-        jniLibs {
-            // Asegura que los símbolos no se eliminen prematuramente
-            keepDebugSymbols.add("**/*.so")
-            useLegacyPackaging = true
         }
     }
     ndkVersion = "29.0.14206865"

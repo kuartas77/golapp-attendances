@@ -49,7 +49,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun checkLogin() {
-        viewModelScope.launch {
+        viewModelScope.launch(ioDispatcher) {
             authUseCases.checkLoginUseCase().collect { isLoggedIn ->
                 if (!isLoggedIn) {
                     _uiState.update {
@@ -67,9 +67,8 @@ class HomeViewModel @Inject constructor(
 
     fun fetchStatistics() {
         viewModelScope.launch(ioDispatcher) {
-//            groupsUseCases.getStatistics().collect {
-//                _uiState.value = _uiState.value.copy(listStatistics = it)
-//            }
+            val statistics = attendanceUseCases.getAttendanceStatisticsUseCase()
+            _uiState.value = _uiState.value.copy(listStatistics = statistics)
         }
     }
 }

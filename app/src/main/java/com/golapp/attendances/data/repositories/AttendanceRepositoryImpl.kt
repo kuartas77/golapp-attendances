@@ -6,12 +6,12 @@ import com.golapp.attendances.data.local.database.AttendancesDB
 import com.golapp.attendances.data.local.database.daos.AttendanceDao
 import com.golapp.attendances.data.mappers.toDomain
 import com.golapp.attendances.data.mappers.toEntity
-import com.golapp.attendances.data.remote.models.dtos.StatisticsDto
 import com.golapp.attendances.di.IoDispatcher
 import com.golapp.attendances.domain.models.Attendance
 import com.golapp.attendances.domain.models.AttendanceSync
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.domain.models.ClassDay
+import com.golapp.attendances.domain.models.Statistics
 import com.golapp.attendances.domain.repositories.AttendanceRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -141,8 +141,6 @@ class AttendanceRepositoryImpl @Inject constructor(
         remote.syncAttendance(attendance)
     }
 
-    override suspend fun getAttendanceStatistics(): List<StatisticsDto> {
-        TODO("Not yet implemented")
-    }
-
+    override suspend fun getAttendanceStatistics(): List<Statistics> = remote.fetchStatistics()
+    
 }

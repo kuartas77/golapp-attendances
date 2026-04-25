@@ -1,10 +1,10 @@
 package com.golapp.attendances.domain.repositories
 
-import com.golapp.attendances.data.remote.models.dtos.StatisticsDto
 import com.golapp.attendances.domain.models.Attendance
 import com.golapp.attendances.domain.models.AttendanceSync
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.domain.models.ClassDay
+import com.golapp.attendances.domain.models.Statistics
 import kotlinx.coroutines.flow.Flow
 
 interface AttendanceRepository {
@@ -25,5 +25,5 @@ interface AttendanceRepository {
     suspend fun getAttendanceById(id: Long): Attendance?
     suspend fun syncAttendance(attendance: Attendance)
 
-    suspend fun getAttendanceStatistics(): List<StatisticsDto>
+    suspend fun getAttendanceStatistics(): List<Statistics>
 }
