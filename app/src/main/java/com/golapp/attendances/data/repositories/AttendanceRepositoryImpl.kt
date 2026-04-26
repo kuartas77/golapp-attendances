@@ -137,8 +137,8 @@ class AttendanceRepositoryImpl @Inject constructor(
         attendanceDao.getAttendanceById(id)?.toDomain()
     }
 
-    override suspend fun syncAttendance(attendance: Attendance) {
-        remote.syncAttendance(attendance)
+    override suspend fun syncAttendance(attendance: Attendance): Boolean {
+        return remote.syncAttendance(attendance)
     }
 
     override suspend fun getAttendanceStatistics(): List<Statistics> = remote.fetchStatistics()

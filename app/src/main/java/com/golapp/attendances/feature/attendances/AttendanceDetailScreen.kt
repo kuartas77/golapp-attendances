@@ -30,9 +30,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -65,8 +68,10 @@ fun DetailPanelAttendance(
     val scope = rememberCoroutineScope()
 
     navigator.currentDestination?.contentKey?.let { selectedItem ->
+        val currentAttendance = uiState.selectedAttendance ?: selectedItem
+
         Crossfade(
-            targetState = selectedItem,
+            targetState = currentAttendance,
             label = "Detail Pane",
         ) { attendance ->
             DetailScreen(
@@ -117,7 +122,11 @@ private fun DetailScreen(
     onTakeAttendance: (AttendanceWithPlayer) -> Unit = {},
 ) {
     val attendancesList = remember { getListOfAttendance() }
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(attendance.value) }
+    var selectedOption by remember(attendance.id) { mutableStateOf(attendance.value) }
+
+    LaunchedEffect(attendance.value) {
+        selectedOption = attendance.value
+    }
 
     Scaffold(
         modifier = modifier,
@@ -182,7 +191,7 @@ private fun DetailScreen(
                                         selectedOption.toString()
                                     ) {
                                         onTakeAttendance(attendance.copy(value = it))
-                                        onOptionSelected(it)
+                                        selectedOption = it
                                     }
                                 }
                             }

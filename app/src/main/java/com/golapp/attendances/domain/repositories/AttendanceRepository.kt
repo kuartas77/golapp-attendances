@@ -23,7 +23,7 @@ interface AttendanceRepository {
     suspend fun insertAttendancesSync(items: List<AttendanceSync>)
     suspend fun deleteAttendanceSync(item: AttendanceSync)
     suspend fun getAttendanceById(id: Long): Attendance?
-    suspend fun syncAttendance(attendance: Attendance)
+    suspend fun syncAttendance(attendance: Attendance): Boolean
 
     suspend fun getAttendanceStatistics(): List<Statistics>
 }

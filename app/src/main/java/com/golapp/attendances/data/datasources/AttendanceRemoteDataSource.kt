@@ -6,7 +6,7 @@ import com.golapp.attendances.domain.models.Statistics
 
 interface AttendanceRemoteDataSource {
     suspend fun fetchAttendances(classDay: ClassDay): List<Attendance>
-    suspend fun syncAttendance(attendance: Attendance)
+    suspend fun syncAttendance(attendance: Attendance): Boolean
 
     suspend fun fetchStatistics(): List<Statistics>
 }

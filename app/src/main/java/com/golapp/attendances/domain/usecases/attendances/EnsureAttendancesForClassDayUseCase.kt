@@ -18,19 +18,6 @@ class EnsureAttendancesForClassDayUseCase @Inject constructor(
         val groupWithPlayers = groupRepository.getGroupWhitPlayersById(classDay.groupId)
         val expectedPlayers = groupWithPlayers.players
 
-        // Local (con players) para ese classDay + year
-        val localAttendances = attendanceRepository.getAttendancesWithPlayers(
-            classDay = classDay,
-            year = year
-        )
-
-        // Si ya están todas, salimos
-        val expectedPlayerIds = expectedPlayers.map { it.playerId }.toSet()
-        val localPlayerIds = localAttendances.map { it.playerId }.toSet()
-        val missing = expectedPlayerIds - localPlayerIds
-        if (missing.isEmpty()) return
-
-        // Intentar remoto solo si faltan
         val remoteAttendances = attendanceRepository.fetchAttendances(
             classDay = classDay,
             year = year
@@ -38,10 +25,18 @@ class EnsureAttendancesForClassDayUseCase @Inject constructor(
 
         if (remoteAttendances.isNotEmpty()) {
             attendanceRepository.upsertAttendances(remoteAttendances)
-            return
         }
 
-        // Si remoto no trae nada: placeholders SOLO para faltantes
+        val localAttendances = attendanceRepository.getAttendancesWithPlayers(
+            classDay = classDay,
+            year = year
+        )
+
+        val expectedPlayerIds = expectedPlayers.map { it.playerId }.toSet()
+        val localPlayerIds = localAttendances.map { it.playerId }.toSet()
+        val missing = expectedPlayerIds - localPlayerIds
+        if (missing.isEmpty()) return
+
         val placeholders = expectedPlayers
             .asSequence()
             .filter { it.playerId in missing }

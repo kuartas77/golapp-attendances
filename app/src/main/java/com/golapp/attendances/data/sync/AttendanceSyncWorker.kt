@@ -53,7 +53,9 @@ class AttendanceSyncWorker @AssistedInject constructor(
         }
 
         resultOf {
-            attendanceRepository.syncAttendance(attendance)
+            check(attendanceRepository.syncAttendance(attendance)) {
+                "Server rejected attendance sync for ${item.id}"
+            }
         }.onSuccess {
             attendanceRepository.deleteAttendanceSync(item)
         }.onFailure {

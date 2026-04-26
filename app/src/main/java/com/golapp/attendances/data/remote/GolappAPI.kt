@@ -39,7 +39,7 @@ interface GolappAPI {
 
     @Authorized
     @POST(UPDATE_ATTENDANCE)
-    suspend fun syncAttendance(@Body request: AttendanceRequest): Response<Unit>
+    suspend fun syncAttendance(@Body request: AttendanceRequest): ApiData<Boolean>
 
     @Authorized
     @GET(STATISTICS)

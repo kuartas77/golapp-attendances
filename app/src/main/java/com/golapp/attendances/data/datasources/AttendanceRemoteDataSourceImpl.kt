@@ -24,8 +24,9 @@ class AttendanceRemoteDataSourceImpl @Inject constructor(
         return res.data.orEmpty().map { it.toDomain() }
     }
 
-    override suspend fun syncAttendance(attendance: Attendance) {
-        api.syncAttendance(attendance.toRequest())
+    override suspend fun syncAttendance(attendance: Attendance): Boolean {
+        val res = api.syncAttendance(attendance.toRequest())
+        return res.data == true
     }
 
     override suspend fun fetchStatistics(): List<Statistics> {
