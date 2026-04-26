@@ -72,6 +72,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun GroupsScreen(
+    onNavigateBackHome: () -> Unit = {},
     onClickClassDay: (String) -> Unit = {},
     onShowSnackbar: suspend (String, String?) -> Boolean
 ) {
@@ -111,6 +112,7 @@ fun GroupsScreen(
             ListGroups(
                 uiState = uiState,
                 onEvent = viewModel::onEvent,
+                onNavigateBackHome = onNavigateBackHome,
                 onClickClassDay = onClickClassDay
             )
         }
@@ -124,6 +126,7 @@ fun ListGroups(
     modifier: Modifier = Modifier,
     uiState: GroupsUiState = GroupsUiState(),
     onEvent: (GroupsUiEvent) -> Unit = {},
+    onNavigateBackHome: () -> Unit = {},
     onClickClassDay: (String) -> Unit = {}
 ) {
     val navigator = rememberListDetailPaneScaffoldNavigator<GroupWithClassDays>()
@@ -138,6 +141,10 @@ fun ListGroups(
         scope.launch {
             navigator.navigateBack(backBehavior)
         }
+    }
+
+    BackHandler(!navigator.canNavigateBack()) {
+        onNavigateBackHome()
     }
 
     ListDetailPaneScaffold(

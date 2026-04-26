@@ -9,6 +9,7 @@ import com.golapp.attendances.navigation.graphs.Authentication
 import com.golapp.attendances.navigation.graphs.authenticationScreens
 import com.golapp.attendances.navigation.graphs.groupsScreen
 import com.golapp.attendances.navigation.graphs.homeScreen
+import com.golapp.attendances.navigation.graphs.Home
 import com.golapp.attendances.navigation.graphs.navigateToAuthentication
 import com.golapp.attendances.navigation.graphs.navigateToGroups
 import com.golapp.attendances.navigation.graphs.navigateToHome
@@ -50,6 +51,18 @@ fun GolappNavHost(
         })
 
         groupsScreen(
+            onNavigateBackHome = {
+                navController.navigateToHome(
+                    navOptions {
+                        popUpTo(Home) {
+                            inclusive = false
+                            saveState = false
+                        }
+                        launchSingleTop = true
+                        restoreState = false
+                    }
+                )
+            },
             onClickClassDay = {
                 navController.navigateToGroups(it)
             },

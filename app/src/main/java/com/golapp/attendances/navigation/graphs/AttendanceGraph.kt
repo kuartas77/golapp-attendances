@@ -24,16 +24,25 @@ fun NavController.navigateToGroups(navOptions: NavOptions) =
 fun NavController.navigateToGroups(
     classDayId: String,
     navOptions: NavOptions? = null
-) = navigate(Attendances(classDayId), navOptions)
+) = navigate(Attendances(classDayId), navOptions ?: androidx.navigation.navOptions {
+    popUpTo(Groups) {
+        inclusive = false
+        saveState = false
+    }
+    launchSingleTop = true
+    restoreState = false
+})
 
 fun NavGraphBuilder.groupsScreen(
     onClickClassDay: (String) -> Unit = {},
+    onNavigateBackHome: () -> Unit = {},
     onShowSnackbar: suspend (String, String?) -> Boolean
 ) {
     navigation<GroupAttendances>(startDestination = Groups) {
 
         composable<Groups> {
             GroupsScreen(
+                onNavigateBackHome = onNavigateBackHome,
                 onClickClassDay = onClickClassDay,
                 onShowSnackbar = onShowSnackbar
             )
