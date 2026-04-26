@@ -115,9 +115,10 @@ object UseCasesModule {
     @Singleton
     fun provideUpdateAttendanceValueUseCase(
         attendanceRepository: AttendanceRepository,
+        workManager: WorkManager,
         @IoDispatcher ioDispatcher: CoroutineDispatcher
     ): UpdateAttendanceValueUseCase =
-        UpdateAttendanceValueUseCase(attendanceRepository, ioDispatcher)
+        UpdateAttendanceValueUseCase(attendanceRepository, workManager, ioDispatcher)
 
     @Provides
     @Singleton

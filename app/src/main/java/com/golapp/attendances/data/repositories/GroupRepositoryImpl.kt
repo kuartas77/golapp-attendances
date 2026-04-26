@@ -6,6 +6,7 @@ import com.golapp.attendances.data.local.database.AttendancesDB
 import com.golapp.attendances.data.local.database.daos.ClassDayDao
 import com.golapp.attendances.data.local.database.daos.GroupDao
 import com.golapp.attendances.data.local.database.daos.PlayerDao
+import com.golapp.attendances.data.local.database.entities.GroupWithPlayersEntity
 import com.golapp.attendances.data.mappers.toDomain
 import com.golapp.attendances.data.mappers.toGraphEntities
 import com.golapp.attendances.di.IoDispatcher
@@ -80,8 +81,16 @@ class GroupRepositoryImpl @Inject constructor(
     // ---------------------------
     override suspend fun getGroupWhitPlayersById(groupId: Int): GroupWithPlayers =
         withContext(ioDispatcher) {
-            val entity = groupDao.getGroupWithPlayersById(groupId)
-                ?: throw IllegalStateException("Group not found: $groupId")
+            val entity = db.withTransaction {
+                val group = groupDao.getGroupById(groupId)
+                    ?: throw IllegalStateException("Group not found: $groupId")
+                val players = playerDao.getPlayersByGroupIdOrderByCategoryNumber(groupId)
+
+                GroupWithPlayersEntity(
+                    group = group,
+                    players = players
+                )
+            }
             entity.toDomain()
         }
 

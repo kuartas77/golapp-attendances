@@ -62,7 +62,8 @@ object BrandDefaults {
     /** Colores de ítems (selected/unselected/indicator) para bar/rail/drawer */
     @Composable
     fun navigationSuiteItemColors(): NavigationSuiteItemColors {
-        val indicator = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f) // suave en dark y light
+        val indicator =
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.18f) // suave en dark y light
         val selectedIcon = MaterialTheme.colorScheme.primary
         val selectedText = MaterialTheme.colorScheme.onSurface
         val unselected = MaterialTheme.colorScheme.onSurfaceVariant

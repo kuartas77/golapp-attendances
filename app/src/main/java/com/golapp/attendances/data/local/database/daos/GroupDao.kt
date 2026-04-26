@@ -46,6 +46,9 @@ interface GroupDao {
     @Query("SELECT * FROM `groups` WHERE id = :groupId LIMIT 1")
     suspend fun getGroupWithPlayersById(groupId: Int): GroupWithPlayersEntity?
 
+    @Query("SELECT * FROM `groups` WHERE id = :groupId LIMIT 1")
+    suspend fun getGroupById(groupId: Int): GroupEntity?
+
     @Upsert
     suspend fun upsertGroups(groups: List<GroupEntity>)
 

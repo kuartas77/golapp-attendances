@@ -38,10 +38,13 @@ object DatabaseModule {
 
     @Provides
     fun provideGroupDao(db: AttendancesDB): GroupDao = db.groupDao()
+
     @Provides
     fun provideClassDayDao(db: AttendancesDB): ClassDayDao = db.classDayDao()
+
     @Provides
     fun providePlayerDao(db: AttendancesDB): PlayerDao = db.playerDao()
+
     @Provides
     fun provideAttendanceDao(db: AttendancesDB): AttendanceDao = db.attendanceDao()
 

@@ -56,8 +56,8 @@ class GolAppState(
             .currentBackStackEntryAsState().value?.destination
 
     val isGuestDestination: Boolean
-        @Composable get() = currentDestination?.hierarchy?.any { 
-            it.route == navController.graph[Authentication].route 
+        @Composable get() = currentDestination?.hierarchy?.any {
+            it.route == navController.graph[Authentication].route
         } == true
 
     val isOffline = networkMonitor.isConnected

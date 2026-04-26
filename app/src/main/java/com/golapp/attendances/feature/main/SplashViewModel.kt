@@ -12,8 +12,12 @@ class SplashViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            delay(4000L)
+            delay(SPLASH_MIN_DURATION_MS)
             mutableStateFlow.value = false
         }
+    }
+
+    private companion object {
+        const val SPLASH_MIN_DURATION_MS = 700L
     }
 }

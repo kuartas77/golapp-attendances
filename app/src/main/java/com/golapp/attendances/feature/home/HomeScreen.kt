@@ -45,7 +45,8 @@ fun HomeScreen(
 ) {
     Surface(
         modifier = modifier
-            .padding(horizontal = SPACER_MEDIUM).fillMaxHeight()
+            .padding(horizontal = SPACER_MEDIUM)
+            .fillMaxHeight()
             .verticalScroll(rememberScrollState()),
     ) {
         Column {
@@ -126,7 +127,7 @@ private fun ItemsText(
         modifier = Modifier.padding(SPACER_SMALL),
         elevation = CardDefaults.cardElevation(defaultElevation = SPACER_SMALL),
 
-    ) {
+        ) {
         Row {
             Column(
                 modifier = Modifier

@@ -7,7 +7,6 @@ import androidx.work.WorkManager
 import com.golapp.attendances.data.local.datastore.SessionManager
 import com.golapp.attendances.data.remote.RefreshApi
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

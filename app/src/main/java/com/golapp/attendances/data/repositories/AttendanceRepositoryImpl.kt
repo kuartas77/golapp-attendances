@@ -109,10 +109,14 @@ class AttendanceRepositoryImpl @Inject constructor(
             try {
                 val attendance = attendanceDao.getAttendanceById(localAttendanceId)?.toDomain()
                 if (attendance != null) {
-                    remote.syncAttendance(attendance)
+                    check(remote.syncAttendance(attendance)) {
+                        "Server rejected attendance sync for $localAttendanceId"
+                    }
+                    attendanceDao.deleteAttendanceSync(AttendanceSync(localAttendanceId).toEntity())
                 }
             } catch (e: Exception) {
-                Timber.e(e, "syncAssignedGroups failed: ${e.message}")
+                attendanceDao.insertAttendancesSync(listOf(AttendanceSync(localAttendanceId).toEntity()))
+                Timber.e(e, "updateAttendanceValue queued for sync: ${e.message}")
                 return@withContext
             }
         }
@@ -142,5 +146,5 @@ class AttendanceRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAttendanceStatistics(): List<Statistics> = remote.fetchStatistics()
-    
+
 }

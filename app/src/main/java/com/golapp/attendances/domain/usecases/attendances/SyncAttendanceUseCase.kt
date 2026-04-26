@@ -16,11 +16,15 @@ class SyncAttendanceUseCase @Inject constructor(
 
         if (attendanceSyncList.isEmpty()) return
 
-        attendanceRepository.insertAttendancesSync(attendanceSyncList.map { AttendanceSync(it.id!!) })
+        attendanceRepository.insertAttendancesSync(
+            attendanceSyncList.mapNotNull { attendance ->
+                attendance.id?.let { AttendanceSync(it) }
+            }
+        )
 
         workManager.beginUniqueWork(
             AttendanceSyncWorker.TAG,
-            ExistingWorkPolicy.REPLACE,
+            ExistingWorkPolicy.KEEP,
             AttendanceSyncWorker.oneTimeWorkRequest()
         ).enqueue()
     }

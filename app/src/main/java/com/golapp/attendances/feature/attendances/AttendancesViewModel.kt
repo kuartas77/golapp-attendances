@@ -84,7 +84,7 @@ class AttendancesViewModel @Inject constructor(
             .flatMapLatest { classDay ->
                 attendancesUseCases.getAttendancesByClassDayUseCase(classDay)
                     .map<List<AttendanceWithPlayer>, AttendancesResult> {
-                        AttendancesResult.Success(it )
+                        AttendancesResult.Success(it)
                     }
                     .onStart {
                         // asegura la data 1 sola vez por classDay
@@ -199,7 +199,7 @@ class AttendancesViewModel @Inject constructor(
     private fun takeAttendance(attendanceWithPlayer: AttendanceWithPlayer) {
         viewModelScope.launch(ioDispatcher) {
             runCatching {
-                 attendancesUseCases.takeAttendanceUseCase(attendanceWithPlayer)
+                attendancesUseCases.takeAttendanceUseCase(attendanceWithPlayer)
             }.onFailure { e ->
                 _effects.emit(
                     AttendancesUiEffect.ShowSnackbar(

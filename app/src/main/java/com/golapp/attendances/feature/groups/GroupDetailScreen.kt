@@ -214,7 +214,10 @@ private fun Header(modifier: Modifier, groupWithClassDays: GroupWithClassDays) {
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            Text(groupWithClassDays.group.days.scheduleInline(), style = MaterialTheme.typography.bodyMedium)
+            Text(
+                groupWithClassDays.group.days.scheduleInline(),
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 

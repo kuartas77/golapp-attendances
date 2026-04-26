@@ -18,7 +18,7 @@ android {
     defaultConfig {
         applicationId = "com.golapp.attendances"
         minSdk = 28
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 11
         versionName = "1.0.3"
 
@@ -26,7 +26,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        multiDexEnabled = true
     }
 
     buildTypes {

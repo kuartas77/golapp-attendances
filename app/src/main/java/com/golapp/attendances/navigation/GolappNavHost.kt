@@ -6,10 +6,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.golapp.attendances.feature.main.GolAppState
 import com.golapp.attendances.navigation.graphs.Authentication
+import com.golapp.attendances.navigation.graphs.Home
 import com.golapp.attendances.navigation.graphs.authenticationScreens
 import com.golapp.attendances.navigation.graphs.groupsScreen
 import com.golapp.attendances.navigation.graphs.homeScreen
-import com.golapp.attendances.navigation.graphs.Home
 import com.golapp.attendances.navigation.graphs.navigateToAuthentication
 import com.golapp.attendances.navigation.graphs.navigateToGroups
 import com.golapp.attendances.navigation.graphs.navigateToHome
