@@ -2,5 +2,15 @@ package com.golapp.attendances.domain.ui
 
 sealed interface LoginState {
     data object Success : LoginState
-    data class Error(val code: Int? = null, val message: String? = null) : LoginState
+    data class Error(
+        val reason: Reason,
+        val code: Int? = null
+    ) : LoginState
+
+    enum class Reason {
+        INVALID_CREDENTIALS,
+        CONNECTION,
+        SERVER,
+        UNKNOWN
+    }
 }

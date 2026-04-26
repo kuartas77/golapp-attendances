@@ -1,8 +1,10 @@
 package com.golapp.attendances.data.datasources
 
 import com.golapp.attendances.data.remote.GolappAPI
+import com.golapp.attendances.data.remote.errors.AuthApiException
 import com.golapp.attendances.data.remote.models.requests.AuthRequest
 import com.golapp.attendances.data.remote.models.responses.LoginResponse
+import com.google.gson.Gson
 import javax.inject.Inject
 
 class AuthRemoteDataSourceImpl @Inject constructor(
@@ -14,9 +16,18 @@ class AuthRemoteDataSourceImpl @Inject constructor(
 
         if (response.isSuccessful && body != null) return body
 
-        // aquí puedes crear una excepción con mensaje más útil
-        throw RuntimeException(
-            response.message().ifBlank { "Login falló (HTTP ${response.code()})" }
+        val errorBody = response.errorBody()
+            ?.string()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { raw ->
+                runCatching {
+                    Gson().fromJson(raw, LoginResponse::class.java).message
+                }.getOrNull() ?: raw
+            }
+
+        throw AuthApiException(
+            code = response.code(),
+            serverMessage = errorBody ?: response.message()
         )
     }
 }

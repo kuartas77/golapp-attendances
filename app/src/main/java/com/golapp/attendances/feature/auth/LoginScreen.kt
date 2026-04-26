@@ -163,7 +163,7 @@ private fun Form(
 
             if (uiState.error != null) {
                 Text(
-                    text = uiState.error,
+                    text = uiState.error.asString(),
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )

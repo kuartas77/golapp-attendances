@@ -63,7 +63,7 @@ class AuthViewModel @Inject constructor(
                     it.copy(
                         isLoggedIn = false,
                         isLoading = false,
-                        errorEmail = UiText.StringResource(resId = R.string.session_expired)
+                        error = UiText.StringResource(resId = R.string.session_expired)
                     )
                 }
             }
@@ -71,7 +71,6 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun validateAndLogin() {
-        // limpiar errores previos
         _uiState.update { it.copy(errorEmail = null, errorPassword = null, error = null) }
 
         val email = uiState.value.email
@@ -112,24 +111,27 @@ class AuthViewModel @Inject constructor(
             }
 
             is LoginState.Error -> {
-                when (result.code) {
-                    422 -> {
-                        _uiState.update {
-                            it.copy(
-                                isLoggedIn = false,
-                                errorEmail = UiText.StringResource(R.string.error_credential_is_not_valid)
-                            )
-                        }
-                    }
+                _uiState.update {
+                    it.copy(
+                        isLoggedIn = false,
+                        errorEmail = when (result.reason) {
+                            LoginState.Reason.INVALID_CREDENTIALS ->
+                                UiText.StringResource(R.string.error_credential_is_not_valid)
 
-                    else -> {
-                        _uiState.update {
-                            it.copy(
-                                isLoggedIn = false,
-                                error = result.message ?: "Error de autenticación"
-                            )
+                            else -> null
+                        },
+                        error = when (result.reason) {
+                            LoginState.Reason.INVALID_CREDENTIALS -> null
+                            LoginState.Reason.CONNECTION ->
+                                UiText.StringResource(R.string.error_connection)
+
+                            LoginState.Reason.SERVER ->
+                                UiText.StringResource(R.string.server_error)
+
+                            LoginState.Reason.UNKNOWN ->
+                                UiText.StringResource(R.string.unknown_error)
                         }
-                    }
+                    )
                 }
             }
         }
@@ -152,7 +154,7 @@ data class AuthUiState(
     val isLoading: Boolean = false,
     val isError: Boolean = false,
     val isLoggedIn: Boolean = false,
-    val error: String? = null,
+    val error: UiText? = null,
     val errorPassword: UiText? = null,
     val errorEmail: UiText? = null
 )

@@ -12,7 +12,7 @@ class AuthenticateWithEmailUseCase @Inject constructor(
         email: String,
         password: String
     ): LoginState {
-        Timber.tag("AuthenticateWithEmailUseCaseImpl").d("email: $email, password: $password")
+        Timber.tag("AuthenticateWithEmailUseCaseImpl").d("Trying login for email: $email")
         return authRepository.login(email, password)
     }
 }
