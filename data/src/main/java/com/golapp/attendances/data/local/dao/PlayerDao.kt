@@ -19,4 +19,15 @@ interface PlayerDao {
 
     @Query("DELETE FROM players WHERE group_id = :groupId")
     suspend fun deletePlayersByGroupId(groupId: Int)
+
+    @Query(
+        """
+        SELECT * FROM players
+        WHERE group_id = :groupId
+        ORDER BY
+            CAST(REPLACE(category, 'SUB-', '') AS INTEGER) ASC,
+            full_names COLLATE NOCASE ASC
+        """
+    )
+    suspend fun getPlayersByGroupIdOrderedByCategoryNumber(groupId: Int): List<PlayerEntity>
 }

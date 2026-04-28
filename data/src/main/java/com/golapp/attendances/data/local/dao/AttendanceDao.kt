@@ -28,7 +28,21 @@ interface AttendanceDao {
     suspend fun getAttendanceWithPlayerById(attendanceId: Int): AttendanceWithPlayerEntity?
 
     @Transaction
-    @Query("SELECT * FROM attendances WHERE group_id = :groupId AND month = :month AND `column` = :column AND school_id = :schoolId")
+    @Query(
+        """
+        SELECT * FROM attendances
+        WHERE group_id = :groupId
+          AND month = :month
+          AND `column` = :column
+          AND school_id = :schoolId
+        ORDER BY
+            (
+                SELECT CAST(REPLACE(players.category, 'SUB-', '') AS INTEGER)
+                FROM players
+                WHERE players.player_id = attendances.player_id
+            ) ASC
+        """
+    )
     suspend fun getAttendancesWithPlayers(
         groupId: Int,
         month: Int,
@@ -37,7 +51,21 @@ interface AttendanceDao {
     ): List<AttendanceWithPlayerEntity>
 
     @Transaction
-    @Query("SELECT * FROM attendances WHERE group_id = :groupId AND month = :month AND `column` = :column AND school_id = :schoolId")
+    @Query(
+        """
+        SELECT * FROM attendances
+        WHERE group_id = :groupId
+          AND month = :month
+          AND `column` = :column
+          AND school_id = :schoolId
+        ORDER BY
+            (
+                SELECT CAST(REPLACE(players.category, 'SUB-', '') AS INTEGER)
+                FROM players
+                WHERE players.player_id = attendances.player_id
+            ) ASC
+        """
+    )
     fun getAttendances(
         groupId: Int,
         month: Int,

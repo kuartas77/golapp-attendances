@@ -22,7 +22,12 @@ interface AttendanceDao {
           AND year      = :year
           AND month     = :month
           AND `column`  = :column
-        ORDER BY player_id ASC
+        ORDER BY
+            (
+                SELECT CAST(REPLACE(players.category, 'SUB-', '') AS INTEGER)
+                FROM players
+                WHERE players.player_id = attendances.player_id
+            ) ASC
     """
     )
     fun observeAttendancesWithPlayers(
@@ -42,7 +47,17 @@ interface AttendanceDao {
           AND year      = :year
           AND month     = :month
           AND `column`  = :column
-        ORDER BY player_id ASC
+        ORDER BY
+            (
+                SELECT CAST(REPLACE(players.category, 'SUB-', '') AS INTEGER)
+                FROM players
+                WHERE players.player_id = attendances.player_id
+            ) ASC,
+            (
+                SELECT players.full_names
+                FROM players
+                WHERE players.player_id = attendances.player_id
+            ) COLLATE NOCASE ASC
     """
     )
     suspend fun getAttendancesWithPlayers(

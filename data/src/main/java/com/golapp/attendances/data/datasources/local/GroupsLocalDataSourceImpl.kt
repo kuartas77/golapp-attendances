@@ -1,15 +1,18 @@
 package com.golapp.attendances.data.datasources.local
 
 import com.golapp.attendances.data.local.dao.GroupDao
+import com.golapp.attendances.data.local.dao.PlayerDao
 import com.golapp.attendances.data.local.datasources.GroupsLocalDataSource
 import com.golapp.attendances.data.local.models.GroupEntity
+import com.golapp.attendances.data.local.models.GroupWithPlayersEntity
 import com.golapp.attendances.data.mappers.asDomain
 import com.golapp.attendances.domain.models.GroupWithClassDays
 import com.golapp.attendances.domain.models.GroupWithPlayers
 import javax.inject.Inject
 
 class GroupsLocalDataSourceImpl @Inject constructor(
-    private val groupDao: GroupDao
+    private val groupDao: GroupDao,
+    private val playerDao: PlayerDao
 ) : GroupsLocalDataSource {
     override suspend fun insertGroup(group: GroupEntity) = groupDao.insertGroup(group)
 
@@ -31,7 +34,10 @@ class GroupsLocalDataSourceImpl @Inject constructor(
 
 
     override suspend fun getGroupWhitPlayersById(groupId: Int): GroupWithPlayers =
-        groupDao.getGroupWhitPlayersById(groupId).asDomain()
+        GroupWithPlayersEntity(
+            group = groupDao.getGroupById(groupId),
+            players = playerDao.getPlayersByGroupIdOrderedByCategoryNumber(groupId)
+        ).asDomain()
 
 
     override suspend fun deleteGroups() = groupDao.deleteGroups()

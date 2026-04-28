@@ -31,6 +31,9 @@ interface GroupDao {
     @Query("SELECT * FROM groups WHERE id = :groupId")
     suspend fun getGroupWhitPlayersById(groupId: Int): GroupWithPlayersEntity
 
+    @Query("SELECT * FROM groups WHERE id = :groupId")
+    suspend fun getGroupById(groupId: Int): GroupEntity
+
     @Transaction
     @Query("SELECT * FROM groups JOIN class_days ON groups.id = class_days.group_id WHERE month = :month")
     suspend fun getGroupsWithClassDaysOnMonth(month: Int): Map<GroupEntity, List<ClassDayEntity>>

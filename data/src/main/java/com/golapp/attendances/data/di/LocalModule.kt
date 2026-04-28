@@ -91,8 +91,8 @@ object LocalModule {
         AttendancesLocalDataSourceImpl(attendanceDao)
 
     @Provides
-    fun provideGroupsLocalDatasource(groupDao: GroupDao): GroupsLocalDataSource =
-        GroupsLocalDataSourceImpl(groupDao)
+    fun provideGroupsLocalDatasource(groupDao: GroupDao, playerDao: PlayerDao): GroupsLocalDataSource =
+        GroupsLocalDataSourceImpl(groupDao, playerDao)
 
     @Provides
     fun providePlayerLocalDatasource(playerDao: PlayerDao): PlayersLocalDataSource =
