@@ -2,17 +2,17 @@ package com.golapp.attendances.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.navOptions
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
 import com.golapp.attendances.feature.main.GolAppState
+import com.golapp.attendances.navigation.graphs.Attendances
 import com.golapp.attendances.navigation.graphs.Authentication
 import com.golapp.attendances.navigation.graphs.Home
 import com.golapp.attendances.navigation.graphs.authenticationScreens
 import com.golapp.attendances.navigation.graphs.groupsScreen
 import com.golapp.attendances.navigation.graphs.homeScreen
-import com.golapp.attendances.navigation.graphs.navigateToAuthentication
-import com.golapp.attendances.navigation.graphs.navigateToGroups
-import com.golapp.attendances.navigation.graphs.navigateToHome
 import com.golapp.attendances.navigation.graphs.settingScreen
 
 @Composable
@@ -21,53 +21,42 @@ fun GolappNavHost(
     modifier: Modifier = Modifier,
     onShowSnackbar: suspend (String, String?) -> Boolean
 ) {
-    val navController = appState.navController
     val mainViewModel = appState.mainViewModel
-    NavHost(
-        navController = navController,
-        startDestination = Authentication,
-        modifier = modifier
-    ) {
+    NavDisplay(
+        backStack = appState.backStack,
+        modifier = modifier,
+        onBack = { appState.navigateBack() },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        ),
+        entryProvider = entryProvider {
+            authenticationScreens(
+                onDetectLogin = {
+                    appState.replaceStack(Home)
+                }
+            )
 
-        authenticationScreens(
-            onDetectLogin = {
-                navController.navigateToHome(
-                    navOptions {
-                        popUpTo(Authentication) { inclusive = true } // elimina Auth del stack
-                        launchSingleTop = true
-                    }
-                )
-            }
-        )
+            homeScreen(onLogout = {
+                mainViewModel.logout()
+                appState.replaceStack(Authentication)
+            })
 
-        homeScreen(onLogout = {
-            mainViewModel.logout()
-            navController.navigateToAuthentication()
-        })
+            settingScreen(onLogout = {
+                mainViewModel.logout()
+                appState.replaceStack(Authentication)
+            })
 
-        settingScreen(onLogout = {
-            mainViewModel.logout()
-            navController.navigateToAuthentication()
-        })
-
-        groupsScreen(
-            onNavigateBackHome = {
-                navController.navigateToHome(
-                    navOptions {
-                        popUpTo(Home) {
-                            inclusive = false
-                            saveState = false
-                        }
-                        launchSingleTop = true
-                        restoreState = false
-                    }
-                )
-            },
-            onClickClassDay = {
-                navController.navigateToGroups(it)
-            },
-            onShowSnackbar = onShowSnackbar
-        )
-    }
+            groupsScreen(
+                onNavigateBackHome = {
+                    appState.replaceStack(Home)
+                },
+                onClickClassDay = {
+                    appState.navigate(Attendances(it))
+                },
+                onShowSnackbar = onShowSnackbar
+            )
+        }
+    )
 
 }

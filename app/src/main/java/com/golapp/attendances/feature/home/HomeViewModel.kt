@@ -43,8 +43,12 @@ class HomeViewModel @Inject constructor(
     fun syncAttendances() {
         currentDayJob?.cancel()
         currentDayJob = viewModelScope.launch(ioDispatcher) {
-            attendanceUseCases.syncAttendanceUseCase()
-            groupsUseCases.syncAssignedGroupsUseCase()
+            runCatching {
+                attendanceUseCases.syncAttendanceUseCase()
+                groupsUseCases.syncAssignedGroupsUseCase()
+            }.onFailure { e ->
+                _uiState.update { it.copy(error = e.message) }
+            }
         }
     }
 
@@ -67,8 +71,13 @@ class HomeViewModel @Inject constructor(
 
     fun fetchStatistics() {
         viewModelScope.launch(ioDispatcher) {
-            val statistics = attendanceUseCases.getAttendanceStatisticsUseCase()
-            _uiState.value = _uiState.value.copy(listStatistics = statistics)
+            runCatching {
+                attendanceUseCases.getAttendanceStatisticsUseCase()
+            }.onSuccess { statistics ->
+                _uiState.update { it.copy(listStatistics = statistics) }
+            }.onFailure { e ->
+                _uiState.update { it.copy(error = e.message) }
+            }
         }
     }
 }

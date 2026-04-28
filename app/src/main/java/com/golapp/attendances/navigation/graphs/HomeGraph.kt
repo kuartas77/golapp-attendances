@@ -1,35 +1,28 @@
 package com.golapp.attendances.navigation.graphs
 
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.golapp.attendances.feature.home.HomeScreen
 import com.golapp.attendances.feature.settings.SettingsScreen
 import kotlinx.serialization.Serializable
 
 
 @Serializable
-object Home
+data object Home : NavKey
 
 @Serializable
-object Settings
+data object Settings : NavKey
 
-fun NavController.navigateToHome(navOptions: NavOptions? = null) = navigate(Home, navOptions)
-
-fun NavGraphBuilder.homeScreen(onLogout: () -> Unit = {}) {
-    composable<Home> {
+fun EntryProviderScope<NavKey>.homeScreen(onLogout: () -> Unit = {}) {
+    entry<Home> {
         HomeScreen(onLogout = onLogout)
     }
 }
 
-fun NavController.navigateToSettings(navOptions: NavOptions? = null) =
-    navigate(Settings, navOptions)
-
-fun NavGraphBuilder.settingScreen(
+fun EntryProviderScope<NavKey>.settingScreen(
     onLogout: () -> Unit
 ) {
-    composable<Settings> {
+    entry<Settings> {
         SettingsScreen(onLogout = onLogout)
     }
 }

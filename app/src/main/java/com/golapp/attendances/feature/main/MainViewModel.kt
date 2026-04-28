@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,7 +20,10 @@ class MainViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState
-        .onSubscription { getUserData() }
+        .onSubscription {
+            getUserData()
+            checkLogin()
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -36,7 +40,22 @@ class MainViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             authUseCases.logoutUseCase()
-            _uiState.value = HomeUiState(isLoading = false, isLoggedIn = false)
+            _uiState.update { it.copy(isLoading = false, isLoggedIn = false) }
+        }
+    }
+
+    private fun checkLogin() {
+        viewModelScope.launch {
+            authUseCases.checkLoginUseCase().collect { isLoggedIn ->
+                if (!isLoggedIn) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isLoggedIn = false
+                        )
+                    }
+                }
+            }
         }
     }
 }

@@ -1,14 +1,11 @@
 package com.golapp.attendances.feature.attendances
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
 import com.golapp.attendances.di.IoDispatcher
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.domain.usecases.attendances.AttendancesUseCases
-import com.golapp.attendances.navigation.graphs.Attendances
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,6 +21,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -36,13 +34,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AttendancesViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val attendancesUseCases: AttendancesUseCases,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    private val route: Attendances = savedStateHandle.toRoute()
-
+    private val classDayIdFlow = MutableStateFlow<String?>(null)
     private val queryFlow = MutableStateFlow("")
     private val selectedKeyFlow = MutableStateFlow<String?>(null) // key estable (ej: uniqueCode)
     private val isSyncingFlow = MutableStateFlow(false)
@@ -53,15 +49,28 @@ class AttendancesViewModel @Inject constructor(
     )
     val effects: SharedFlow<AttendancesUiEffect> = _effects.asSharedFlow()
 
+    fun setClassDayId(classDayId: String) {
+        if (classDayIdFlow.value == classDayId) return
+        classDayIdFlow.value = classDayId
+        queryFlow.value = ""
+        selectedKeyFlow.value = null
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val classDayResultFlow: StateFlow<ClassDayResult> =
-        flow<ClassDayResult> {
-            val classDay = attendancesUseCases.getClassDayByIdUseCase(route.classDayId)
+        classDayIdFlow
+            .filterNotNull()
+            .distinctUntilChanged()
+            .flatMapLatest { classDayId ->
+                flow<ClassDayResult> {
+            val classDay = attendancesUseCases.getClassDayByIdUseCase(classDayId)
             emit(ClassDayResult.Success(classDay))
         }
             .flowOn(ioDispatcher)
             .onStart { emit(ClassDayResult.Loading) }
             .catch { e ->
                 emit(ClassDayResult.Error(e.message ?: "Error cargando el día de clase"))
+            }
             }
             .onEach { result ->
                 if (result is ClassDayResult.Error) {

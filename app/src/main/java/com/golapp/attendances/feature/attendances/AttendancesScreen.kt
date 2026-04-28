@@ -73,11 +73,16 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AttendancesScreen(
+    classDayId: String,
     onShowSnackbar: suspend (String, String?) -> Boolean,
     viewModel: AttendancesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val showSnackbarLatest = rememberUpdatedState(onShowSnackbar)
+
+    LaunchedEffect(classDayId) {
+        viewModel.setClassDayId(classDayId)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effects.collectLatest { effect ->

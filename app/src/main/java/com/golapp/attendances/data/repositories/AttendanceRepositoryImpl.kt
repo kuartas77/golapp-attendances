@@ -145,6 +145,13 @@ class AttendanceRepositoryImpl @Inject constructor(
         return remote.syncAttendance(attendance)
     }
 
-    override suspend fun getAttendanceStatistics(): List<Statistics> = remote.fetchStatistics()
+    override suspend fun getAttendanceStatistics(): List<Statistics> = withContext(ioDispatcher) {
+        try {
+            remote.fetchStatistics()
+        } catch (e: Exception) {
+            Timber.e(e, "getAttendanceStatistics failed: ${e.message}")
+            emptyList()
+        }
+    }
 
 }

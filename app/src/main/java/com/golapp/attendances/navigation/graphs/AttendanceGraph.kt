@@ -1,58 +1,37 @@
 package com.golapp.attendances.navigation.graphs
 
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import androidx.navigation.compose.composable
-import androidx.navigation.navigation
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.golapp.attendances.feature.attendances.AttendancesScreen
 import com.golapp.attendances.feature.groups.GroupsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
-object GroupAttendances
+data object GroupAttendances : NavKey
 
 @Serializable
-object Groups
+data object Groups : NavKey
 
 @Serializable
-data class Attendances(val classDayId: String)
+data class Attendances(val classDayId: String) : NavKey
 
-fun NavController.navigateToGroups(navOptions: NavOptions) =
-    navigate(Groups, navOptions)
-
-fun NavController.navigateToGroups(
-    classDayId: String,
-    navOptions: NavOptions? = null
-) = navigate(Attendances(classDayId), navOptions ?: androidx.navigation.navOptions {
-    popUpTo(Groups) {
-        inclusive = false
-        saveState = false
-    }
-    launchSingleTop = true
-    restoreState = false
-})
-
-fun NavGraphBuilder.groupsScreen(
+fun EntryProviderScope<NavKey>.groupsScreen(
     onClickClassDay: (String) -> Unit = {},
     onNavigateBackHome: () -> Unit = {},
     onShowSnackbar: suspend (String, String?) -> Boolean
 ) {
-    navigation<GroupAttendances>(startDestination = Groups) {
+    entry<Groups> {
+        GroupsScreen(
+            onNavigateBackHome = onNavigateBackHome,
+            onClickClassDay = onClickClassDay,
+            onShowSnackbar = onShowSnackbar
+        )
+    }
 
-        composable<Groups> {
-            GroupsScreen(
-                onNavigateBackHome = onNavigateBackHome,
-                onClickClassDay = onClickClassDay,
-                onShowSnackbar = onShowSnackbar
-            )
-        }
-
-        composable<Attendances> {
-            // Si luego Attendances necesita UiEffect/snackbar, ya lo tienes listo:
-            AttendancesScreen(
-                onShowSnackbar = onShowSnackbar
-            )
-        }
+    entry<Attendances> { key ->
+        AttendancesScreen(
+            classDayId = key.classDayId,
+            onShowSnackbar = onShowSnackbar
+        )
     }
 }

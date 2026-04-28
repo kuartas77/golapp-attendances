@@ -19,8 +19,8 @@ android {
         applicationId = "com.golapp.attendances"
         minSdk = 28
         targetSdk = 37
-        versionCode = 11
-        versionName = "1.0.3"
+        versionCode = 12
+        versionName = "1.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -88,14 +88,16 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.core)
 
     // Navigation
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.kotlinx.serialization.json)
 
 
     // Dependency Injection
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
 
     // WorkManager
     implementation(libs.androidx.work.runtime.ktx)

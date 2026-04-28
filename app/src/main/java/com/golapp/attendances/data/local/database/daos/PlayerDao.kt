@@ -14,8 +14,7 @@ interface PlayerDao {
         """
         SELECT * FROM players
         WHERE group_id = :groupId
-        ORDER BY
-            CAST(SUBSTR(category, INSTR(category, '-') + 1) AS INTEGER) ASC
+        ORDER BY LENGTH(category) ASC, category ASC
         """
     )
     suspend fun getPlayersByGroupIdOrderByCategoryNumber(groupId: Int): List<PlayerEntity>

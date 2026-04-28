@@ -42,9 +42,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation3.runtime.NavKey
 import com.golapp.attendances.common.NetworkMonitor
 import com.golapp.attendances.feature.main.GolAppState
 import com.golapp.attendances.feature.main.HeaderContent
@@ -54,10 +52,8 @@ import com.golapp.attendances.navigation.GolappNavHost
 import com.golapp.attendances.ui.theme.BrandDefaults
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.mapNotNull
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.reflect.KClass
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -77,12 +73,18 @@ class MainActivity : ComponentActivity() {
 
 //            val themeColors = if (isSystemInDarkTheme()) darkThemeColors else lightThemeColors
 
-            val appState = rememberAppState(networkMonitor = networkMonitor)
+    val appState = rememberAppState(networkMonitor = networkMonitor)
+    val uiState by appState.mainViewModel.uiState.collectAsStateWithLifecycle()
 
-//            CompositionLocalProvider(LocalTheme provides themeColors) {
-            GolappAttendancesTheme {
-                MainScreen(appState = appState)
-            }
+    LaunchedEffect(uiState.isLoggedIn) {
+        if (!uiState.isLoggedIn && !appState.isGuestDestination) {
+            appState.replaceStack(com.golapp.attendances.navigation.graphs.Authentication)
+        }
+    }
+
+    GolappAttendancesTheme {
+        MainScreen(appState = appState)
+    }
 //            }
         }
     }
@@ -118,12 +120,10 @@ internal fun MainScreen(
     }
 
     if (BuildConfig.DEBUG) {
-        LaunchedEffect(Unit) {
-            appState.navController.currentBackStackEntryFlow.collect { entry ->
-                val stack = appState.navController.currentBackStackEntryFlow
-                    .mapNotNull { it.destination.route }
-                Timber.tag("NAV").d("current=${entry.destination.route} stack=$stack")
-            }
+        LaunchedEffect(currentDestination) {
+            Timber.tag("NAV").d(
+                "current=${currentDestination?.javaClass?.simpleName} stack=${appState.backStack}"
+            )
         }
     }
 
@@ -134,7 +134,7 @@ internal fun MainScreen(
 internal fun GolApp(
     layoutType: NavigationSuiteType,
     appState: GolAppState,
-    currentDestination: NavDestination?,
+    currentDestination: NavKey?,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier
 ) {
@@ -205,12 +205,11 @@ internal fun GolApp(
 
 private fun NavigationSuiteScope.navigationItems(
     appState: GolAppState,
-    currentDestination: NavDestination?,
+    currentDestination: NavKey?,
     suiteItemColors: NavigationSuiteItemColors
 ) {
     appState.topLevelDestinations.forEach { destination ->
-        val isSelected =
-            currentDestination.isRouteInHierarchy(destination.baseRoute)
+        val isSelected = destination.isSelected(currentDestination)
 
         item(
             selected = isSelected,
@@ -230,6 +229,3 @@ private fun NavigationSuiteScope.navigationItems(
         )
     }
 }
-
-private fun NavDestination?.isRouteInHierarchy(route: KClass<*>) =
-    this?.hierarchy?.any { it.hasRoute(route) } == true
