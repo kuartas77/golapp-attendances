@@ -26,3 +26,5 @@ local.properties
 /app/release/output-metadata.json
 *.log
 /.idea/deviceManager.xml
+/.gradle-user-home
+/.tools
