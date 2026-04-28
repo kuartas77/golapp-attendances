@@ -179,7 +179,7 @@ internal fun GolApp(
                     .consumeWindowInsets(padding)
                     .windowInsetsPadding(
                         WindowInsets.safeDrawing.only(
-                            WindowInsetsSides.Horizontal
+                            WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
                         )
                     )
             ) {

@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.GolappAttendances" parent="android:Theme.Material.Light.NoActionBar" >
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-
-        <!-- Optional, if your app is drawing behind the status bar also. -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>
+    <style name="Theme.GolappAttendances" parent="android:Theme.Material.Light.NoActionBar" />
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen.IconBackground">
         <!-- Set the splash screen background, animated icon, and animation duration. -->

@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -53,6 +54,18 @@ class AuthViewModel @Inject constructor(
     private fun checkTokenExpiry() {
         viewModelScope.launch(ioDispatcher) {
             setLoading(true)
+
+            val hasSession = authUseCases.checkLoginUseCase().first()
+            if (!hasSession) {
+                _uiState.update {
+                    it.copy(
+                        isLoggedIn = false,
+                        isLoading = false,
+                        error = null
+                    )
+                }
+                return@launch
+            }
 
             val valid = authUseCases.validateTokenExpiryUseCase()
 
