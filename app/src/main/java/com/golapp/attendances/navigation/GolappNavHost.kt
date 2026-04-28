@@ -1,5 +1,9 @@
 package com.golapp.attendances.navigation
 
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -22,41 +26,59 @@ fun GolappNavHost(
     onShowSnackbar: suspend (String, String?) -> Boolean
 ) {
     val mainViewModel = appState.mainViewModel
-    NavDisplay(
-        backStack = appState.backStack,
-        modifier = modifier,
-        onBack = { appState.navigateBack() },
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
-        ),
-        entryProvider = entryProvider {
-            authenticationScreens(
-                onDetectLogin = {
-                    appState.replaceStack(Home)
-                }
-            )
+    SharedTransitionLayout {
+        NavDisplay(
+            backStack = appState.backStack,
+            modifier = modifier,
+            onBack = { appState.navigateBack() },
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator()
+            ),
+            entryProvider = entryProvider {
+                authenticationScreens(
+                    onDetectLogin = {
+                        appState.replaceStack(Home)
+                    }
+                )
 
-            homeScreen(onLogout = {
-                mainViewModel.logout()
-                appState.replaceStack(Authentication)
-            })
+                homeScreen(onLogout = {
+                    mainViewModel.logout()
+                    appState.replaceStack(Authentication)
+                })
 
-            settingScreen(onLogout = {
-                mainViewModel.logout()
-                appState.replaceStack(Authentication)
-            })
+                settingScreen(onLogout = {
+                    mainViewModel.logout()
+                    appState.replaceStack(Authentication)
+                })
 
-            groupsScreen(
-                onNavigateBackHome = {
-                    appState.replaceStack(Home)
-                },
-                onClickClassDay = {
-                    appState.navigate(Attendances(it))
-                },
-                onShowSnackbar = onShowSnackbar
-            )
-        }
-    )
+                groupsScreen(
+                    onNavigateBackHome = {
+                        appState.replaceStack(Home)
+                    },
+                    onClickClassDay = {
+                        appState.navigate(Attendances(it))
+                    },
+                    onShowSnackbar = onShowSnackbar
+                )
+            },
+            sharedTransitionScope = this,
+            transitionSpec = {
+                // Slide in from right when navigating forward
+                slideInHorizontally(initialOffsetX = { it }) togetherWith
+                        slideOutHorizontally(targetOffsetX = { -it })
+            },
+            popTransitionSpec = {
+                // Slide in from left when navigating back
+                slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                        slideOutHorizontally(targetOffsetX = { it })
+            },
+            predictivePopTransitionSpec = {
+                // Slide in from left when navigating back
+                slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                        slideOutHorizontally(targetOffsetX = { it })
+            },
+        )
+    }
 
 }
