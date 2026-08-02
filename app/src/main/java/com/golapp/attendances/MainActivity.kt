@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -53,6 +54,7 @@ import com.golapp.attendances.feature.main.rememberAppState
 import com.golapp.attendances.core.navigation.GolappNavHost
 import com.golapp.attendances.core.navigation.graphs.Authentication
 import com.golapp.attendances.core.navigation.graphs.Home
+import com.golapp.attendances.core.update.PlayUpdateCoordinator
 import com.golapp.attendances.ui.theme.BrandDefaults
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,12 +66,27 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
     private val viewModel: MainViewModel by viewModels()
+    private lateinit var playUpdateCoordinator: PlayUpdateCoordinator
     private var isNavigationReady = false
+
+    private val updateResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            if (result.resultCode != RESULT_OK) {
+                Timber.w(
+                    "El flujo de actualización inmediata terminó con código %s",
+                    result.resultCode
+                )
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        playUpdateCoordinator = PlayUpdateCoordinator.create(this, updateResultLauncher)
+        playUpdateCoordinator.checkForUpdate()
+
         enableEdgeToEdge()
 
         viewModel.start()
@@ -101,6 +118,13 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::playUpdateCoordinator.isInitialized) {
+            playUpdateCoordinator.resumeUpdateIfNeeded()
         }
     }
 }

@@ -142,6 +142,9 @@ dependencies {
     //Splash Screen
     implementation(libs.androidx.core.splashscreen)
 
+    // Google Play In-App Updates
+    implementation(libs.play.app.update)
+
     // Adaptive Navigation
     implementation(libs.androidx.material3.adaptive.navigation.suite)
     implementation(libs.androidx.adaptive.layout)
