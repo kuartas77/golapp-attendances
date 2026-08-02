@@ -8,6 +8,9 @@
     <string name="home">Inicio</string>
     <string name="training">Grupos</string>
     <string name="attendances">Asistencias</string>
+    <string name="attendance_statistics">Estadísticas de asistencias</string>
+    <string name="attendance_completion">Progreso de asistencias tomadas</string>
+    <string name="total">Total</string>
     <string name="settings">Config</string>
     <string name="title_groups">Grupos de entrenamiento</string>
     <string name="body_groups">En esta sección podrás encontrar los grupos de entrenamiento, además podrás ver los integrantes de cada grupo.</string>
@@ -22,6 +25,12 @@
     <string name="title_attendances_p">Asistencias, Mes: %1$s, Fecha: %2$s, Día: %3$s</string>
     <string name="month">Mes</string>
     <string name="members">Integrantes</string>
+    <string name="group_members_count">%1$d integrantes</string>
+    <string name="training_days">Días de entrenamiento</string>
+    <string name="training_schedule">Horario</string>
+    <string name="pick_training_date">Selecciona una fecha de entrenamiento</string>
+    <string name="available_dates_month">Fechas disponibles en %1$s</string>
+    <string name="no_training_dates">Este grupo no tiene fechas de entrenamiento disponibles.</string>
     <string name="days">Días</string>
     <string name="schedules">Horarios</string>
     <string name="trainings">Entrenamientos/Mes</string>
@@ -46,6 +55,9 @@
     <string name="pick_group_description">Selecciona un grupo para gestionar sus asistencias.</string>
     <string name="no_group_selected">Selecciona un grupo para ver sus días de entrenamiento.</string>
     <string name="no_attendance_selected">Selecciona un deportista para tomar asistencia.</string>
+    <string name="player_code_and_category">Código %1$s · %2$s</string>
+    <string name="select_attendance_status">Selecciona el estado de asistencia</string>
+    <string name="attendance_saved_automatically">El cambio se guardará automáticamente.</string>
     <string name="session_expired">La sesión ha expirado, ingresa de nuevo.</string>
     <string name="player_photo">Imagen del deportista</string>
     <string name="lastNames">Apellidos:</string>

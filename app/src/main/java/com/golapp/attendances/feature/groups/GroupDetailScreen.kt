@@ -1,7 +1,7 @@
 package com.golapp.attendances.feature.groups
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,16 +15,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,11 +38,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.golapp.attendances.R
@@ -136,149 +135,175 @@ private fun DetailScreen(
             Column(
                 modifier = modifier
                     .fillMaxSize()
-                    .padding(horizontal = GolappSpacing.sm),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(GolappSpacing.md),
+                verticalArrangement = Arrangement.spacedBy(GolappSpacing.md),
             ) {
-                Header(modifier, group)
+                GroupOverview(group)
 
-                HorizontalDivider(modifier = modifier.padding(start = 12.dp, end = 12.dp))
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-
+                if (group.classDays.isNotEmpty()) {
+                    Column(verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs)) {
                     Text(
-                        text = buildAnnotatedString {
-                            append(stringResource(R.string.pick_date))
-                            append(" ")
-                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(group.classDays.first().monthName)
-                            }
-                        },
-
-                        modifier = Modifier.padding(8.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        fontStyle = FontStyle.Italic
-                    )
-
-                    Column(
-                        modifier = Modifier.background(
-                            color = MaterialTheme.colorScheme.surface,
-                            shape = MaterialTheme.shapes.large
+                            text = stringResource(R.string.pick_training_date),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
                         )
-                    ) {
-                        FlowRow(
-                            modifier = Modifier.padding(GolappSpacing.xs),
-                            horizontalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
-                            verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
+                        Text(
+                            text = stringResource(
+                                R.string.available_dates_month,
+                                group.classDays.first().monthName,
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+
+                        Surface(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = MaterialTheme.shapes.large,
                         ) {
-                            group.classDays.forEach { classDay ->
-                                ItemDay(
-                                    item = classDay,
-                                    navigateToAttendances = navigateToAttendances,
-                                )
+                            FlowRow(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(GolappSpacing.sm),
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    space = GolappSpacing.xs,
+                                    alignment = Alignment.CenterHorizontally,
+                                ),
+                                verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
+                            ) {
+                                group.classDays.forEach { classDay ->
+                                    ItemDay(
+                                        item = classDay,
+                                        navigateToAttendances = navigateToAttendances,
+                                    )
+                                }
                             }
                         }
                     }
-
+                } else {
+                    OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = stringResource(R.string.no_training_dates),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(GolappSpacing.lg),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
                 }
             }
         }
     }
-
 }
 
 @Composable
-private fun Header(modifier: Modifier, groupWithClassDays: GroupWithClassDays) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(GolappSpacing.sm)
+private fun GroupOverview(groupWithClassDays: GroupWithClassDays) {
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = BrandDefaults.elevatedCardColors(),
+        elevation = CardDefaults.cardElevation(defaultElevation = GolappElevation.card),
     ) {
-        Column {
-            Text(
-                stringResource(R.string.nombre_del_grupo),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+        Column(
+            modifier = Modifier.padding(GolappSpacing.md),
+            verticalArrangement = Arrangement.spacedBy(GolappSpacing.md),
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(GolappSpacing.sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Surface(
+                    modifier = Modifier.size(48.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_team),
+                        contentDescription = null,
+                        modifier = Modifier.padding(GolappSpacing.xs),
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.nombre_del_grupo),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        text = groupWithClassDays.group.fullGroup,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(GolappSpacing.sm)) {
+                GroupMetric(
+                    value = groupWithClassDays.group.playerCount.toString(),
+                    label = stringResource(R.string.members),
+                    modifier = Modifier.weight(1f),
+                )
+                GroupMetric(
+                    value = groupWithClassDays.classDays.size.toString(),
+                    label = stringResource(R.string.trainings),
+                    modifier = Modifier.weight(1f),
+                )
+            }
+
+            DetailInfoRow(
+                iconRes = R.drawable.id_calendar,
+                label = stringResource(R.string.training_days),
+                value = groupWithClassDays.group.days.scheduleInline(),
             )
-            Text(groupWithClassDays.group.fullGroup, style = MaterialTheme.typography.bodyMedium)
+            DetailInfoRow(
+                iconRes = R.drawable.ic_stopwatch,
+                label = stringResource(R.string.training_schedule),
+                value = groupWithClassDays.group.explodeSchedules.scheduleInline(),
+            )
         }
     }
+}
 
-    HorizontalDivider(modifier = modifier.padding(start = 12.dp, end = 12.dp))
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(GolappSpacing.sm),
-        horizontalArrangement = Arrangement.SpaceBetween
+@Composable
+private fun GroupMetric(
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        shape = MaterialTheme.shapes.medium,
     ) {
-        Column(modifier = modifier.weight(1f)) {
-            Text(
-                stringResource(R.string.days),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                groupWithClassDays.group.days.scheduleInline(),
-                style = MaterialTheme.typography.bodyMedium
-            )
+        Column(
+            modifier = Modifier.padding(GolappSpacing.sm),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(value, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text(label, style = MaterialTheme.typography.labelMedium, textAlign = TextAlign.Center)
         }
     }
+}
 
-    HorizontalDivider(modifier = modifier.padding(start = 12.dp, end = 12.dp))
-
+@Composable
+private fun DetailInfoRow(iconRes: Int, label: String, value: String) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(GolappSpacing.sm),
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(GolappSpacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(modifier = modifier.weight(1f)) {
-            Text(
-                stringResource(R.string.schedules),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                groupWithClassDays.group.explodeSchedules.scheduleInline(),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
-
-    HorizontalDivider(modifier = modifier.padding(start = 12.dp, end = 12.dp))
-
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(GolappSpacing.sm),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Column(modifier = modifier.weight(1f)) {
-            Text(
-                stringResource(R.string.trainings),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                groupWithClassDays.classDays.size.toString(),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-
-        Column(modifier = modifier.weight(1f)) {
-            Text(
-                stringResource(R.string.members),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                groupWithClassDays.group.playerCount.toString(),
-                style = MaterialTheme.typography.bodyMedium
-            )
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            modifier = Modifier.size(22.dp),
+            tint = MaterialTheme.colorScheme.primary,
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
         }
     }
 }
@@ -292,34 +317,37 @@ private fun ItemDay(
     Card(
         modifier = modifier
             .wrapContentSize()
-            .padding(2.dp)
             .clickable { navigateToAttendances(item.classDayId) },
-        shape = MaterialTheme.shapes.small,
-        colors = BrandDefaults.elevatedCardColors(),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = GolappElevation.card),
     ) {
         Column(
             modifier = modifier
-                .size(86.dp),
+                .size(width = 94.dp, height = 100.dp)
+                .padding(GolappSpacing.xs),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
                 painter = painterResource(R.drawable.id_calendar),
-                contentDescription = "calendar",
+                contentDescription = null,
                 modifier = modifier.size(22.dp),
+                tint = MaterialTheme.colorScheme.primary,
             )
             Text(
                 text = item.date.toString(),
                 modifier = modifier,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.titleLarge,
             )
             Text(
                 text = item.day,
                 modifier = modifier,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
             )
         }
     }

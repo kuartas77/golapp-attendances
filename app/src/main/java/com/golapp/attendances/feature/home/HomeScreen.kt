@@ -1,21 +1,20 @@
 package com.golapp.attendances.feature.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
@@ -24,7 +23,9 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.golapp.attendances.R
-import com.golapp.attendances.core.common.Constants.SPACER_SMALL
 import com.golapp.attendances.domain.models.Statistics
 import com.golapp.attendances.ui.theme.BrandDefaults
 import com.golapp.attendances.ui.theme.GolappElevation
@@ -73,80 +73,22 @@ private fun SectionInfo(onLogout: () -> Unit) {
         }
     }
 
-    val textListInfo = listOf(
-        stringResource(R.string.groups_info),
-        stringResource(R.string.attendance_info),
-        stringResource(R.string.sync_groups),
-        stringResource(R.string.action_attendance),
-        stringResource(R.string.sync_info),
-    )
-
-//    Row(
-//        modifier = Modifier
-//            .padding(top = GolappSpacing.xxs, start = GolappSpacing.xs, end = GolappSpacing.xs)
-//            .fillMaxWidth(),
-//        horizontalArrangement = Arrangement.Start
-//    ) {
-//        Column(
-//            verticalArrangement = Arrangement.Center,
-//            horizontalAlignment = Alignment.Start
-//        ) {
-//            Text(
-//                stringResource(R.string.attendances),
-//                fontWeight = FontWeight.Bold,
-//                style = MaterialTheme.typography.headlineSmall,
-//                color = MaterialTheme.colorScheme.onBackground
-//            )
-//        }
-//    }
-
     Spacer(modifier = Modifier.height(GolappSpacing.xxs))
 
-    LazyHorizontalGrid(
-        rows = GridCells.Fixed(1),
+    Text(
+        text = stringResource(R.string.attendance_statistics),
+        style = MaterialTheme.typography.headlineSmall,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onBackground,
         modifier = Modifier
-            .height(168.dp)
-            .padding(vertical = GolappSpacing.xs),
-        verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
-        horizontalArrangement = Arrangement.spacedBy(GolappSpacing.xs)
-    ) {
-        items(count = listStatistics.size, key = { it }) {
-            val statistics = listStatistics[it]
-            StatisticsCard(statistic = statistics)
-        }
-    }
-
-    Spacer(modifier = Modifier.height(GolappSpacing.sm))
-
-    textListInfo.forEach { item ->
-        ItemsText(text = item)
-    }
-}
-
-@Composable
-private fun ItemsText(
-    modifier: Modifier = Modifier,
-    text: String
-) {
-    OutlinedCard(
-        modifier = Modifier
-            .padding(vertical = GolappSpacing.xs)
             .fillMaxWidth(),
-        colors = BrandDefaults.cardColors(),
-        elevation = CardDefaults.cardElevation(defaultElevation = GolappElevation.card),
-    ) {
-        Row {
-            Column(
-                modifier = Modifier
-            ) {
-                Text(
-                    text = text,
-                    fontWeight = FontWeight.Medium,
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Start,
-                    modifier = modifier.padding(vertical = GolappSpacing.sm, horizontal = GolappSpacing.md),
-                )
-            }
+    )
+
+    Spacer(modifier = Modifier.height(GolappSpacing.xs))
+
+    Column(verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs)) {
+        listStatistics.forEach { statistic ->
+            StatisticsCard(statistic = statistic)
         }
     }
 }
@@ -154,89 +96,124 @@ private fun ItemsText(
 
 @Composable
 fun StatisticsCard(modifier: Modifier = Modifier, statistic: Statistics) {
+    val progress = if (statistic.attendancesTotal > 0) {
+        statistic.attendancesTaken.toFloat() / statistic.attendancesTotal
+    } else {
+        0f
+    }.coerceIn(0f, 1f)
+
     OutlinedCard(
-        Modifier
-            .size(250.dp)
-            .padding(SPACER_SMALL),
+        modifier = modifier.fillMaxWidth(),
         colors = BrandDefaults.elevatedCardColors(),
         elevation = CardDefaults.cardElevation(defaultElevation = GolappElevation.card)
     ) {
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 48.dp)
-                .padding(top = 12.dp, start = 14.dp, end = 14.dp)
+                .padding(GolappSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(GolappSpacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column {
+            Text(
+                text = statistic.fullGroup,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                shape = MaterialTheme.shapes.small,
+            ) {
                 Text(
-                    statistic.fullGroup,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
+                    text = statistic.avg,
+                    modifier = Modifier.padding(horizontal = GolappSpacing.sm, vertical = GolappSpacing.xs),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
                 )
             }
         }
 
-        HorizontalDivider(modifier = modifier.padding(start = 12.dp, end = 12.dp))
+        HorizontalDivider(modifier = Modifier.padding(horizontal = GolappSpacing.md))
 
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp, start = 12.dp, end = 12.dp),
+                .padding(horizontal = GolappSpacing.sm, vertical = GolappSpacing.md),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(modifier = modifier.weight(1f)) {
-                Text(
-                    stringResource(R.string.taken),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    statistic.attendancesTaken.toString(),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-
-            Column(modifier = modifier.weight(.5f)) {
-                Text(
-                    "Total",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    statistic.attendancesTotal.toString(),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            StatisticMetric(
+                label = stringResource(R.string.taken),
+                value = statistic.attendancesTaken,
+                valueColor = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.weight(1f),
+            )
+            VerticalDivider(modifier = Modifier.height(48.dp))
+            StatisticMetric(
+                label = stringResource(R.string.pending),
+                value = statistic.attendancesNoTaken,
+                valueColor = MaterialTheme.colorScheme.error,
+                modifier = Modifier.weight(1f),
+            )
+            VerticalDivider(modifier = Modifier.height(48.dp))
+            StatisticMetric(
+                label = stringResource(R.string.total),
+                value = statistic.attendancesTotal,
+                valueColor = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f),
+            )
         }
 
-        HorizontalDivider(modifier = modifier.padding(start = 12.dp, end = 12.dp))
-
-        Row(
-            modifier = modifier
+        Column(
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp, start = 12.dp, end = 12.dp, bottom = 8.dp),
+                .padding(start = GolappSpacing.md, end = GolappSpacing.md, bottom = GolappSpacing.md),
+            verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
         ) {
-            Column(modifier = modifier.weight(1f)) {
-                Text(
-                    stringResource(R.string.pending),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    statistic.attendancesNoTaken.toString(),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            Text(
+                text = stringResource(R.string.attendance_completion),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+        }
+    }
+}
 
-            VerticalDivider(modifier = modifier.padding(start = 12.dp, end = 12.dp))
-
-            Column(modifier = modifier.weight(.5f)) {
-                Text(
-                    "%",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(statistic.avg, style = MaterialTheme.typography.bodyMedium)
-            }
+@Composable
+private fun StatisticMetric(
+    label: String,
+    value: Int,
+    valueColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier.defaultMinSize(minHeight = 48.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = value.toString(),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = valueColor,
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
         }
     }
 }

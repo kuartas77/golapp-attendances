@@ -13,40 +13,57 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColorScheme = lightColorScheme(
-    primary = Navy,
-    onPrimary = Color.White,          // contraste: texto/iconos sobre primary
-    secondary = Gold,
-    onSecondary = Navy,        // contraste: texto/iconos sobre secondary
-
-    background = Color(0xFFF7F8FC),
-    onBackground = Navy,
-
-    surface = Color.White,
-    onSurface = Navy,
-
-    surfaceVariant = Color(0xFFEEF1F9),
-    onSurfaceVariant = Navy,
-
-    outline = Color(0xFFCBD2E6)
+    primary = BrandNavy,
+    onPrimary = Color.White,
+    primaryContainer = LightPrimaryContainer,
+    onPrimaryContainer = LightOnPrimaryContainer,
+    secondary = LightSecondary,
+    onSecondary = Color.White,
+    secondaryContainer = LightSecondaryContainer,
+    onSecondaryContainer = LightOnSecondaryContainer,
+    tertiary = LightTertiary,
+    onTertiary = Color.White,
+    tertiaryContainer = LightTertiaryContainer,
+    onTertiaryContainer = LightOnPrimaryContainer,
+    background = LightBackground,
+    onBackground = LightOnSurface,
+    surface = LightBackground,
+    onSurface = LightOnSurface,
+    surfaceContainer = LightSurfaceContainer,
+    surfaceVariant = LightSurfaceVariant,
+    onSurfaceVariant = LightOnSurfaceVariant,
+    outline = LightOutline,
+    outlineVariant = LightOutlineVariant,
+    inverseSurface = BrandNavy,
+    inverseOnSurface = Color.White,
+    inversePrimary = BrandGold,
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = GoldMuted,
-    onPrimary = DarkBg,
-
-    secondary = NavyMuted,
-    onSecondary = DarkText,
-
-    background = DarkBg,
-    onBackground = DarkText,
-
+    primary = DarkPrimary,
+    onPrimary = DarkOnPrimary,
+    primaryContainer = DarkPrimaryContainer,
+    onPrimaryContainer = DarkOnPrimaryContainer,
+    secondary = DarkSecondary,
+    onSecondary = DarkOnPrimary,
+    secondaryContainer = DarkSecondaryContainer,
+    onSecondaryContainer = DarkOnSecondaryContainer,
+    tertiary = DarkTertiary,
+    onTertiary = Color(0xFF002E69),
+    tertiaryContainer = DarkTertiaryContainer,
+    onTertiaryContainer = Color(0xFFD9E2FF),
+    background = DarkBackground,
+    onBackground = DarkOnSurface,
     surface = DarkSurface,
-    onSurface = DarkText,
-
-    surfaceVariant = DarkSurface2,
-    onSurfaceVariant = DarkTextMuted,
-
-    outline = Color(0xFF3A4775)
+    onSurface = DarkOnSurface,
+    surfaceContainer = DarkSurfaceContainer,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = DarkOnSurfaceVariant,
+    outline = DarkOutline,
+    outlineVariant = DarkOutlineVariant,
+    inverseSurface = DarkOnSurface,
+    inverseOnSurface = DarkBackground,
+    inversePrimary = BrandNavy,
 )
 
 @Composable

@@ -2,10 +2,10 @@ package com.golapp.attendances.feature.attendances
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,13 +16,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -49,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.golapp.attendances.R
-import com.golapp.attendances.core.common.ui.components.GolappRadioButton
 import com.golapp.attendances.core.common.ui.preview.attendanceWithPlayerPreview
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.ui.theme.BrandDefaults
@@ -115,7 +114,7 @@ fun DetailPanelAttendance(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailScreen(
     modifier: Modifier = Modifier,
@@ -157,55 +156,35 @@ private fun DetailScreen(
             Column(
                 modifier = modifier
                     .fillMaxSize()
-                    .padding(horizontal = GolappSpacing.sm),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(GolappSpacing.md),
+                verticalArrangement = Arrangement.spacedBy(GolappSpacing.md),
             ) {
-                Header(modifier, attendance)
+                PlayerHeader(attendance)
 
-                Column(modifier = modifier.padding(GolappSpacing.sm)) {
-
+                Column(verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs)) {
                     Text(
-                        text = stringResource(R.string.action_attendance),
-                        modifier = modifier.padding(8.dp),
+                        text = stringResource(R.string.select_attendance_status),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = stringResource(R.string.attendance_saved_automatically),
                         style = MaterialTheme.typography.bodySmall,
-                        fontStyle = FontStyle.Italic
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
 
-                    Card(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .padding(vertical = GolappSpacing.xs),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = BrandDefaults.cardColors(),
-                        elevation = CardDefaults.cardElevation(defaultElevation = GolappElevation.card)
-                    ) {
-                        FlowRow(
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .padding(GolappSpacing.xs),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalArrangement = Arrangement.Center,
-                            maxItemsInEachRow = 3
-                        ) {
-                            attendancesList.forEach { item ->
-                                Row(
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-
-                                    GolappRadioButton(
-                                        item.title,
-                                        item.value,
-                                        selectedOption.toString()
-                                    ) {
-                                        onTakeAttendance(attendance.copy(value = it))
-                                        selectedOption = it
-                                    }
-                                }
-                            }
+                    Column(verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs)) {
+                        attendancesList.forEach { item ->
+                            AttendanceStatusOption(
+                                title = item.title,
+                                value = item.value,
+                                selected = item.value == selectedOption,
+                                onSelected = {
+                                    selectedOption = item.value
+                                    onTakeAttendance(attendance.copy(value = item.value))
+                                },
+                            )
                         }
-
                     }
                 }
             }
@@ -214,84 +193,103 @@ private fun DetailScreen(
 }
 
 @Composable
-private fun Header(
-    modifier: Modifier,
+private fun PlayerHeader(
     attendance: AttendanceWithPlayer,
 ) {
     val imageRequest = ImageRequest.Builder(LocalContext.current).data(attendance.player.photoUrl)
         .build()
-    Column {
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = BrandDefaults.elevatedCardColors(),
+        elevation = CardDefaults.cardElevation(defaultElevation = GolappElevation.card),
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(GolappSpacing.sm)
+                .padding(GolappSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(GolappSpacing.md),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column {
+            Surface(
+                shape = MaterialTheme.shapes.large,
+                modifier = Modifier.size(96.dp),
+            ) {
+                AsyncImage(
+                    model = imageRequest,
+                    contentDescription = stringResource(R.string.player_photo),
+                    placeholder = painterResource(R.drawable.user),
+                    error = painterResource(R.drawable.user),
+                    contentScale = ContentScale.Crop,
+                )
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
+            ) {
                 Text(
                     attendance.player.fullNames,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = stringResource(
+                        R.string.player_code_and_category,
+                        attendance.player.uniqueCode,
+                        attendance.player.category,
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
+    }
+}
 
-        HorizontalDivider(modifier = Modifier.padding(start = 12.dp, end = 12.dp))
-
+@Composable
+private fun AttendanceStatusOption(
+    title: String,
+    value: String,
+    selected: Boolean,
+    onSelected: () -> Unit,
+) {
+    val statusColor = attendanceStatusColor(value)
+    OutlinedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onSelected),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.outlinedCardColors(
+            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer
+            else MaterialTheme.colorScheme.surface,
+        ),
+        border = BorderStroke(
+            width = if (selected) 2.dp else 1.dp,
+            color = if (selected) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.outlineVariant,
+        ),
+    ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth()
+                .padding(horizontal = GolappSpacing.sm, vertical = GolappSpacing.xs),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(GolappSpacing.sm),
         ) {
-            Column(
-                modifier = Modifier
-                    .weight(2f)
-                    .padding(GolappSpacing.md)
-            ) {
-                Text(
-                    stringResource(R.string.unique_code),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    attendance.player.uniqueCode,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                HorizontalDivider(modifier = Modifier)
-
-                Text(
-                    stringResource(R.string.category),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    attendance.player.category,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(GolappSpacing.sm)
-            ) {
-                Surface(
-                    shape = MaterialTheme.shapes.large,
-                    modifier = Modifier.size(width = 100.dp, height = 100.dp)
-                ) {
-                    AsyncImage(
-                        model = imageRequest,
-                        contentDescription = stringResource(R.string.player_photo),
-                        placeholder = painterResource(R.drawable.user),
-                        error = painterResource(R.drawable.user),
-                        contentScale = ContentScale.Crop,
-                        modifier = modifier
-                    )
-                }
-            }
+            Surface(
+                modifier = Modifier.size(12.dp),
+                shape = MaterialTheme.shapes.extraLarge,
+                color = statusColor,
+            ) {}
+            Text(
+                text = title,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+            )
+            RadioButton(selected = selected, onClick = onSelected)
         }
-
-        HorizontalDivider(modifier = Modifier.padding(start = 12.dp, end = 12.dp))
     }
 }
 

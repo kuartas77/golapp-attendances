@@ -2,9 +2,12 @@ package com.golapp.attendances.feature.attendances
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,15 +18,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
@@ -46,15 +50,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.window.core.layout.WindowWidthSizeClass
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -67,9 +68,7 @@ import com.golapp.attendances.core.common.ui.components.SearchBar
 import com.golapp.attendances.core.common.ui.preview.attendanceWithPlayerPreview
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
-import com.golapp.attendances.ui.theme.BrandDefaults
 import com.golapp.attendances.ui.theme.GolappElevation
-import com.golapp.attendances.ui.theme.GolappSize
 import com.golapp.attendances.ui.theme.GolappSpacing
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -133,6 +132,9 @@ fun ListAttendances(
     onTakeAttendance: (AttendanceWithPlayer) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
+    val windowAdaptiveInfo = currentWindowAdaptiveInfo()
+    val useInlineTaking = windowAdaptiveInfo.windowSizeClass.windowWidthSizeClass ==
+        WindowWidthSizeClass.COMPACT
     val navigator = rememberListDetailPaneScaffoldNavigator<AttendanceWithPlayer>(
         isDestinationHistoryAware = false
     )
@@ -158,7 +160,9 @@ fun ListAttendances(
                 ListPanelAttendances(
                     uiState = uiState,
                     onEvent = onEvent,
-                    navigator = navigator
+                    navigator = navigator,
+                    useInlineTaking = useInlineTaking,
+                    onTakeAttendance = onTakeAttendance,
                 )
             }
         },
@@ -178,11 +182,14 @@ private fun ListPanelAttendances(
     modifier: Modifier = Modifier,
     uiState: AttendancesUiState = AttendancesUiState(),
     onEvent: (AttendancesUiEvent) -> Unit,
-    navigator: ThreePaneScaffoldNavigator<AttendanceWithPlayer>
+    navigator: ThreePaneScaffoldNavigator<AttendanceWithPlayer>,
+    useInlineTaking: Boolean,
+    onTakeAttendance: (AttendanceWithPlayer) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val attendances = uiState.listAttendances
     val scope = rememberCoroutineScope()
+    var expandedPlayerId by rememberSaveable { mutableStateOf<Int?>(null) }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -218,13 +225,30 @@ private fun ListPanelAttendances(
                     key = { it }
                 ) {
                     val attendance = attendances[it]
-                    AttendanceItem(attendance = attendance) {
-                        onEvent(AttendancesUiEvent.OnSelectAttendance(attendance))
-                        scope.launch {
-                            navigator.navigateTo(
-                                ListDetailPaneScaffoldRole.Detail,
-                                attendance
-                            )
+                    AttendanceItem(
+                        attendance = attendance,
+                        selected = uiState.selectedAttendance?.playerId == attendance.playerId,
+                        inlineTaking = useInlineTaking,
+                        expanded = useInlineTaking && expandedPlayerId == attendance.playerId,
+                        onTakeAttendance = { updatedAttendance ->
+                            onTakeAttendance(updatedAttendance)
+                            expandedPlayerId = null
+                        },
+                    ) {
+                        if (useInlineTaking) {
+                            expandedPlayerId = if (expandedPlayerId == attendance.playerId) {
+                                null
+                            } else {
+                                attendance.playerId
+                            }
+                        } else {
+                            onEvent(AttendancesUiEvent.OnSelectAttendance(attendance))
+                            scope.launch {
+                                navigator.navigateTo(
+                                    ListDetailPaneScaffoldRole.Detail,
+                                    attendance
+                                )
+                            }
                         }
                     }
                 }
@@ -298,10 +322,15 @@ private fun SearchBarSection(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun AttendanceItem(
     modifier: Modifier = Modifier,
     attendance: AttendanceWithPlayer,
+    selected: Boolean = false,
+    inlineTaking: Boolean = false,
+    expanded: Boolean = false,
+    onTakeAttendance: (AttendanceWithPlayer) -> Unit = {},
     onClickItem: () -> Unit = {}
 ) {
     val attendancesList = remember { getListOfAttendance() }
@@ -322,117 +351,139 @@ private fun AttendanceItem(
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top)
             .clickable { onClickItem() },
-        shape = MaterialTheme.shapes.small,
+        shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = GolappElevation.card),
-        colors = BrandDefaults.cardColors()
+        colors = CardDefaults.outlinedCardColors(
+            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer
+            else MaterialTheme.colorScheme.surface,
+        ),
+        border = BorderStroke(
+            width = if (selected) 2.dp else 1.dp,
+            color = if (selected) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.outlineVariant,
+        ),
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(124.dp)
-                .padding(GolappSpacing.sm),
-        ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
+        Column {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(GolappSpacing.md),
+                horizontalArrangement = Arrangement.spacedBy(GolappSpacing.sm),
             ) {
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(stringResource(R.string.unique_code))
-                        }
-                        append(" ")
-                        append(attendance.player.uniqueCode)
-                    },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(stringResource(R.string.category))
-                        }
-                        append(" ")
-                        append(attendance.player.category)
-                    },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 12.sp,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Spacer(modifier = modifier.height(GolappSpacing.xs))
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(stringResource(R.string.names))
-                        }
-                        append(" ")
-                        append(attendance.player.names)
-                    },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 12.sp,
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(stringResource(R.string.lastNames))
-                        }
-                        append(" ")
-                        append(attendance.player.lastNames)
-                    },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 12.sp,
-                    style = MaterialTheme.typography.bodySmall
-                )
-
-                AssistChip(
-                    modifier = modifier.wrapContentHeight(),
-                    onClick = { onClickItem() },
-                    enabled = true,
-                    label = {
-                        Text(
-                            text = attendanceValue,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            fontSize = 12.sp,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    },
-                    colors = AssistChipDefaults.assistChipColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
-                    ),
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.id_calendar),
-                            contentDescription = "calendar",
-                            modifier = Modifier.size(12.dp),
-                        )
-                    },
-                    shape = MaterialTheme.shapes.small
-                )
-            }
-
             Surface(
                 shape = MaterialTheme.shapes.large,
-                modifier = Modifier.size(width = GolappSize.listAvatarWidth, height = GolappSize.listAvatarHeight)
+                modifier = Modifier.size(64.dp),
             ) {
-
                 AsyncImage(
                     model = imageRequest,
                     contentDescription = stringResource(R.string.player_photo),
                     placeholder = painterResource(R.drawable.user),
                     error = painterResource(R.drawable.user),
                     contentScale = ContentScale.Crop,
-                    modifier = modifier
                 )
+            }
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
+                ) {
+                Text(
+                    text = attendance.player.fullNames,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = stringResource(
+                        R.string.player_code_and_category,
+                        attendance.player.uniqueCode,
+                        attendance.player.category,
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                    Surface(
+                        shape = MaterialTheme.shapes.small,
+                        color = attendanceStatusColor(attendance.value),
+                        contentColor = MaterialTheme.colorScheme.surface,
+                    ) {
+                        Text(
+                            text = attendanceValue,
+                            modifier = Modifier.padding(
+                                horizontal = GolappSpacing.sm,
+                                vertical = GolappSpacing.xs,
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
+            }
+
+            if (inlineTaking) {
+                AnimatedVisibility(visible = expanded) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = GolappSpacing.md,
+                                end = GolappSpacing.md,
+                                bottom = GolappSpacing.md,
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.select_attendance_status),
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
+                            verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
+                        ) {
+                            attendancesList.forEach { option ->
+                                val optionSelected = option.value == attendance.value
+                                FilterChip(
+                                    selected = optionSelected,
+                                    onClick = {
+                                        onTakeAttendance(attendance.copy(value = option.value))
+                                    },
+                                    label = { Text(option.title) },
+                                    leadingIcon = {
+                                        Surface(
+                                            modifier = Modifier.size(10.dp),
+                                            shape = MaterialTheme.shapes.extraLarge,
+                                            color = attendanceStatusColor(option.value),
+                                        ) {}
+                                    },
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    ),
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
+}
+
+@Composable
+internal fun attendanceStatusColor(value: String?) = when (value) {
+    "1" -> MaterialTheme.colorScheme.primary
+    "2" -> MaterialTheme.colorScheme.error
+    "3" -> MaterialTheme.colorScheme.tertiary
+    "4" -> MaterialTheme.colorScheme.secondary
+    "5" -> MaterialTheme.colorScheme.inverseSurface
+    else -> MaterialTheme.colorScheme.outline
 }
 
 @Preview

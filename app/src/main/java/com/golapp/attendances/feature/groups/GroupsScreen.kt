@@ -2,6 +2,7 @@ package com.golapp.attendances.feature.groups
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,10 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -44,12 +45,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -62,7 +60,6 @@ import com.golapp.attendances.core.common.ui.components.Loader
 import com.golapp.attendances.core.common.ui.components.SearchBar
 import com.golapp.attendances.core.common.ui.preview.groupWithClassPreview
 import com.golapp.attendances.domain.models.GroupWithClassDays
-import com.golapp.attendances.ui.theme.BrandDefaults
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import com.golapp.attendances.ui.theme.GolappElevation
 import com.golapp.attendances.ui.theme.GolappSpacing
@@ -220,7 +217,10 @@ private fun ListPanelGroups(
                     key = { it }
                 ) {
                     val group = groupWithClassDays[it]
-                    GroupItem(item = group) {
+                    GroupItem(
+                        item = group,
+                        selected = uiState.selectedGroup?.group?.id == group.group.id,
+                    ) {
                         onEvent(GroupsUiEvent.OnSelectGroup(group))
                         scope.launch {
                             navigator.navigateTo(
@@ -304,89 +304,119 @@ private fun SearchBarSection(
 private fun GroupItem(
     modifier: Modifier = Modifier,
     item: GroupWithClassDays,
+    selected: Boolean = false,
     onClickItem: (GroupWithClassDays) -> Unit = {}
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top)
             .clickable { onClickItem(item) },
-        shape = MaterialTheme.shapes.small,
+        shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = GolappElevation.card),
-        colors = BrandDefaults.cardColors()
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer
+            else MaterialTheme.colorScheme.surface
+        ),
+        border = BorderStroke(
+            width = if (selected) 2.dp else 1.dp,
+            color = if (selected) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.outlineVariant,
+        ),
     ) {
-        Column(modifier = Modifier.padding(GolappSpacing.sm)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth(),
+        Row(
+            modifier = Modifier.padding(GolappSpacing.md),
+            horizontalArrangement = Arrangement.spacedBy(GolappSpacing.sm),
+            verticalAlignment = Alignment.Top,
+        ) {
+            Surface(
+                modifier = Modifier.size(44.dp),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.Center,
-
-                    ) {
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(item.group.fullGroup)
-                            }
-                        },
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Spacer(modifier = modifier.height(GolappSpacing.xs))
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append(stringResource(R.string.members))
-                                append(" ")
-                                append(item.group.playerCount.toString())
-                            }
-                        },
-                        maxLines = 1,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Spacer(modifier = modifier.height(GolappSpacing.sm))
-
-                    Row(
-                        modifier = modifier,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.id_calendar),
-                            contentDescription = "Icon Date",
-                            modifier = Modifier.size(18.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Text(
-                            text = item.group.days.scheduleInline(),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-
-                    Row(
-                        modifier = modifier,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_stopwatch),
-                            contentDescription = "Icon Date",
-                            modifier = Modifier.size(18.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Text(
-                            text = item.group.explodeSchedules.scheduleInline(),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
+                Icon(
+                    painter = painterResource(R.drawable.ic_team),
+                    contentDescription = null,
+                    modifier = Modifier.padding(GolappSpacing.xs),
+                )
             }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(GolappSpacing.sm),
+            ) {
+                Text(
+                    text = item.group.fullGroup,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+
+                Surface(
+                    shape = MaterialTheme.shapes.small,
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ) {
+                    Text(
+                        text = stringResource(R.string.group_members_count, item.group.playerCount),
+                        modifier = Modifier.padding(
+                            horizontal = GolappSpacing.sm,
+                            vertical = GolappSpacing.xs,
+                        ),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+
+                GroupScheduleInfo(
+                    iconRes = R.drawable.id_calendar,
+                    label = stringResource(R.string.training_days),
+                    value = item.group.days.scheduleInline(),
+                )
+                GroupScheduleInfo(
+                    iconRes = R.drawable.ic_stopwatch,
+                    label = stringResource(R.string.training_schedule),
+                    value = item.group.explodeSchedules.scheduleInline(),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GroupScheduleInfo(
+    iconRes: Int,
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+            tint = MaterialTheme.colorScheme.primary,
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = value,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
         }
     }
 }
