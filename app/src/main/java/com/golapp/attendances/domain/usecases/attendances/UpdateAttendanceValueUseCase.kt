@@ -2,8 +2,8 @@ package com.golapp.attendances.domain.usecases.attendances
 
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
-import com.golapp.attendances.data.sync.AttendanceSyncWorker
-import com.golapp.attendances.di.IoDispatcher
+import com.golapp.attendances.core.workers.AttendanceSyncWorker
+import com.golapp.attendances.core.di.IoDispatcher
 import com.golapp.attendances.domain.repositories.AttendanceRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -20,7 +20,7 @@ class UpdateAttendanceValueUseCase @Inject constructor(
             if (attendanceRepository.getAllAttendanceSync().isNotEmpty()) {
                 workManager.beginUniqueWork(
                     AttendanceSyncWorker.TAG,
-                    ExistingWorkPolicy.KEEP,
+                    ExistingWorkPolicy.REPLACE,
                     AttendanceSyncWorker.oneTimeWorkRequest()
                 ).enqueue()
             }

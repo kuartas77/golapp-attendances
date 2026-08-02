@@ -2,81 +2,64 @@ package com.golapp.attendances.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.golapp.attendances.di.IoDispatcher
+import com.golapp.attendances.core.di.IoDispatcher
+import com.golapp.attendances.core.coroutines.rethrowIfCancellation
 import com.golapp.attendances.domain.models.Statistics
 import com.golapp.attendances.domain.models.User
 import com.golapp.attendances.domain.usecases.attendances.AttendancesUseCases
-import com.golapp.attendances.domain.usecases.auth.AuthUseCases
 import com.golapp.attendances.domain.usecases.groups.GroupsUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.onSubscription
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val authUseCases: AuthUseCases,
     private val attendanceUseCases: AttendancesUseCases,
     private val groupsUseCases: GroupsUseCases,
-    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    initialState: HomeUiState,
 ) : ViewModel() {
 
     private var currentDayJob: Job? = null
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState = _uiState.onSubscription {
-        checkLogin()
+    private val _uiState = MutableStateFlow(initialState)
+    val uiState = _uiState.asStateFlow()
+    private var started = false
+
+    fun start() {
+        if (started) return
+        started = true
         syncAttendances()
         fetchStatistics()
     }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = HomeUiState(isLoading = true)
-        )
 
     fun syncAttendances() {
         currentDayJob?.cancel()
         currentDayJob = viewModelScope.launch(ioDispatcher) {
-            runCatching {
+            try {
                 attendanceUseCases.syncAttendanceUseCase()
                 groupsUseCases.syncAssignedGroupsUseCase()
-            }.onFailure { e ->
-                _uiState.update { it.copy(error = e.message) }
-            }
-        }
-    }
-
-    fun checkLogin() {
-        viewModelScope.launch(ioDispatcher) {
-            authUseCases.checkLoginUseCase().collect { isLoggedIn ->
-                if (!isLoggedIn) {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = true,
-                            isLoggedIn = false,
-                            error = null
-                        )
-                    }
-                    authUseCases.logoutUseCase()
-                }
+            } catch (error: Exception) {
+                error.rethrowIfCancellation()
+                _uiState.update { it.copy(error = error.message) }
             }
         }
     }
 
     fun fetchStatistics() {
         viewModelScope.launch(ioDispatcher) {
-            runCatching {
-                attendanceUseCases.getAttendanceStatisticsUseCase()
-            }.onSuccess { statistics ->
+            try {
+                val statistics = attendanceUseCases.getAttendanceStatisticsUseCase()
                 _uiState.update { it.copy(listStatistics = statistics) }
-            }.onFailure { e ->
-                _uiState.update { it.copy(error = e.message) }
+            } catch (error: Exception) {
+                error.rethrowIfCancellation()
+                _uiState.update { it.copy(error = error.message) }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }

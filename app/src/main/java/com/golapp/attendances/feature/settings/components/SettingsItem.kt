@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Info
@@ -24,10 +24,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.golapp.attendances.common.Constants.SHAPE_LARGE
-import com.golapp.attendances.common.Constants.SPACER_MEDIUM
-import com.golapp.attendances.common.Constants.SPACER_XLARGE
+import com.golapp.attendances.core.common.Constants.SPACER_MEDIUM
+import com.golapp.attendances.core.common.Constants.SPACER_XLARGE
+import com.golapp.attendances.ui.theme.GolappSize
 
 
 @Composable
@@ -40,17 +39,19 @@ fun SettingsItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(CutCornerShape(topEnd = SHAPE_LARGE, bottomStart = SHAPE_LARGE))
+            .heightIn(min = GolappSize.compactItemHeight)
+            .clip(MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable { onClick() }
-            .padding(6.dp),
+            .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .clip(CutCornerShape(topEnd = SHAPE_LARGE, bottomStart = SHAPE_LARGE))
-                    .background(MaterialTheme.colorScheme.background)
+                    .clip(MaterialTheme.shapes.small)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
                     .padding(SPACER_MEDIUM),
                 contentAlignment = Alignment.Center
             ) {
@@ -64,7 +65,7 @@ fun SettingsItem(
             Text(
                 text = text,
                 fontWeight = FontWeight.Medium,
-                fontSize = 16.sp
+                style = MaterialTheme.typography.bodyMedium
             )
         }
         Icon(

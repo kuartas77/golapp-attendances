@@ -2,7 +2,7 @@ package com.golapp.attendances.domain.usecases.attendances
 
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
-import com.golapp.attendances.data.sync.AttendanceSyncWorker
+import com.golapp.attendances.core.workers.AttendanceSyncWorker
 import com.golapp.attendances.domain.models.AttendanceSync
 import com.golapp.attendances.domain.repositories.AttendanceRepository
 import javax.inject.Inject

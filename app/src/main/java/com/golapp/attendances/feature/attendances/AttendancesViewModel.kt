@@ -1,8 +1,10 @@
 package com.golapp.attendances.feature.attendances
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.golapp.attendances.di.IoDispatcher
+import com.golapp.attendances.core.coroutines.rethrowIfCancellation
+import com.golapp.attendances.core.di.IoDispatcher
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.domain.usecases.attendances.AttendancesUseCases
@@ -30,18 +32,25 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 @HiltViewModel
 class AttendancesViewModel @Inject constructor(
     private val attendancesUseCases: AttendancesUseCases,
-    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val savedStateHandle: SavedStateHandle,
+    initialState: AttendancesUiState,
 ) : ViewModel() {
 
-    private val classDayIdFlow = MutableStateFlow<String?>(null)
-    private val queryFlow = MutableStateFlow("")
-    private val selectedKeyFlow = MutableStateFlow<String?>(null) // key estable (ej: uniqueCode)
+    private val classDayIdFlow = MutableStateFlow(savedStateHandle.get<String>(KEY_CLASS_DAY_ID))
+    private val queryFlow = MutableStateFlow(savedStateHandle[KEY_QUERY] ?: initialState.query)
+    private val selectedKeyFlow = MutableStateFlow(savedStateHandle.get<String>(KEY_SELECTED_KEY))
     private val isSyncingFlow = MutableStateFlow(false)
+    private val retryGenerationFlow = MutableStateFlow(0)
+    private val attendanceMutationMutex = Mutex()
+    private val syncMutex = Mutex()
 
     private val _effects = MutableSharedFlow<AttendancesUiEffect>(
         replay = 0,
@@ -52,15 +61,16 @@ class AttendancesViewModel @Inject constructor(
     fun setClassDayId(classDayId: String) {
         if (classDayIdFlow.value == classDayId) return
         classDayIdFlow.value = classDayId
+        savedStateHandle[KEY_CLASS_DAY_ID] = classDayId
         queryFlow.value = ""
+        savedStateHandle[KEY_QUERY] = ""
         selectedKeyFlow.value = null
+        savedStateHandle[KEY_SELECTED_KEY] = null
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val classDayResultFlow: StateFlow<ClassDayResult> =
-        classDayIdFlow
-            .filterNotNull()
-            .distinctUntilChanged()
+        combine(classDayIdFlow.filterNotNull(), retryGenerationFlow) { classDayId, _ -> classDayId }
             .flatMapLatest { classDayId ->
                 flow<ClassDayResult> {
             val classDay = attendancesUseCases.getClassDayByIdUseCase(classDayId)
@@ -69,6 +79,7 @@ class AttendancesViewModel @Inject constructor(
             .flowOn(ioDispatcher)
             .onStart { emit(ClassDayResult.Loading) }
             .catch { e ->
+                e.rethrowIfCancellation()
                 emit(ClassDayResult.Error(e.message ?: "Error cargando el día de clase"))
             }
             }
@@ -97,21 +108,22 @@ class AttendancesViewModel @Inject constructor(
                     }
                     .onStart {
                         // asegura la data 1 sola vez por classDay
-                        runCatching {
+                        try {
                             attendancesUseCases.ensureAttendancesForClassDayUseCase(classDay)
-                        }
-                            .onFailure { e ->
-                                _effects.tryEmit(
-                                    AttendancesUiEffect.ShowSnackbar(
-                                        message = e.message ?: "Error preparando asistencias",
-                                        actionLabel = "Reintentar",
-                                        action = AttendancesUiAction.RetryLoad
-                                    )
+                        } catch (error: Exception) {
+                            error.rethrowIfCancellation()
+                            _effects.tryEmit(
+                                AttendancesUiEffect.ShowSnackbar(
+                                    message = error.message ?: "Error preparando asistencias",
+                                    actionLabel = "Reintentar",
+                                    action = AttendancesUiAction.RetryLoad
                                 )
-                            }
+                            )
+                        }
                         emit(AttendancesResult.Loading)
                     }
                     .catch { e ->
+                        e.rethrowIfCancellation()
                         emit(AttendancesResult.Error(e.message ?: "Error cargando asistencias"))
                     }
             }
@@ -181,16 +193,17 @@ class AttendancesViewModel @Inject constructor(
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = AttendancesUiState(isLoading = true)
+            initialValue = initialState
         )
 
     fun onEvent(event: AttendancesUiEvent) {
         when (event) {
-            is AttendancesUiEvent.OnSearchAttendance -> queryFlow.value = event.query
-            AttendancesUiEvent.OnClearText -> queryFlow.value = ""
+            is AttendancesUiEvent.OnSearchAttendance -> updateQuery(event.query)
+            AttendancesUiEvent.OnClearText -> updateQuery("")
 
             is AttendancesUiEvent.OnSelectAttendance -> {
                 selectedKeyFlow.value = event.attendanceWithPlayer.player.uniqueCode
+                savedStateHandle[KEY_SELECTED_KEY] = selectedKeyFlow.value
             }
 
             is AttendancesUiEvent.OnTakeAttendance -> takeAttendance(event.attendanceWithPlayer)
@@ -201,45 +214,59 @@ class AttendancesViewModel @Inject constructor(
     }
 
     private fun retryLoad() {
-        // Fuerza un “refresh” lógico: reemite query para recombinar y/o dispara ensure + flujo
-        queryFlow.value = queryFlow.value
+        retryGenerationFlow.value += 1
     }
 
     private fun takeAttendance(attendanceWithPlayer: AttendanceWithPlayer) {
         viewModelScope.launch(ioDispatcher) {
-            runCatching {
-                attendancesUseCases.takeAttendanceUseCase(attendanceWithPlayer)
-            }.onFailure { e ->
-                _effects.emit(
-                    AttendancesUiEffect.ShowSnackbar(
-                        message = e.message ?: "Error guardando asistencia",
-                        actionLabel = "Reintentar",
-                        action = AttendancesUiAction.RetryTake(attendanceWithPlayer)
+            attendanceMutationMutex.withLock {
+                try {
+                    attendancesUseCases.takeAttendanceUseCase(attendanceWithPlayer)
+                } catch (error: Exception) {
+                    error.rethrowIfCancellation()
+                    _effects.emit(
+                        AttendancesUiEffect.ShowSnackbar(
+                            message = error.message ?: "Error guardando asistencia",
+                            actionLabel = "Reintentar",
+                            action = AttendancesUiAction.RetryTake(attendanceWithPlayer)
+                        )
                     )
-                )
+                }
             }
         }
     }
 
     private fun syncAttendances() {
         viewModelScope.launch(ioDispatcher) {
-            if (isSyncingFlow.value) return@launch
+            if (!syncMutex.tryLock()) return@launch
             isSyncingFlow.value = true
-
-            runCatching {
+            try {
                 attendancesUseCases.syncAttendanceUseCase()
-            }.onFailure { e ->
+            } catch (error: Exception) {
+                error.rethrowIfCancellation()
                 _effects.emit(
                     AttendancesUiEffect.ShowSnackbar(
-                        message = e.message ?: "Error sincronizando asistencias",
+                        message = error.message ?: "Error sincronizando asistencias",
                         actionLabel = "Reintentar",
                         action = AttendancesUiAction.RetrySync
                     )
                 )
+            } finally {
+                isSyncingFlow.value = false
+                syncMutex.unlock()
             }
-
-            isSyncingFlow.value = false
         }
+    }
+
+    private fun updateQuery(query: String) {
+        queryFlow.value = query
+        savedStateHandle[KEY_QUERY] = query
+    }
+
+    private companion object {
+        const val KEY_CLASS_DAY_ID = "attendances.classDayId"
+        const val KEY_QUERY = "attendances.query"
+        const val KEY_SELECTED_KEY = "attendances.selectedKey"
     }
 
     private sealed interface ClassDayResult {

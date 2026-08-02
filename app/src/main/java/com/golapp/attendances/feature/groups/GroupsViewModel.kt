@@ -1,8 +1,10 @@
 package com.golapp.attendances.feature.groups
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.golapp.attendances.di.IoDispatcher
+import com.golapp.attendances.core.coroutines.rethrowIfCancellation
+import com.golapp.attendances.core.di.IoDispatcher
 import com.golapp.attendances.domain.models.GroupWithClassDays
 import com.golapp.attendances.domain.usecases.groups.GroupsUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -30,14 +33,17 @@ import javax.inject.Inject
 @HiltViewModel
 class GroupsViewModel @Inject constructor(
     private val groupsUseCases: GroupsUseCases,
-    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val savedStateHandle: SavedStateHandle,
+    initialState: GroupsUiState,
 ) : ViewModel() {
     private val currentMonth = LocalDate.now().monthValue
 
     // ---- State holders ----
-    private val queryFlow = MutableStateFlow("")
-    private val selectedGroupIdFlow = MutableStateFlow<Int?>(null)
+    private val queryFlow = MutableStateFlow(savedStateHandle[KEY_QUERY] ?: initialState.query)
+    private val selectedGroupIdFlow = MutableStateFlow(savedStateHandle.get<Int>(KEY_SELECTED_ID))
     private val isSyncingFlow = MutableStateFlow(false)
+    private val syncMutex = Mutex()
 
     // ---- One-shot effects (snackbar, navigation, etc.) ----
     private val _effects = MutableSharedFlow<GroupsUiEffect>(
@@ -51,6 +57,7 @@ class GroupsViewModel @Inject constructor(
             .map<List<GroupWithClassDays>, GroupsResult> { GroupsResult.Success(it) }
             .onStart { emit(GroupsResult.Loading) }
             .catch { e ->
+                e.rethrowIfCancellation()
                 emit(GroupsResult.Error(e.message ?: "Error cargando grupos"))
             }
             .onEach { result ->
@@ -103,14 +110,17 @@ class GroupsViewModel @Inject constructor(
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = GroupsUiState(isLoading = true)
+            initialValue = initialState
         )
 
     fun onEvent(event: GroupsUiEvent) {
         when (event) {
-            is GroupsUiEvent.OnSearchGroup -> queryFlow.value = event.query
-            GroupsUiEvent.OnClearText -> queryFlow.value = ""
-            is GroupsUiEvent.OnSelectGroup -> selectedGroupIdFlow.value = event.item.group.id
+            is GroupsUiEvent.OnSearchGroup -> updateQuery(event.query)
+            GroupsUiEvent.OnClearText -> updateQuery("")
+            is GroupsUiEvent.OnSelectGroup -> {
+                selectedGroupIdFlow.value = event.item.group.id
+                savedStateHandle[KEY_SELECTED_ID] = event.item.group.id
+            }
             GroupsUiEvent.SyncGroups -> syncGroups()
             GroupsUiEvent.Retry -> syncGroups()
         }
@@ -118,24 +128,34 @@ class GroupsViewModel @Inject constructor(
 
     private fun syncGroups() {
         viewModelScope.launch(ioDispatcher) {
-            if (isSyncingFlow.value) return@launch
-
+            if (!syncMutex.tryLock()) return@launch
             isSyncingFlow.value = true
-
-            runCatching {
+            try {
                 groupsUseCases.syncAssignedGroupsUseCase()
-            }.onFailure { e ->
+            } catch (error: Exception) {
+                error.rethrowIfCancellation()
                 _effects.emit(
                     GroupsUiEffect.ShowSnackbar(
-                        message = e.message ?: "Error sincronizando grupos",
+                        message = error.message ?: "Error sincronizando grupos",
                         actionLabel = "Reintentar",
                         action = GroupsUiAction.RetrySync
                     )
                 )
+            } finally {
+                isSyncingFlow.value = false
+                syncMutex.unlock()
             }
-
-            isSyncingFlow.value = false
         }
+    }
+
+    private fun updateQuery(query: String) {
+        queryFlow.value = query
+        savedStateHandle[KEY_QUERY] = query
+    }
+
+    private companion object {
+        const val KEY_QUERY = "groups.query"
+        const val KEY_SELECTED_ID = "groups.selectedId"
     }
 
     // ---- Result wrapper ----

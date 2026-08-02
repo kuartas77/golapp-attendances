@@ -1,12 +1,13 @@
 package com.golapp.attendances.data.repositories
 
 import androidx.room.withTransaction
+import com.golapp.attendances.core.coroutines.rethrowIfCancellation
 import com.golapp.attendances.data.datasources.AttendanceRemoteDataSource
 import com.golapp.attendances.data.local.database.AttendancesDB
 import com.golapp.attendances.data.local.database.daos.AttendanceDao
 import com.golapp.attendances.data.mappers.toDomain
 import com.golapp.attendances.data.mappers.toEntity
-import com.golapp.attendances.di.IoDispatcher
+import com.golapp.attendances.core.di.IoDispatcher
 import com.golapp.attendances.domain.models.Attendance
 import com.golapp.attendances.domain.models.AttendanceSync
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
@@ -63,6 +64,7 @@ class AttendanceRepositoryImpl @Inject constructor(
                 if (a.year == year) a else a.copy(year = year)
             }
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             Timber.e(e, "fetchAttendances failed: ${e.message}")
             emptyList()
         }
@@ -116,6 +118,7 @@ class AttendanceRepositoryImpl @Inject constructor(
                 }
             } catch (e: Exception) {
                 attendanceDao.insertAttendancesSync(listOf(AttendanceSync(localAttendanceId).toEntity()))
+                e.rethrowIfCancellation()
                 Timber.e(e, "updateAttendanceValue queued for sync: ${e.message}")
                 return@withContext
             }
@@ -149,6 +152,7 @@ class AttendanceRepositoryImpl @Inject constructor(
         try {
             remote.fetchStatistics()
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
             Timber.e(e, "getAttendanceStatistics failed: ${e.message}")
             emptyList()
         }

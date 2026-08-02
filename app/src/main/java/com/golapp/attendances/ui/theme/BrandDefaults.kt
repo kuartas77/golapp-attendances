@@ -38,7 +38,7 @@ object BrandDefaults {
     // --- TopAppBar ---
     @Composable
     fun topAppBarColors(): TopAppBarColors = TopAppBarDefaults.topAppBarColors(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
         titleContentColor = MaterialTheme.colorScheme.onSurface,
         navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
         actionIconContentColor = MaterialTheme.colorScheme.onSurface
@@ -49,13 +49,13 @@ object BrandDefaults {
     @Composable
     fun navigationSuiteColors(): NavigationSuiteColors =
         NavigationSuiteDefaults.colors(
-            navigationBarContainerColor = MaterialTheme.colorScheme.surface,
+            navigationBarContainerColor = MaterialTheme.colorScheme.background,
             navigationBarContentColor = MaterialTheme.colorScheme.onSurface,
 
-            navigationRailContainerColor = MaterialTheme.colorScheme.surface,
+            navigationRailContainerColor = MaterialTheme.colorScheme.background,
             navigationRailContentColor = MaterialTheme.colorScheme.onSurface,
 
-            navigationDrawerContainerColor = MaterialTheme.colorScheme.surface,
+            navigationDrawerContainerColor = MaterialTheme.colorScheme.background,
             navigationDrawerContentColor = MaterialTheme.colorScheme.onSurface,
         )
 
@@ -97,13 +97,13 @@ object BrandDefaults {
     // --- Cards ---
     @Composable
     fun cardColors(): CardColors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface
     )
 
     @Composable
     fun elevatedCardColors(): CardColors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         contentColor = MaterialTheme.colorScheme.onSurface
     )
 }

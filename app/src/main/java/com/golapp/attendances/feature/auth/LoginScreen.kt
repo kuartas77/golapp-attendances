@@ -3,12 +3,13 @@ package com.golapp.attendances.feature.auth
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -35,9 +36,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.golapp.attendances.R
-import com.golapp.attendances.common.Constants.SHAPE_SMALL
-import com.golapp.attendances.common.ui.components.CustomButton
-import com.golapp.attendances.common.ui.components.CustomTextField
+import com.golapp.attendances.core.common.Constants.SHAPE_SMALL
+import com.golapp.attendances.core.common.ui.components.CustomButton
+import com.golapp.attendances.core.common.ui.components.CustomTextField
+import com.golapp.attendances.ui.theme.GolappElevation
+import com.golapp.attendances.ui.theme.GolappSpacing
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 
 @Composable
@@ -47,6 +50,10 @@ fun LoginScreen(
     val viewModel: AuthViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(viewModel) {
+        viewModel.onEvent(AuthUiEvent.Start)
+    }
+
     LaunchedEffect(uiState.isLoggedIn) {
         if (uiState.isLoggedIn) {
             onDetectLogin()
@@ -54,38 +61,33 @@ fun LoginScreen(
     }
 
     Scaffold { padding ->
-        Surface(
+        Box(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.soccer_field),
                 contentDescription = "Soccer Field",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
-                alpha = 0.1f
+                alpha = 0.08f
             )
 
             Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(GolappSpacing.lg),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    content = {
-                        if (uiState.isLoading) {
-                            CircularProgressIndicator()
-                        } else {
-                            Form(uiState = uiState, onEvent = viewModel::onEvent)
-                        }
-                    }
-                )
+                if (uiState.isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    Form(uiState = uiState, onEvent = viewModel::onEvent)
+                }
             }
         }
     }
@@ -102,12 +104,15 @@ private fun Form(
     Surface(
         modifier = modifier
             .wrapContentHeight()
-            .width(400.dp)
+            .widthIn(max = 420.dp)
+            .fillMaxWidth()
             .padding(SHAPE_SMALL),
         shape = MaterialTheme.shapes.medium,
+        tonalElevation = GolappElevation.card,
+        shadowElevation = GolappElevation.raised,
     ) {
         Column(
-            modifier = modifier,
+            modifier = modifier.padding(vertical = GolappSpacing.lg),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -115,9 +120,9 @@ private fun Form(
                 contentDescription = "Logo",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .height(100.dp)
-                    .width(400.dp)
-                    .padding(horizontal = 40.dp)
+                    .height(92.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = GolappSpacing.xl)
             )
 
             CustomTextField.Email(
@@ -127,7 +132,7 @@ private fun Form(
                 label = stringResource(R.string.input_email),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
+                    .padding(horizontal = GolappSpacing.lg),
                 errorMessage = uiState.errorEmail?.asString(),
                 isEnabled = uiState.isLoading.not(),
                 keyboardActions = KeyboardActions(onAny = {
@@ -143,7 +148,7 @@ private fun Form(
                 label = stringResource(R.string.input_password),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
+                    .padding(horizontal = GolappSpacing.lg),
                 errorMessage = uiState.errorPassword?.asString(),
                 isEnabled = uiState.isLoading.not(),
                 keyboardActions = KeyboardActions(onAny = {
@@ -155,8 +160,8 @@ private fun Form(
                 text = stringResource(R.string.login_button),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 8.dp, bottom = 8.dp),
+                    .padding(horizontal = GolappSpacing.lg)
+                    .padding(top = GolappSpacing.sm, bottom = GolappSpacing.xs),
                 isEnabled = uiState.isLoading.not(),
                 onClick = { onEvent(AuthUiEvent.LoginClicked) }
             )
@@ -165,7 +170,8 @@ private fun Form(
                 Text(
                     text = uiState.error.asString(),
                     color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = GolappSpacing.lg, vertical = GolappSpacing.xs)
                 )
             }
         }

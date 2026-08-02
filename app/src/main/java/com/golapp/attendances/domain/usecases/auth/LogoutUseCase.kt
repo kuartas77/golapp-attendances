@@ -1,6 +1,6 @@
 package com.golapp.attendances.domain.usecases.auth
 
-import com.golapp.attendances.di.IoDispatcher
+import com.golapp.attendances.core.di.IoDispatcher
 import com.golapp.attendances.domain.repositories.AuthRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.NonCancellable

@@ -3,7 +3,6 @@ package com.golapp.attendances
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -21,7 +20,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult.ActionPerformed
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -43,12 +41,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
-import com.golapp.attendances.common.NetworkMonitor
+import com.golapp.attendances.core.common.NetworkMonitor
 import com.golapp.attendances.feature.main.GolAppState
 import com.golapp.attendances.feature.main.HeaderContent
-import com.golapp.attendances.feature.main.SplashViewModel
+import com.golapp.attendances.feature.main.MainViewModel
 import com.golapp.attendances.feature.main.rememberAppState
-import com.golapp.attendances.navigation.GolappNavHost
+import com.golapp.attendances.core.navigation.GolappNavHost
+import com.golapp.attendances.core.navigation.graphs.Authentication
 import com.golapp.attendances.ui.theme.BrandDefaults
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,31 +58,31 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
-    private val viewModel: SplashViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         val splashScreen = installSplashScreen()
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        splashScreen.setKeepOnScreenCondition { viewModel.isLoading.value }
+        viewModel.start()
+        splashScreen.setKeepOnScreenCondition { viewModel.uiState.value.isLoading }
 
         setContent {
 
 //            val themeColors = if (isSystemInDarkTheme()) darkThemeColors else lightThemeColors
 
-    val appState = rememberAppState(networkMonitor = networkMonitor)
+    val appState = rememberAppState(networkMonitor = networkMonitor, mainViewModel = viewModel)
     val uiState by appState.mainViewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(uiState.isLoggedIn) {
-        if (!uiState.isLoggedIn && !appState.isGuestDestination) {
-            appState.replaceStack(com.golapp.attendances.navigation.graphs.Authentication)
+    LaunchedEffect(uiState.isLoading, uiState.isLoggedIn) {
+        if (!uiState.isLoading) {
+            appState.replaceStack(if (uiState.isLoggedIn) com.golapp.attendances.core.navigation.graphs.Home else Authentication)
         }
     }
 
     GolappAttendancesTheme {
-        MainScreen(appState = appState)
+        MainScreen(appState = appState, uiState = uiState)
     }
 //            }
         }
@@ -93,6 +92,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 internal fun MainScreen(
     appState: GolAppState,
+    uiState: com.golapp.attendances.feature.home.HomeUiState,
     modifier: Modifier = Modifier,
     windowAdaptiveInfo: WindowAdaptiveInfo = currentWindowAdaptiveInfo()
 ) {
@@ -127,7 +127,7 @@ internal fun MainScreen(
         }
     }
 
-    GolApp(layoutType, appState, currentDestination, snackbarHostState, modifier)
+    GolApp(layoutType, appState, currentDestination, uiState, snackbarHostState, modifier)
 }
 
 @Composable
@@ -135,6 +135,7 @@ internal fun GolApp(
     layoutType: NavigationSuiteType,
     appState: GolAppState,
     currentDestination: NavKey?,
+    uiState: com.golapp.attendances.feature.home.HomeUiState,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier
 ) {
@@ -157,8 +158,6 @@ internal fun GolApp(
                 .semantics {
                     testTagsAsResourceId = true
                 },
-//            containerColor = Color.Transparent,
-//            contentColor = MaterialTheme.colorScheme.onBackground,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             snackbarHost = {
                 SnackbarHost(
@@ -168,7 +167,7 @@ internal fun GolApp(
             },
             topBar = {
                 if (layoutType != NavigationSuiteType.None) {
-                    HeaderContent()
+                    HeaderContent(uiState = uiState)
                 }
             }
         ) { padding ->
@@ -183,20 +182,16 @@ internal fun GolApp(
                         )
                     )
             ) {
-                Surface(
-                    modifier = modifier
-                ) {
-                    GolappNavHost(
-                        appState = appState,
-                        onShowSnackbar = { message, action ->
-                            snackbarHostState.showSnackbar(
-                                message = message,
-                                actionLabel = action,
-                                duration = SnackbarDuration.Short,
-                            ) == ActionPerformed
-                        }
-                    )
-                }
+                GolappNavHost(
+                    appState = appState,
+                    onShowSnackbar = { message, action ->
+                        snackbarHostState.showSnackbar(
+                            message = message,
+                            actionLabel = action,
+                            duration = SnackbarDuration.Short,
+                        ) == ActionPerformed
+                    }
+                )
             }
         }
     }

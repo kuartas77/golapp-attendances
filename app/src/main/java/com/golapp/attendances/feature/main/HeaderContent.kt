@@ -25,18 +25,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.golapp.attendances.R
+import com.golapp.attendances.feature.home.HomeUiState
 
 
 @Composable
 fun HeaderContent(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = hiltViewModel()
+    uiState: HomeUiState,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val userName = uiState.user?.name ?: ""
     val schoolLogoUrl = uiState.user?.schoolLogo ?: "https://app.golapp.com.co/img/ballon.png"
     val schoolName = uiState.user?.schoolName ?: "GOLAPP"

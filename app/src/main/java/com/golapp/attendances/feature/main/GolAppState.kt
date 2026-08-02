@@ -8,9 +8,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.tracing.trace
-import com.golapp.attendances.common.NetworkMonitor
-import com.golapp.attendances.navigation.Destinations
-import com.golapp.attendances.navigation.graphs.Authentication
+import com.golapp.attendances.core.common.NetworkMonitor
+import com.golapp.attendances.core.navigation.Destinations
+import com.golapp.attendances.core.navigation.graphs.Authentication
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map

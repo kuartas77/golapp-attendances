@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.golapp.attendances.core.coroutines.rethrowIfCancellation
 import com.golapp.attendances.data.remote.RefreshApi
 import com.golapp.attendances.data.remote.models.dtos.toDomain
 import com.golapp.attendances.domain.models.User
@@ -57,18 +58,13 @@ class SessionManager @Inject constructor(
         }
     }
 
-    suspend fun saveUser(user: User) {
-        preferenceDatasource.updateData { prefs ->
-            prefs.toMutablePreferences().apply {
-                this[USER_KEY] = gson.toJson(user)
-            }
-        }
-    }
-
-    suspend fun getUserOnce(): User? = runCatching {
+    suspend fun getUserOnce(): User? = try {
         val prefs = preferenceDatasource.data.first()
         prefs[USER_KEY]?.let { gson.fromJson(it, User::class.java) }
-    }.getOrNull()
+    } catch (error: Exception) {
+        error.rethrowIfCancellation()
+        null
+    }
 
     suspend fun getToken(): String =
         preferenceDatasource.data.first()[TOKEN_KEY] ?: ""
@@ -108,7 +104,8 @@ class SessionManager @Inject constructor(
             } else {
                 false
             }
-        } catch (_: Exception) {
+        } catch (error: Exception) {
+            error.rethrowIfCancellation()
             false
         }
     }

@@ -1,6 +1,6 @@
 package com.golapp.attendances.domain.usecases.groups
 
-import com.golapp.attendances.di.IoDispatcher
+import com.golapp.attendances.core.di.IoDispatcher
 import com.golapp.attendances.domain.models.Group
 import com.golapp.attendances.domain.repositories.GroupRepository
 import kotlinx.coroutines.CoroutineDispatcher

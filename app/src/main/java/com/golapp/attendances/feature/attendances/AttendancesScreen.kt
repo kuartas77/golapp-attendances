@@ -60,14 +60,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.golapp.attendances.R
-import com.golapp.attendances.common.Constants.SPACER_MEDIUM
-import com.golapp.attendances.common.Constants.SPACER_SMALL
-import com.golapp.attendances.common.ui.components.AlertDialogSync
-import com.golapp.attendances.common.ui.components.Loader
-import com.golapp.attendances.common.ui.components.SearchBar
-import com.golapp.attendances.common.ui.preview.attendanceWithPlayerPreview
+import com.golapp.attendances.core.common.Constants.SPACER_SMALL
+import com.golapp.attendances.core.common.ui.components.AlertDialogSync
+import com.golapp.attendances.core.common.ui.components.Loader
+import com.golapp.attendances.core.common.ui.components.SearchBar
+import com.golapp.attendances.core.common.ui.preview.attendanceWithPlayerPreview
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
+import com.golapp.attendances.ui.theme.BrandDefaults
+import com.golapp.attendances.ui.theme.GolappElevation
+import com.golapp.attendances.ui.theme.GolappSize
+import com.golapp.attendances.ui.theme.GolappSpacing
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -105,7 +108,10 @@ fun AttendancesScreen(
         }
     }
 
-    Surface(modifier = Modifier.padding(horizontal = SPACER_MEDIUM)) {
+    Surface(
+        modifier = Modifier.padding(horizontal = GolappSpacing.md),
+        color = MaterialTheme.colorScheme.background
+    ) {
         Column {
             Loader(show = uiState.isLoading)
             ListAttendances(
@@ -180,7 +186,7 @@ private fun ListPanelAttendances(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(8.dp)
+            .padding(GolappSpacing.xs)
     ) {
         Row(
             modifier = modifier.fillMaxWidth(),
@@ -205,7 +211,7 @@ private fun ListPanelAttendances(
             LazyColumn(
                 state = listState,
                 modifier = modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs)
             ) {
                 items(
                     count = attendances.count(),
@@ -253,7 +259,7 @@ private fun SearchBarSection(
 
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
@@ -316,15 +322,16 @@ private fun AttendanceItem(
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top)
             .clickable { onClickItem() },
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+        shape = MaterialTheme.shapes.small,
+        elevation = CardDefaults.cardElevation(defaultElevation = GolappElevation.card),
+        colors = BrandDefaults.cardColors()
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp)
-                .padding(8.dp),
+                .height(124.dp)
+                .padding(GolappSpacing.sm),
         ) {
             Column(
                 modifier = Modifier.weight(1f),
@@ -355,7 +362,7 @@ private fun AttendanceItem(
                     fontSize = 12.sp,
                     style = MaterialTheme.typography.bodySmall
                 )
-                Spacer(modifier = modifier.height(SPACER_MEDIUM))
+                Spacer(modifier = modifier.height(GolappSpacing.xs))
                 Text(
                     text = buildAnnotatedString {
                         withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -397,7 +404,7 @@ private fun AttendanceItem(
                         )
                     },
                     colors = AssistChipDefaults.assistChipColors(
-                        containerColor = MaterialTheme.colorScheme.surface
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
                     leadingIcon = {
                         Icon(
@@ -412,7 +419,7 @@ private fun AttendanceItem(
 
             Surface(
                 shape = MaterialTheme.shapes.large,
-                modifier = Modifier.size(width = 100.dp, height = 140.dp)
+                modifier = Modifier.size(width = GolappSize.listAvatarWidth, height = GolappSize.listAvatarHeight)
             ) {
 
                 AsyncImage(

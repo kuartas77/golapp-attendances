@@ -45,10 +45,13 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.golapp.attendances.R
-import com.golapp.attendances.common.scheduleInline
-import com.golapp.attendances.common.ui.preview.groupWithClassPreview
+import com.golapp.attendances.core.common.scheduleInline
+import com.golapp.attendances.core.common.ui.preview.groupWithClassPreview
 import com.golapp.attendances.domain.models.ClassDay
 import com.golapp.attendances.domain.models.GroupWithClassDays
+import com.golapp.attendances.ui.theme.BrandDefaults
+import com.golapp.attendances.ui.theme.GolappElevation
+import com.golapp.attendances.ui.theme.GolappSpacing
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import kotlinx.coroutines.launch
 
@@ -109,9 +112,11 @@ private fun DetailScreen(
 ) {
     Scaffold(
         modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 windowInsets = WindowInsets(0.dp),
+                colors = BrandDefaults.topAppBarColors(),
                 title = {
                     Text(
                         text = stringResource(R.string.info_group),
@@ -129,7 +134,9 @@ private fun DetailScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Column(
-                modifier = modifier.fillMaxSize(),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(horizontal = GolappSpacing.sm),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -163,9 +170,9 @@ private fun DetailScreen(
                         )
                     ) {
                         FlowRow(
-                            modifier = Modifier.padding(6.dp),
-                            horizontalArrangement = Arrangement.spacedBy(2.dp),
-                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                            modifier = Modifier.padding(GolappSpacing.xs),
+                            horizontalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
+                            verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
                         ) {
                             group.classDays.forEach { classDay ->
                                 ItemDay(
@@ -188,7 +195,7 @@ private fun Header(modifier: Modifier, groupWithClassDays: GroupWithClassDays) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(12.dp)
+            .padding(GolappSpacing.sm)
     ) {
         Column {
             Text(
@@ -205,7 +212,7 @@ private fun Header(modifier: Modifier, groupWithClassDays: GroupWithClassDays) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(GolappSpacing.sm),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = modifier.weight(1f)) {
@@ -226,7 +233,7 @@ private fun Header(modifier: Modifier, groupWithClassDays: GroupWithClassDays) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(GolappSpacing.sm),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = modifier.weight(1f)) {
@@ -247,7 +254,7 @@ private fun Header(modifier: Modifier, groupWithClassDays: GroupWithClassDays) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(GolappSpacing.sm),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = modifier.weight(1f)) {
@@ -285,21 +292,22 @@ private fun ItemDay(
     Card(
         modifier = modifier
             .wrapContentSize()
-            .padding(8.dp)
+            .padding(2.dp)
             .clickable { navigateToAttendances(item.classDayId) },
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-
-        ) {
+        shape = MaterialTheme.shapes.small,
+        colors = BrandDefaults.elevatedCardColors(),
+        elevation = CardDefaults.cardElevation(defaultElevation = GolappElevation.card),
+    ) {
         Column(
             modifier = modifier
-                .size(90.dp),
+                .size(86.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
                 painter = painterResource(R.drawable.id_calendar),
                 contentDescription = "calendar",
-                modifier = modifier.size(24.dp),
+                modifier = modifier.size(22.dp),
             )
             Text(
                 text = item.date.toString(),

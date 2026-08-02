@@ -1,6 +1,7 @@
 package com.golapp.attendances.data.repositories
 
 import androidx.room.withTransaction
+import com.golapp.attendances.core.coroutines.rethrowIfCancellation
 import com.golapp.attendances.data.datasources.AuthRemoteDataSource
 import com.golapp.attendances.data.local.database.AttendancesDB
 import com.golapp.attendances.data.local.database.daos.GroupDao
@@ -8,7 +9,7 @@ import com.golapp.attendances.data.local.datastore.SessionManager
 import com.golapp.attendances.data.remote.errors.AuthApiException
 import com.golapp.attendances.data.remote.errors.NoNetworkException
 import com.golapp.attendances.data.remote.models.dtos.toDomain
-import com.golapp.attendances.di.IoDispatcher
+import com.golapp.attendances.core.di.IoDispatcher
 import com.golapp.attendances.domain.models.User
 import com.golapp.attendances.domain.repositories.AuthRepository
 import com.golapp.attendances.domain.ui.LoginState
@@ -66,6 +67,7 @@ class AuthRepositoryImpl @Inject constructor(
             } catch (e: IOException) {
                 LoginState.Error(reason = LoginState.Reason.CONNECTION)
             } catch (e: Exception) {
+                e.rethrowIfCancellation()
                 Timber.tag("AuthRepositoryImpl").e(e, "Unexpected login error")
                 LoginState.Error(reason = LoginState.Reason.UNKNOWN)
             }

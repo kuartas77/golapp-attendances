@@ -55,17 +55,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.golapp.attendances.R
-import com.golapp.attendances.common.Constants.SPACER_LARGE
-import com.golapp.attendances.common.Constants.SPACER_MEDIUM
-import com.golapp.attendances.common.Constants.SPACER_SMALL
-import com.golapp.attendances.common.scheduleInline
-import com.golapp.attendances.common.ui.components.AlertDialogSync
-import com.golapp.attendances.common.ui.components.Loader
-import com.golapp.attendances.common.ui.components.SearchBar
-import com.golapp.attendances.common.ui.preview.groupWithClassPreview
+import com.golapp.attendances.core.common.Constants.SPACER_MEDIUM
+import com.golapp.attendances.core.common.scheduleInline
+import com.golapp.attendances.core.common.ui.components.AlertDialogSync
+import com.golapp.attendances.core.common.ui.components.Loader
+import com.golapp.attendances.core.common.ui.components.SearchBar
+import com.golapp.attendances.core.common.ui.preview.groupWithClassPreview
 import com.golapp.attendances.domain.models.GroupWithClassDays
 import com.golapp.attendances.ui.theme.BrandDefaults
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
+import com.golapp.attendances.ui.theme.GolappElevation
+import com.golapp.attendances.ui.theme.GolappSpacing
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -104,7 +104,8 @@ fun GroupsScreen(
     }
 
     Surface(
-        modifier = Modifier.padding(horizontal = SPACER_MEDIUM),
+        modifier = Modifier.padding(horizontal = GolappSpacing.md),
+        color = MaterialTheme.colorScheme.background,
     ) {
         Column {
             Loader(show = uiState.isLoading)
@@ -184,10 +185,10 @@ private fun ListPanelGroups(
 
     Column(
         modifier = modifier
-            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+            .padding(top = GolappSpacing.xxs, start = GolappSpacing.xs, end = GolappSpacing.xs)
     ) {
         SearchBarSection(uiState = uiState, onEvent = onEvent)
-        Spacer(modifier = modifier.height(SPACER_SMALL))
+        Spacer(modifier = modifier.height(SPACER_MEDIUM))
 
         if (groupWithClassDays.isEmpty()) {
             Column(
@@ -212,7 +213,7 @@ private fun ListPanelGroups(
             LazyColumn(
                 state = listState,
                 modifier = modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs)
             ) {
                 items(
                     count = groupWithClassDays.count(),
@@ -259,7 +260,7 @@ private fun SearchBarSection(
 
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
@@ -267,7 +268,7 @@ private fun SearchBarSection(
             onClick = { showDialog = !showDialog }
         ) {
             if (uiState.isSyncing) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(modifier = Modifier.size(24.dp))
             } else {
                 Icon(
                     painter = painterResource(R.drawable.ic_sync),
@@ -310,10 +311,11 @@ private fun GroupItem(
             .fillMaxWidth()
             .wrapContentHeight(align = Alignment.Top)
             .clickable { onClickItem(item) },
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        shape = MaterialTheme.shapes.small,
+        elevation = CardDefaults.cardElevation(defaultElevation = GolappElevation.card),
         colors = BrandDefaults.cardColors()
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
+        Column(modifier = Modifier.padding(GolappSpacing.sm)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -334,7 +336,7 @@ private fun GroupItem(
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.bodySmall
                     )
-                    Spacer(modifier = modifier.height(SPACER_SMALL))
+                    Spacer(modifier = modifier.height(GolappSpacing.xs))
                     Text(
                         text = buildAnnotatedString {
                             withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -346,7 +348,7 @@ private fun GroupItem(
                         maxLines = 1,
                         style = MaterialTheme.typography.bodySmall
                     )
-                    Spacer(modifier = modifier.height(SPACER_LARGE))
+                    Spacer(modifier = modifier.height(GolappSpacing.sm))
 
                     Row(
                         modifier = modifier,
@@ -355,7 +357,7 @@ private fun GroupItem(
                         Icon(
                             painter = painterResource(id = R.drawable.id_calendar),
                             contentDescription = "Icon Date",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(18.dp)
                         )
 
                         Spacer(modifier = Modifier.width(8.dp))
@@ -373,7 +375,7 @@ private fun GroupItem(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_stopwatch),
                             contentDescription = "Icon Date",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(18.dp)
                         )
 
                         Spacer(modifier = Modifier.width(8.dp))

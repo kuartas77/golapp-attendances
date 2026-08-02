@@ -15,18 +15,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import com.golapp.attendances.R
-import com.golapp.attendances.common.Constants.SPACER_MEDIUM
-import com.golapp.attendances.common.Constants.SPACER_MEDIUM_LARGE
+import com.golapp.attendances.core.common.Constants.SPACER_MEDIUM
+import com.golapp.attendances.core.common.Constants.SPACER_MEDIUM_LARGE
 import com.golapp.attendances.feature.settings.components.SettingsItem
+import com.golapp.attendances.ui.theme.GolappSpacing
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 
 @Composable
 fun SettingsScreen(onLogout: () -> Unit) {
 
     Surface(
-        modifier = Modifier.padding(horizontal = SPACER_MEDIUM)
+        modifier = Modifier.padding(horizontal = GolappSpacing.md),
+        color = MaterialTheme.colorScheme.background,
     ) {
         Column {
 
@@ -46,7 +47,7 @@ private fun Configuration(onLogout: () -> Unit) {
         Text(
             text = stringResource(R.string.title_settings),
             fontWeight = FontWeight.Medium,
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary
         )
         SettingsItem(

@@ -49,9 +49,12 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.golapp.attendances.R
-import com.golapp.attendances.common.ui.components.GolappRadioButton
-import com.golapp.attendances.common.ui.preview.attendanceWithPlayerPreview
+import com.golapp.attendances.core.common.ui.components.GolappRadioButton
+import com.golapp.attendances.core.common.ui.preview.attendanceWithPlayerPreview
 import com.golapp.attendances.domain.models.AttendanceWithPlayer
+import com.golapp.attendances.ui.theme.BrandDefaults
+import com.golapp.attendances.ui.theme.GolappElevation
+import com.golapp.attendances.ui.theme.GolappSpacing
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import kotlinx.coroutines.launch
 
@@ -130,9 +133,11 @@ private fun DetailScreen(
 
     Scaffold(
         modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 windowInsets = WindowInsets(0.dp),
+                colors = BrandDefaults.topAppBarColors(),
                 title = {
                     Text(
                         text = stringResource(R.string.asistencia),
@@ -150,13 +155,15 @@ private fun DetailScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Column(
-                modifier = modifier.fillMaxSize(),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(horizontal = GolappSpacing.sm),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Header(modifier, attendance)
 
-                Column(modifier = modifier.padding(12.dp)) {
+                Column(modifier = modifier.padding(GolappSpacing.sm)) {
 
                     Text(
                         text = stringResource(R.string.action_attendance),
@@ -168,13 +175,15 @@ private fun DetailScreen(
                     Card(
                         modifier = modifier
                             .fillMaxWidth()
-                            .padding(8.dp),
+                            .padding(vertical = GolappSpacing.xs),
                         shape = MaterialTheme.shapes.medium,
-                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                        colors = BrandDefaults.cardColors(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = GolappElevation.card)
                     ) {
                         FlowRow(
                             modifier = modifier
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .padding(GolappSpacing.xs),
                             verticalArrangement = Arrangement.Center,
                             horizontalArrangement = Arrangement.Center,
                             maxItemsInEachRow = 3
@@ -215,7 +224,7 @@ private fun Header(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(GolappSpacing.sm)
         ) {
             Column {
                 Text(
@@ -236,7 +245,7 @@ private fun Header(
             Column(
                 modifier = Modifier
                     .weight(2f)
-                    .padding(20.dp)
+                    .padding(GolappSpacing.md)
             ) {
                 Text(
                     stringResource(R.string.unique_code),
@@ -264,7 +273,7 @@ private fun Header(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(12.dp)
+                    .padding(GolappSpacing.sm)
             ) {
                 Surface(
                     shape = MaterialTheme.shapes.large,
