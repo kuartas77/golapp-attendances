@@ -19,7 +19,8 @@ import kotlinx.coroutines.flow.stateIn
 @Composable
 fun rememberAppState(
     networkMonitor: NetworkMonitor,
-    backStack: MutableList<NavKey> = rememberNavBackStack(Authentication),
+    startDestination: NavKey,
+    backStack: MutableList<NavKey> = rememberNavBackStack(startDestination),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     mainViewModel: MainViewModel = hiltViewModel()
 ): GolAppState {

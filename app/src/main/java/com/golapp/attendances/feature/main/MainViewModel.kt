@@ -6,6 +6,7 @@ import com.golapp.attendances.domain.usecases.auth.AuthUseCases
 import com.golapp.attendances.core.coroutines.rethrowIfCancellation
 import com.golapp.attendances.feature.home.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -22,6 +23,7 @@ class MainViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(initialState)
     val uiState = _uiState.asStateFlow()
     private var started = false
+    private var logoutJob: Job? = null
 
     fun start() {
         if (started) return
@@ -50,9 +52,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun logout() {
-        viewModelScope.launch {
-            authUseCases.logoutUseCase()
-            _uiState.update { it.copy(isLoading = false, isLoggedIn = false) }
+        if (logoutJob?.isActive == true) return
+        logoutJob = viewModelScope.launch {
+            try {
+                authUseCases.logoutUseCase()
+            } catch (error: Exception) {
+                error.rethrowIfCancellation()
+                _uiState.update { it.copy(error = error.message) }
+            }
         }
     }
 

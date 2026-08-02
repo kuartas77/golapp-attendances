@@ -12,7 +12,6 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.golapp.attendances.feature.main.GolAppState
 import com.golapp.attendances.core.navigation.graphs.Attendances
-import com.golapp.attendances.core.navigation.graphs.Authentication
 import com.golapp.attendances.core.navigation.graphs.Home
 import com.golapp.attendances.core.navigation.graphs.authenticationScreens
 import com.golapp.attendances.core.navigation.graphs.groupsScreen
@@ -44,12 +43,10 @@ fun GolappNavHost(
 
                 homeScreen(onLogout = {
                     mainViewModel.logout()
-                    appState.replaceStack(Authentication)
                 })
 
                 settingScreen(onLogout = {
                     mainViewModel.logout()
-                    appState.replaceStack(Authentication)
                 })
 
                 groupsScreen(

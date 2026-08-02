@@ -30,6 +30,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ import com.golapp.attendances.feature.main.MainViewModel
 import com.golapp.attendances.feature.main.rememberAppState
 import com.golapp.attendances.core.navigation.GolappNavHost
 import com.golapp.attendances.core.navigation.graphs.Authentication
+import com.golapp.attendances.core.navigation.graphs.Home
 import com.golapp.attendances.ui.theme.BrandDefaults
 import com.golapp.attendances.ui.theme.GolappAttendancesTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,6 +61,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
     private val viewModel: MainViewModel by viewModels()
+    private var isNavigationReady = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -66,28 +69,40 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         viewModel.start()
-        splashScreen.setKeepOnScreenCondition { viewModel.uiState.value.isLoading }
+        splashScreen.setKeepOnScreenCondition {
+            viewModel.uiState.value.isLoading || !isNavigationReady
+        }
 
         setContent {
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-//            val themeColors = if (isSystemInDarkTheme()) darkThemeColors else lightThemeColors
+            GolappAttendancesTheme {
+                if (!uiState.isLoading) {
+                    val initialDestination = remember {
+                        sessionDestination(uiState.isLoggedIn)
+                    }
+                    val appState = rememberAppState(
+                        networkMonitor = networkMonitor,
+                        startDestination = initialDestination,
+                        mainViewModel = viewModel,
+                    )
 
-    val appState = rememberAppState(networkMonitor = networkMonitor, mainViewModel = viewModel)
-    val uiState by appState.mainViewModel.uiState.collectAsStateWithLifecycle()
+                    LaunchedEffect(uiState.isLoggedIn) {
+                        appState.replaceStack(sessionDestination(uiState.isLoggedIn))
+                    }
 
-    LaunchedEffect(uiState.isLoading, uiState.isLoggedIn) {
-        if (!uiState.isLoading) {
-            appState.replaceStack(if (uiState.isLoggedIn) com.golapp.attendances.core.navigation.graphs.Home else Authentication)
-        }
-    }
-
-    GolappAttendancesTheme {
-        MainScreen(appState = appState, uiState = uiState)
-    }
-//            }
+                    MainScreen(appState = appState, uiState = uiState)
+                    SideEffect {
+                        isNavigationReady = true
+                    }
+                }
+            }
         }
     }
 }
+
+internal fun sessionDestination(isLoggedIn: Boolean): NavKey =
+    if (isLoggedIn) Home else Authentication
 
 @Composable
 internal fun MainScreen(
