@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -37,7 +36,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.golapp.attendances.R
-import com.golapp.attendances.core.common.Constants.SHAPE_SMALL
 
 
 object CustomTextField {
@@ -55,12 +53,18 @@ object CustomTextField {
         isEnabled: Boolean = true,
         keyboardOptions: KeyboardOptions = KeyboardOptions(),
         keyboardActions: KeyboardActions = KeyboardActions(),
-        backgroundColor: Color = MaterialTheme.colorScheme.background
+        backgroundColor: Color = Color.Unspecified
     ) {
 
         var hidePassword by remember {
             mutableStateOf(true)
         }
+        val containerColor = if (backgroundColor == Color.Unspecified) {
+            MaterialTheme.colorScheme.surface
+        } else {
+            backgroundColor
+        }
+
         Column(modifier = modifier) {
             OutlinedTextField(
                 value = value,
@@ -108,21 +112,28 @@ object CustomTextField {
                     )
                 },
                 singleLine = true,
-                shape = CutCornerShape(SHAPE_SMALL),
+                shape = MaterialTheme.shapes.medium,
                 colors = OutlinedTextFieldDefaults.colors(
                     cursorColor = MaterialTheme.colorScheme.primary,
-                    focusedTextColor = MaterialTheme.colorScheme.primary,
-                    unfocusedTextColor = MaterialTheme.colorScheme.primary,
-                    focusedContainerColor = backgroundColor,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    focusedContainerColor = containerColor,
+                    unfocusedContainerColor = containerColor,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    errorContainerColor = containerColor,
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-                    focusedLeadingIconColor = MaterialTheme.colorScheme.surface,
-                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.primary,
-                    focusedLabelColor = MaterialTheme.colorScheme.surface,
-                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.surface.copy(
-                        alpha = 0.5f
-                    ),
-                    errorBorderColor = MaterialTheme.colorScheme.error
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                    disabledBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+                    errorBorderColor = MaterialTheme.colorScheme.error,
+                    focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    focusedTrailingIconColor = MaterialTheme.colorScheme.primary,
+                    unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    focusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 ),
                 visualTransformation = if (isPassword && hidePassword) PasswordVisualTransformation() else VisualTransformation.None,
                 keyboardOptions = keyboardOptions,
@@ -159,7 +170,7 @@ object CustomTextField {
             imeAction = ImeAction.Done
         ),
         keyboardActions: KeyboardActions = KeyboardActions(),
-        backgroundColor: Color = MaterialTheme.colorScheme.background
+        backgroundColor: Color = Color.Unspecified
     ) {
         CustomTextField(
             modifier = modifier,
@@ -195,7 +206,7 @@ object CustomTextField {
             imeAction = ImeAction.Next
         ),
         keyboardActions: KeyboardActions = KeyboardActions(),
-        backgroundColor: Color = MaterialTheme.colorScheme.background
+        backgroundColor: Color = Color.Unspecified
     ) {
         CustomTextField(
             modifier = modifier,

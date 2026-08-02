@@ -52,9 +52,10 @@ class HomeViewModel @Inject constructor(
 
     fun fetchStatistics() {
         viewModelScope.launch(ioDispatcher) {
+            _uiState.update { it.copy(isLoading = true, error = null) }
             try {
                 val statistics = attendanceUseCases.getAttendanceStatisticsUseCase()
-                _uiState.update { it.copy(listStatistics = statistics) }
+                _uiState.update { it.copy(listStatistics = statistics, error = null) }
             } catch (error: Exception) {
                 error.rethrowIfCancellation()
                 _uiState.update { it.copy(error = error.message) }

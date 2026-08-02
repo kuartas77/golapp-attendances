@@ -7,18 +7,23 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,15 +48,22 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     onLogout: () -> Unit = {}
 ) {
-    Surface(
-        modifier = modifier
-            .padding(horizontal = GolappSpacing.md)
-            .fillMaxHeight()
-            .verticalScroll(rememberScrollState()),
-        color = MaterialTheme.colorScheme.background,
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter,
     ) {
-        Column {
-            SectionInfo(onLogout)
+        Surface(
+            modifier = Modifier
+                .widthIn(max = 840.dp)
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(horizontal = GolappSpacing.md)
+                .verticalScroll(rememberScrollState()),
+            color = MaterialTheme.colorScheme.background,
+        ) {
+            Column {
+                SectionInfo(onLogout)
+            }
         }
     }
 }
@@ -86,9 +98,75 @@ private fun SectionInfo(onLogout: () -> Unit) {
 
     Spacer(modifier = Modifier.height(GolappSpacing.xs))
 
-    Column(verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs)) {
-        listStatistics.forEach { statistic ->
-            StatisticsCard(statistic = statistic)
+    when {
+        uiState.isLoading -> StatisticsLoading()
+        uiState.error != null && listStatistics.isEmpty() -> StatisticsMessage(
+            message = stringResource(R.string.statistics_load_error),
+            actionLabel = stringResource(R.string.retry),
+            onAction = viewModel::fetchStatistics,
+        )
+        listStatistics.isEmpty() -> StatisticsMessage(
+            message = stringResource(R.string.no_statistics_available),
+        )
+        else -> Column(verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs)) {
+            listStatistics.forEach { statistic ->
+                StatisticsCard(statistic = statistic)
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatisticsLoading() {
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+        colors = BrandDefaults.elevatedCardColors(),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(GolappSpacing.lg),
+            horizontalArrangement = Arrangement.spacedBy(GolappSpacing.md, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            CircularProgressIndicator(modifier = Modifier.size(28.dp), strokeWidth = 3.dp)
+            Text(
+                text = stringResource(R.string.loading_statistics),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun StatisticsMessage(
+    message: String,
+    actionLabel: String? = null,
+    onAction: () -> Unit = {},
+) {
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+        colors = BrandDefaults.elevatedCardColors(),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(GolappSpacing.lg),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(GolappSpacing.xs),
+        ) {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+            if (actionLabel != null) {
+                TextButton(onClick = onAction) {
+                    Text(actionLabel)
+                }
+            }
         }
     }
 }

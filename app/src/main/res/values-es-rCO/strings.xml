@@ -9,6 +9,9 @@
     <string name="training">Grupos</string>
     <string name="attendances">Asistencias</string>
     <string name="attendance_statistics">Estadísticas de asistencias</string>
+    <string name="loading_statistics">Cargando estadísticas…</string>
+    <string name="no_statistics_available">No hay estadísticas de asistencias disponibles.</string>
+    <string name="statistics_load_error">No fue posible cargar las estadísticas de asistencias.</string>
     <string name="attendance_completion">Progreso de asistencias tomadas</string>
     <string name="total">Total</string>
     <string name="settings">Config</string>

@@ -3,6 +3,7 @@ package com.golapp.attendances
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -10,9 +11,11 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -67,6 +70,7 @@ class MainActivity : ComponentActivity() {
 
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         viewModel.start()
         splashScreen.setKeepOnScreenCondition {
@@ -186,16 +190,20 @@ internal fun GolApp(
                 }
             }
         ) { padding ->
+            val contentInsets = if (layoutType == NavigationSuiteType.None) {
+                WindowInsets(0, 0, 0, 0)
+            } else {
+                WindowInsets.safeDrawing.union(WindowInsets.ime).only(
+                    WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
+                )
+            }
+
             Box(
                 modifier = modifier
                     .fillMaxSize()
                     .padding(padding)
                     .consumeWindowInsets(padding)
-                    .windowInsetsPadding(
-                        WindowInsets.safeDrawing.only(
-                            WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
-                        )
-                    )
+                    .windowInsetsPadding(contentInsets)
             ) {
                 GolappNavHost(
                     appState = appState,
